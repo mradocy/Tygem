@@ -2414,9 +2414,8 @@ var AudioManager;
      * @param jsonUrl url pointing to the json mapping the audiosprites.
      */
     function addAudioSprites(jsonUrl) {
-        let url = jsonUrl.toLowerCase();
-        if (JSONManager.jsonExists(url)) {
-            console.warn("audio sprites " + jsonUrl + " already added");
+        if (JSONManager.jsonExists(jsonUrl)) {
+            console.warn("audio sprites " + jsonUrl.toLowerCase() + " already added");
             return;
         }
         if (_addAudioSpritesCalled) {
@@ -2425,7 +2424,7 @@ var AudioManager;
         }
         _addAudioSpritesCalled = true;
         _waitForJsonLoad = true;
-        JSONManager.addFromUrl(jsonNameFromURL(url), url, onJSONLoad);
+        JSONManager.addFromUrl(jsonNameFromURL(jsonUrl), jsonUrl, onJSONLoad);
     }
     AudioManager.addAudioSprites = addAudioSprites;
     // Playing sounds
@@ -2818,8 +2817,7 @@ var AudioManager;
         // create sounds
         for (let i = 0; i < json.sounds.length; i++) {
             let soundJson = json.sounds[i];
-            let fn = soundJson.filename.toLowerCase();
-            soundDictionary[fn] = new Sound(fn, soundJson.asIndex, soundJson.startTime, soundJson.duration);
+            soundDictionary[soundJson.filename.toLowerCase()] = new Sound(soundJson.filename, soundJson.asIndex, soundJson.startTime, soundJson.duration);
         }
     }
     class AudioSprite {
@@ -3036,7 +3034,7 @@ var TexPackManager;
      */
     function addTexturePack(packJsonUrl) {
         if (JSONManager.jsonExists(packJsonUrl)) {
-            console.warn("texture pack " + packJsonUrl + " already added");
+            console.warn("texture pack " + packJsonUrl.toLowerCase() + " already added");
             return;
         }
         _numTexPacks++;

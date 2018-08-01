@@ -10,9 +10,8 @@ namespace AudioManager {
      */
     export function addAudioSprites(jsonUrl: string): void {
 
-        let url: string = jsonUrl.toLowerCase();
-        if (JSONManager.jsonExists(url)) {
-            console.warn("audio sprites " + jsonUrl + " already added");
+        if (JSONManager.jsonExists(jsonUrl)) {
+            console.warn("audio sprites " + jsonUrl.toLowerCase() + " already added");
             return;
         }
 
@@ -24,8 +23,8 @@ namespace AudioManager {
         _waitForJsonLoad = true;
 
         JSONManager.addFromUrl(
-            jsonNameFromURL(url),
-            url,
+            jsonNameFromURL(jsonUrl),
+            jsonUrl,
             onJSONLoad);
         
     }
@@ -430,7 +429,6 @@ namespace AudioManager {
             console.error("Something went wrong with loading the audio sprite json.");
             return;
         }
-
         if (json.audioSprites == null) {
             console.error("The audioSprites field is null in the audio sprite json.");
             return;
@@ -459,10 +457,9 @@ namespace AudioManager {
         // create sounds
         for (let i = 0; i < json.sounds.length; i++) {
             let soundJson: any = json.sounds[i];
-
-            let fn: string = soundJson.filename.toLowerCase();
-            soundDictionary[fn] = new Sound(
-                fn,
+            
+            soundDictionary[soundJson.filename.toLowerCase()] = new Sound(
+                soundJson.filename,
                 soundJson.asIndex,
                 soundJson.startTime,
                 soundJson.duration

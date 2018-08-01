@@ -82,7 +82,7 @@ namespace TexPackManager {
     export function addTexturePack(packJsonUrl: string): void {
         
         if (JSONManager.jsonExists(packJsonUrl)) {
-            console.warn("texture pack " + packJsonUrl + " already added");
+            console.warn("texture pack " + packJsonUrl.toLowerCase() + " already added");
             return;
         }
         
