@@ -1,4 +1,62 @@
 /// <reference path="_ref.ts" />
+class Vec2 {
+    constructor(x = 0, y = 0) {
+        /**
+         * Sets the values of this Vec2.
+         */
+        this.setValues = (x, y) => {
+            this.x = x;
+            this.y = y;
+        };
+        /**
+         * Sets the values of the Vec2 from a Vec2
+         */
+        this.setValuesVec2 = (v) => {
+            this.x = v.x;
+            this.y = v.y;
+        };
+        this.equals = (x, y) => {
+            return this.x === x && this.y === y;
+        };
+        this.equalsVec2 = (v) => {
+            return this.x === v.x && this.y === v.y;
+        };
+        /**
+         * Resizes the vector to have a magnitude of 1.
+         */
+        this.normalize = () => {
+            let mag = Math.sqrt(this.x * this.x + this.y * this.y);
+            if (mag > 0.000001) {
+                this.x /= mag;
+                this.y /= mag;
+            }
+        };
+        /**
+         * Creates a new Vec2 with the same values.
+         */
+        this.clone = () => {
+            return new Vec2(this.x, this.y);
+        };
+        this.toString = () => {
+            return "(" + this.x + ", " + this.y + ")";
+        };
+        this.x = x;
+        this.y = y;
+    }
+    /**
+     * Calculates distance between the two given vectors.
+     */
+    static distance(v1, v2) {
+        return Math.sqrt((v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y));
+    }
+    /**
+     * Calculates the dot product of two vectors.
+     */
+    static dot(v1, v2) {
+        return v1.x * v2.x + v1.y * v2.y;
+    }
+}
+/// <reference path="_ref.ts" />
 var M;
 (function (M) {
     /**
@@ -8323,64 +8381,6 @@ Game._unscaledDeltaTime = 0;
 /// <reference path="AABBPlatform.ts" />
 /// <reference path="TiledMapTileLayerPlatform.ts" />
 /// <reference path="Game.ts" /> 
-/// <reference path="_ref.ts" />
-class Vec2 {
-    constructor(x = 0, y = 0) {
-        /**
-         * Sets the values of this Vec2.
-         */
-        this.setValues = (x, y) => {
-            this.x = x;
-            this.y = y;
-        };
-        /**
-         * Sets the values of the Vec2 from a Vec2
-         */
-        this.setValuesVec2 = (v) => {
-            this.x = v.x;
-            this.y = v.y;
-        };
-        this.equals = (x, y) => {
-            return this.x === x && this.y === y;
-        };
-        this.equalsVec2 = (v) => {
-            return this.x === v.x && this.y === v.y;
-        };
-        /**
-         * Resizes the vector to have a magnitude of 1.
-         */
-        this.normalize = () => {
-            let mag = Math.sqrt(this.x * this.x + this.y * this.y);
-            if (mag > 0.000001) {
-                this.x /= mag;
-                this.y /= mag;
-            }
-        };
-        /**
-         * Creates a new Vec2 with the same values.
-         */
-        this.clone = () => {
-            return new Vec2(this.x, this.y);
-        };
-        this.toString = () => {
-            return "(" + this.x + ", " + this.y + ")";
-        };
-        this.x = x;
-        this.y = y;
-    }
-    /**
-     * Calculates distance between the two given vectors.
-     */
-    static distance(v1, v2) {
-        return Math.sqrt((v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y));
-    }
-    /**
-     * Calculates the dot product of two vectors.
-     */
-    static dot(v1, v2) {
-        return v1.x * v2.x + v1.y * v2.y;
-    }
-}
 /// <reference path="../app.ts" />
 // adding texture packs to the game
 TexPackManager.addTexturePack("Assets/Texpacks/texpack-0.json");
@@ -9270,53 +9270,6 @@ var Prefabs;
     }
     Prefabs.TestPlatform2 = TestPlatform2;
 })(Prefabs || (Prefabs = {}));
-/// <reference path="../../Tygem/_ref.ts" />
-var Prefabs;
-(function (Prefabs) {
-    function Thing1() {
-        let go = new GameObject();
-        let pir = go.addComponent(PackedImageRenderer);
-        pir.setImageByName("sealime.png");
-        pir.order = 1.0;
-        pir.setImageRect(64, 64, 128, 64);
-        return go;
-    }
-    Prefabs.Thing1 = Thing1;
-})(Prefabs || (Prefabs = {}));
-/// <reference path="../../Tygem/_ref.ts" />
-var Prefabs;
-(function (Prefabs) {
-    function Thing2() {
-        let go = new GameObject();
-        // adding component
-        let pir = go.addComponent(PackedImageRenderer);
-        pir.setImageByName("sealime.png");
-        pir.setImageRect(128, 0, 128, 64);
-        pir.order = 1.1;
-        let dg = go.addComponent(Comps.DotGraphic);
-        dg.order = 999;
-        // adding child gameObject
-        let child = new GameObject();
-        child.transform.setParent(go.transform);
-        child.name = "pengrunt";
-        // adding component to child
-        let childPir = child.addComponent(PackedImageRenderer);
-        childPir.setImageByName("pengrunt.png");
-        childPir.setImageRect(0, 0, 64, 64);
-        childPir.order = 1.0;
-        // testing effect stuff
-        childPir.imageSmoothingEnabled = false;
-        childPir.tintColor = "#FF0000";
-        childPir.tintAmount = .6;
-        // adding Thing2 component
-        let thing2 = go.addComponent(Comps.Thing2);
-        thing2.pir = pir;
-        thing2.child = child;
-        thing2.childPir = childPir;
-        return go;
-    }
-    Prefabs.Thing2 = Thing2;
-})(Prefabs || (Prefabs = {}));
 /// <reference path="_ref.ts" />
 class ActorGizmo extends DrawerComponent {
     constructor() {
@@ -9434,4 +9387,51 @@ class RaycastTestGizmo extends DrawerComponent {
         this.layer = DrawLayer.GIZMO;
     }
 }
+/// <reference path="../../Tygem/_ref.ts" />
+var Prefabs;
+(function (Prefabs) {
+    function Thing1() {
+        let go = new GameObject();
+        let pir = go.addComponent(PackedImageRenderer);
+        pir.setImageByName("sealime.png");
+        pir.order = 1.0;
+        pir.setImageRect(64, 64, 128, 64);
+        return go;
+    }
+    Prefabs.Thing1 = Thing1;
+})(Prefabs || (Prefabs = {}));
+/// <reference path="../../Tygem/_ref.ts" />
+var Prefabs;
+(function (Prefabs) {
+    function Thing2() {
+        let go = new GameObject();
+        // adding component
+        let pir = go.addComponent(PackedImageRenderer);
+        pir.setImageByName("sealime.png");
+        pir.setImageRect(128, 0, 128, 64);
+        pir.order = 1.1;
+        let dg = go.addComponent(Comps.DotGraphic);
+        dg.order = 999;
+        // adding child gameObject
+        let child = new GameObject();
+        child.transform.setParent(go.transform);
+        child.name = "pengrunt";
+        // adding component to child
+        let childPir = child.addComponent(PackedImageRenderer);
+        childPir.setImageByName("pengrunt.png");
+        childPir.setImageRect(0, 0, 64, 64);
+        childPir.order = 1.0;
+        // testing effect stuff
+        childPir.imageSmoothingEnabled = false;
+        childPir.tintColor = "#FF0000";
+        childPir.tintAmount = .6;
+        // adding Thing2 component
+        let thing2 = go.addComponent(Comps.Thing2);
+        thing2.pir = pir;
+        thing2.child = child;
+        thing2.childPir = childPir;
+        return go;
+    }
+    Prefabs.Thing2 = Thing2;
+})(Prefabs || (Prefabs = {}));
 //# sourceMappingURL=game.js.map
