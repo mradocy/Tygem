@@ -6,7 +6,7 @@
         <key>texturePackerVersion</key>
         <string>4.6.3</string>
         <key>fileName</key>
-        <string>D:/Mark/Documents/Visual Studio 2015/Projects/TSTests/Pipeline/Images_and_Tiledmaps/texpacker.tps</string>
+        <string>D:/Mark/Gamedev/Projects/TypeScript Projects/Tygem/Pipeline/Images_and_Tiledmaps/texpacker.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -134,7 +134,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../../TSTests/assets/texpacks/texpack-{n}.json</filename>
+                <filename>../../Tygem/Assets/Texpacks/texpack-{n}.json</filename>
             </struct>
         </map>
         <key>multiPack</key>

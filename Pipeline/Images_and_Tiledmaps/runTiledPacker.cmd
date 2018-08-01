@@ -17,7 +17,7 @@ set TILEMAP_DIRECTORY="%~dp0/Tiledmaps"
 set TILESET_DIRECTORY="%~dp0/Tiledmaps/Tilesets"
 
 :: The output file.
-set OUTPUT_FILE="../../TSTests/Assets/add_Tilemaps.ts"
+set OUTPUT_FILE="../../Tygem/Assets/add_Tilemaps.ts"
 
 
 :: Calling TiledPacker (note: add -quick to skip the user input prompt)
