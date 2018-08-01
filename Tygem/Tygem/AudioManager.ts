@@ -384,8 +384,9 @@ namespace AudioManager {
     
     /**
      * Directory containing the audio sprites and json file.
+     * Capitalization matters when getting images in the web browser.
      */
-    export const audioSpritesDirectory: string = "assets/audiosprites/";
+    export const audioSpritesDirectory: string = "Assets/Audiosprites/";
 
     /**
      * Gets the AudioContext used to decode sound.

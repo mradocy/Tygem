@@ -1246,6 +1246,7 @@ declare namespace AudioManager {
     function isAudioContextRunning(): boolean;
     /**
      * Directory containing the audio sprites and json file.
+     * Capitalization matters when getting images in the web browser.
      */
     const audioSpritesDirectory: string;
     /**

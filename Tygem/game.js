@@ -2757,8 +2757,9 @@ var AudioManager;
     AudioManager.isAudioContextRunning = isAudioContextRunning;
     /**
      * Directory containing the audio sprites and json file.
+     * Capitalization matters when getting images in the web browser.
      */
-    AudioManager.audioSpritesDirectory = "assets/audiosprites/";
+    AudioManager.audioSpritesDirectory = "Assets/Audiosprites/";
     /**
      * Gets the AudioContext used to decode sound.
      */
