@@ -25,7 +25,7 @@ namespace Comps {
                     AudioManager.playMusic(sn, 1, 1, true);
                 }
             }
-
+            
         }
         
         // called just before the component is destroyed.

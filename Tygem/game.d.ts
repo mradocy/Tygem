@@ -1,35 +1,3 @@
-declare class Vec2 {
-    constructor(x?: number, y?: number);
-    /**
-     * Sets the values of this Vec2.
-     */
-    setValues: (x: number, y: number) => void;
-    /**
-     * Sets the values of the Vec2 from a Vec2
-     */
-    setValuesVec2: (v: Vec2) => void;
-    equals: (x: number, y: number) => boolean;
-    equalsVec2: (v: Vec2) => boolean;
-    /**
-     * Resizes the vector to have a magnitude of 1.
-     */
-    normalize: () => void;
-    /**
-     * Creates a new Vec2 with the same values.
-     */
-    clone: () => Vec2;
-    toString: () => string;
-    x: number;
-    y: number;
-    /**
-     * Calculates distance between the two given vectors.
-     */
-    static distance(v1: Vec2, v2: Vec2): number;
-    /**
-     * Calculates the dot product of two vectors.
-     */
-    static dot(v1: Vec2, v2: Vec2): number;
-}
 declare namespace M {
     /**
      * Multiply a degree value by this to get its equivalent in radians.
@@ -1332,6 +1300,7 @@ declare namespace TexPackManager {
     function getPackedImage(filename: string): PackedImage;
     /**
      * Directory containing the texpack texture images and json files.
+     * Capitalization matters when getting images in the web browser.
      */
     const texpacksDirectory: string;
     /**
@@ -1342,6 +1311,10 @@ declare namespace TexPackManager {
      * Gets the number of texture packs loaded.
      */
     function getNumTexPacksLoaded(): number;
+    /**
+     * Writes all packed image filenames to the console.
+     */
+    function consoleLogAllPackedImages(): void;
     class TextureAtlas {
         /**
         * Handles loading of sprites packed into a single texture atlas image.  DO NOT CALL THIS DIRECTLY, use addTexture() instead.
@@ -3197,6 +3170,38 @@ declare class Game {
     private static lastTimeStamp;
     private static _unscaledDeltaTime;
 }
+declare class Vec2 {
+    constructor(x?: number, y?: number);
+    /**
+     * Sets the values of this Vec2.
+     */
+    setValues: (x: number, y: number) => void;
+    /**
+     * Sets the values of the Vec2 from a Vec2
+     */
+    setValuesVec2: (v: Vec2) => void;
+    equals: (x: number, y: number) => boolean;
+    equalsVec2: (v: Vec2) => boolean;
+    /**
+     * Resizes the vector to have a magnitude of 1.
+     */
+    normalize: () => void;
+    /**
+     * Creates a new Vec2 with the same values.
+     */
+    clone: () => Vec2;
+    toString: () => string;
+    x: number;
+    y: number;
+    /**
+     * Calculates distance between the two given vectors.
+     */
+    static distance(v1: Vec2, v2: Vec2): number;
+    /**
+     * Calculates the dot product of two vectors.
+     */
+    static dot(v1: Vec2, v2: Vec2): number;
+}
 declare namespace Scenes {
     class Preload extends Scene {
         onLoad: () => void;
@@ -3327,6 +3332,12 @@ declare namespace Prefabs {
 declare namespace Prefabs {
     function TestPlatform2(): GameObject;
 }
+declare namespace Prefabs {
+    function Thing1(): GameObject;
+}
+declare namespace Prefabs {
+    function Thing2(): GameObject;
+}
 declare class ActorGizmo extends DrawerComponent {
     constructor();
     onStart: () => void;
@@ -3362,10 +3373,4 @@ declare class RaycastTestGizmo extends DrawerComponent {
     private raycastHit;
     draw: (context: CanvasRenderingContext2D) => void;
     protected actor: Actor;
-}
-declare namespace Prefabs {
-    function Thing1(): GameObject;
-}
-declare namespace Prefabs {
-    function Thing2(): GameObject;
 }

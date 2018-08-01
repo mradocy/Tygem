@@ -80,17 +80,16 @@ namespace TexPackManager {
      * @param packJsonUrl url pointing to the texture pack.
      */
     export function addTexturePack(packJsonUrl: string): void {
-
-        let url: string = packJsonUrl.toLowerCase();
-        if (JSONManager.jsonExists(url)) {
-            console.warn("texture pack " + url + " already added");
+        
+        if (JSONManager.jsonExists(packJsonUrl)) {
+            console.warn("texture pack " + packJsonUrl + " already added");
             return;
         }
         
         _numTexPacks++;
         JSONManager.addFromUrl(
-            jsonNameFromURL(url),
-            url,
+            jsonNameFromURL(packJsonUrl),
+            packJsonUrl,
             onJSONLoad);
 
     }
@@ -111,6 +110,7 @@ namespace TexPackManager {
     
     /**
      * Directory containing the texpack texture images and json files.
+     * Capitalization matters when getting images in the web browser.
      */
     export const texpacksDirectory: string = "Assets/Texpacks/";
 
@@ -125,6 +125,13 @@ namespace TexPackManager {
      */
     export function getNumTexPacksLoaded(): number {
         return _numTexPacksLoaded;
+    }
+
+    /**
+     * Writes all packed image filenames to the console.
+     */
+    export function consoleLogAllPackedImages(): void {
+        console.log(packedImageDictionary);
     }
 
 
@@ -155,15 +162,16 @@ namespace TexPackManager {
         }
 
         // load texture atlas specified in the json.
-        let imageURL: string = (texpacksDirectory + json.meta.image).toLowerCase();
+        let imageURL: string = texpacksDirectory + json.meta.image;
+        let imageURLLower: string = imageURL.toLowerCase();
         let texAtlas: TextureAtlas = null;
-        if (texAtlasDictionary.hasOwnProperty(imageURL)) {
-            console.warn("image " + imageURL + " already added");
+        if (texAtlasDictionary.hasOwnProperty(imageURLLower)) {
+            console.warn("image " + imageURLLower + " already added");
             _numTexPacksLoaded++;
-            texAtlas = texAtlasDictionary[imageURL];
+            texAtlas = texAtlasDictionary[imageURLLower];
         } else {
             texAtlas = new TextureAtlas(imageURL);
-            texAtlasDictionary[imageURL] = texAtlas;
+            texAtlasDictionary[imageURLLower] = texAtlas;
         }
 
         // create packed images as specified in the json
@@ -179,7 +187,7 @@ namespace TexPackManager {
             }
             let packedImage: PackedImage = new PackedImage();
             packedImage.frameJSON = frame;
-            packedImage.filename = frame.filename.toLowerCase();
+            packedImage.filename = frame.filename;
             packedImage._textureAtlas = texAtlas;
             packedImage.atlasImage = texAtlas.getImage();
             packedImage.frameX = frame.frame.x;
@@ -190,7 +198,7 @@ namespace TexPackManager {
             packedImage.trimTop = frame.spriteSourceSize.y;
             packedImage.trimRight = frame.sourceSize.w - frame.spriteSourceSize.x - frame.spriteSourceSize.w;
             packedImage.trimBottom = frame.sourceSize.h - frame.spriteSourceSize.y - frame.spriteSourceSize.h;
-            packedImageDictionary[packedImage.filename] = packedImage;
+            packedImageDictionary[packedImage.filename.toLowerCase()] = packedImage;
         }
         
     }
