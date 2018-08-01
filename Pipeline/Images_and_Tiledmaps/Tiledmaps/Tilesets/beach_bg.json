@@ -1,0 +1,14 @@
+{ "image":"beach_1_bg.png",
+ "imageheight":192,
+ "imagewidth":224,
+ "margin":0,
+ "name":"beach_bg",
+ "properties":
+    {
+
+    },
+ "spacing":0,
+ "tilecount":168,
+ "tileheight":16,
+ "tilewidth":16
+}

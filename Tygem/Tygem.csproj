@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{0DF31AE1-5CE0-4B04-8DB7-CF45E0B74485}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app.css" />
+    <Content Include="index.html" />
+    <Content Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Assets\add_Materials.ts" />
+    <TypeScriptCompile Include="Assets\add_Scenes.ts" />
+    <TypeScriptCompile Include="Assets\add_Sounds.ts" />
+    <TypeScriptCompile Include="Assets\add_Textures.ts" />
+    <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="Assets\add_Tilemaps.ts" />
+    <TypeScriptCompile Include="Assets\Components\ArrowTestController.ts" />
+    <TypeScriptCompile Include="Assets\Components\ArrowTestPlatController.ts" />
+    <TypeScriptCompile Include="Assets\Components\ControlCameraWithWASD.ts" />
+    <TypeScriptCompile Include="Assets\Components\DotFollowsMouse.ts" />
+    <TypeScriptCompile Include="Assets\Components\DotGraphic.ts" />
+    <TypeScriptCompile Include="Assets\Components\FacesMouse.ts" />
+    <TypeScriptCompile Include="Assets\Components\MovePlatformWithIJKL.ts" />
+    <TypeScriptCompile Include="Assets\Components\Preloader.ts" />
+    <TypeScriptCompile Include="Assets\Components\Template.ts" />
+    <TypeScriptCompile Include="Assets\Components\TestRectOverlap.ts" />
+    <TypeScriptCompile Include="Assets\Components\TestSound.ts" />
+    <TypeScriptCompile Include="Assets\Components\Thing2.ts" />
+    <TypeScriptCompile Include="Assets\Prefabs\Sealime.ts" />
+    <TypeScriptCompile Include="Assets\Prefabs\TestPlatform.ts" />
+    <TypeScriptCompile Include="Assets\Prefabs\TestPlatform2.ts" />
+    <TypeScriptCompile Include="Tygem\AABBPlatform.ts" />
+    <TypeScriptCompile Include="Tygem\AABBPlatformObject.ts" />
+    <TypeScriptCompile Include="Tygem\Actor.ts" />
+    <TypeScriptCompile Include="Tygem\ActorGizmo.ts" />
+    <TypeScriptCompile Include="Tygem\AttachBottom.ts" />
+    <TypeScriptCompile Include="Tygem\AudioManager.ts" />
+    <TypeScriptCompile Include="Tygem\BasePreloader.ts" />
+    <TypeScriptCompile Include="Tygem\BasePreloadScene.ts" />
+    <TypeScriptCompile Include="Tygem\CollisionHandler.ts" />
+    <TypeScriptCompile Include="Tygem\ColorParser.ts" />
+    <TypeScriptCompile Include="Tygem\M.ts" />
+    <TypeScriptCompile Include="Tygem\Material.ts" />
+    <TypeScriptCompile Include="Tygem\Mouse.ts" />
+    <TypeScriptCompile Include="Tygem\MovingPlatformObject.ts" />
+    <TypeScriptCompile Include="Tygem\PackedImageRenderer.ts" />
+    <TypeScriptCompile Include="Tygem\Platform.ts" />
+    <TypeScriptCompile Include="Tygem\PlatformObject.ts" />
+    <TypeScriptCompile Include="Tygem\RaycastTestGizmo.ts" />
+    <TypeScriptCompile Include="Tygem\Rect.ts" />
+    <TypeScriptCompile Include="Tygem\SaveBox.ts" />
+    <TypeScriptCompile Include="Tygem\ScreenFilter.ts" />
+    <TypeScriptCompile Include="Tygem\SpriteRenderer.ts" />
+    <TypeScriptCompile Include="Tygem\Spritesheet.ts" />
+    <TypeScriptCompile Include="Tygem\TexPackManager.ts" />
+    <TypeScriptCompile Include="Tygem\TiledMapComponent.ts" />
+    <TypeScriptCompile Include="Tygem\TiledMapTileLayerPlatform.ts" />
+    <TypeScriptCompile Include="Tygem\TiledMapTileLayerPlatformObject.ts" />
+    <TypeScriptCompile Include="Tygem\TiledMapTileLayerRenderer.ts" />
+    <TypeScriptCompile Include="Assets\Prefabs\Thing1.ts" />
+    <TypeScriptCompile Include="Assets\Prefabs\Thing2.ts" />
+    <TypeScriptCompile Include="Assets\Scenes\Preload.ts" />
+    <TypeScriptCompile Include="Assets\Scenes\TestScene.ts" />
+    <TypeScriptCompile Include="Assets\Scenes\TestScene2.ts" />
+    <TypeScriptCompile Include="Tygem\Camera.ts" />
+    <TypeScriptCompile Include="Tygem\Component.ts" />
+    <TypeScriptCompile Include="Tygem\DrawerComponent.ts" />
+    <TypeScriptCompile Include="Tygem\Drawers.ts" />
+    <TypeScriptCompile Include="Tygem\Game.ts" />
+    <TypeScriptCompile Include="Tygem\GameObject.ts" />
+    <TypeScriptCompile Include="Tygem\Gamepads.ts" />
+    <TypeScriptCompile Include="Tygem\IDrawer.ts" />
+    <TypeScriptCompile Include="Tygem\JSONManager.ts" />
+    <TypeScriptCompile Include="Tygem\Keys.ts" />
+    <TypeScriptCompile Include="Tygem\Scene.ts" />
+    <TypeScriptCompile Include="Tygem\Matrix2x3.ts" />
+    <TypeScriptCompile Include="Tygem\TiledMap.ts" />
+    <TypeScriptCompile Include="Tygem\Transform.ts" />
+    <TypeScriptCompile Include="Tygem\Vec2.ts" />
+    <TypeScriptCompile Include="Tygem\_ref.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Tygem</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>50507</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:50507/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptTarget>ES6</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>None</TypeScriptModuleKind>
+    <TypeScriptOutFile>game.js</TypeScriptOutFile>
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot>
+    </TypeScriptSourceRoot>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <PropertyGroup>
+    <PreBuildEvent>texturepacker "$(SolutionDir)pipeline\images_and_tiledmaps\texpacker.tps"
+"$(SolutionDir)pipeline\images_and_tiledmaps\runTiledPacker.cmd"</PreBuildEvent>
+  </PropertyGroup>
+</Project>
