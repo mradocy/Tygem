@@ -11,7 +11,7 @@ setlocal
 set SOURCE_DIRECTORY=./Source
 
 :: Absolute directory to place the completed audio sprites:
-set DESTINATION_DIRECTORY="../../TSTests/Assets/Audiosprites"
+set DESTINATION_DIRECTORY="../../Tygem/Assets/Audiosprites"
 
 :: Directory that will store .wav versions of the audio sprite
 set WAV_DIRECTORY=./wav-audiosprites

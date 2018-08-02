@@ -51,12 +51,13 @@ namespace TiledMap {
      */
     export function addMap(name: string, mapJSON: any): void {
 
-        if (mapJSONDictionary.hasOwnProperty(name)) {
-            console.error("Cannot add map \"" + name + "\" because a map with that name already exists.");
+        let n: string = name.toLowerCase();
+        if (mapJSONDictionary.hasOwnProperty(n)) {
+            console.error("Cannot add map \"" + n + "\" because a map with that name already exists.");
             return;
         }
 
-        mapJSONDictionary[name] = mapJSON;
+        mapJSONDictionary[n] = mapJSON;
     }
     
 
@@ -68,12 +69,13 @@ namespace TiledMap {
      */
     export function createTiledMapData(mapName: string): MapData {
 
-        if (!mapJSONDictionary.hasOwnProperty(mapName)) {
-            console.error("TiledMap " + mapName + " doesn't exist.");
+        let mn: string = mapName.toLowerCase();
+        if (!mapJSONDictionary.hasOwnProperty(mn)) {
+            console.error("TiledMap " + mn + " doesn't exist.");
             return null;
         }
 
-        let mapJSON: any = mapJSONDictionary[mapName];
+        let mapJSON: any = mapJSONDictionary[mn];
         let map: MapData = new MapData();
         map.parse(mapJSON);
         return map;

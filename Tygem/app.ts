@@ -1,4 +1,4 @@
-﻿/// <reference path="tygem/_ref.ts" />
+﻿/// <reference path="Tygem/_ref.ts" />
 
 
 // typescript handbook: http://www.typescriptlang.org/docs/handbook/basic-types.html
@@ -8,11 +8,11 @@
 
 // adding assets:
 
-/// <reference path="assets/add_Materials.ts" />
-/// <reference path="assets/add_Textures.ts" />
-/// <reference path="assets/add_Sounds.ts" />
-/// <reference path="assets/add_Scenes.ts" />
-/// <reference path="assets/add_Tilemaps.ts" />
+/// <reference path="Code/add_Materials.ts" />
+/// <reference path="Code/add_Textures.ts" />
+/// <reference path="Code/add_Sounds.ts" />
+/// <reference path="Code/add_Scenes.ts" />
+/// <reference path="Code/add_Tilemaps.ts" />
 
 
 

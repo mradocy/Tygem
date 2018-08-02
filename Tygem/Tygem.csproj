@@ -27,27 +27,27 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Assets\add_Materials.ts" />
-    <TypeScriptCompile Include="Assets\add_Scenes.ts" />
-    <TypeScriptCompile Include="Assets\add_Sounds.ts" />
-    <TypeScriptCompile Include="Assets\add_Textures.ts" />
+    <TypeScriptCompile Include="Code\add_Materials.ts" />
+    <TypeScriptCompile Include="Code\add_Scenes.ts" />
+    <TypeScriptCompile Include="Code\add_Sounds.ts" />
+    <TypeScriptCompile Include="Code\add_Textures.ts" />
     <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="Assets\add_Tilemaps.ts" />
-    <TypeScriptCompile Include="Assets\Components\ArrowTestController.ts" />
-    <TypeScriptCompile Include="Assets\Components\ArrowTestPlatController.ts" />
-    <TypeScriptCompile Include="Assets\Components\ControlCameraWithWASD.ts" />
-    <TypeScriptCompile Include="Assets\Components\DotFollowsMouse.ts" />
-    <TypeScriptCompile Include="Assets\Components\DotGraphic.ts" />
-    <TypeScriptCompile Include="Assets\Components\FacesMouse.ts" />
-    <TypeScriptCompile Include="Assets\Components\MovePlatformWithIJKL.ts" />
-    <TypeScriptCompile Include="Assets\Components\Preloader.ts" />
-    <TypeScriptCompile Include="Assets\Components\Template.ts" />
-    <TypeScriptCompile Include="Assets\Components\TestRectOverlap.ts" />
-    <TypeScriptCompile Include="Assets\Components\TestSound.ts" />
-    <TypeScriptCompile Include="Assets\Components\Thing2.ts" />
-    <TypeScriptCompile Include="Assets\Prefabs\Sealime.ts" />
-    <TypeScriptCompile Include="Assets\Prefabs\TestPlatform.ts" />
-    <TypeScriptCompile Include="Assets\Prefabs\TestPlatform2.ts" />
+    <TypeScriptCompile Include="Code\add_Tilemaps.ts" />
+    <TypeScriptCompile Include="Code\Components\ArrowTestController.ts" />
+    <TypeScriptCompile Include="Code\Components\ArrowTestPlatController.ts" />
+    <TypeScriptCompile Include="Code\Components\ControlCameraWithWASD.ts" />
+    <TypeScriptCompile Include="Code\Components\DotFollowsMouse.ts" />
+    <TypeScriptCompile Include="Code\Components\DotGraphic.ts" />
+    <TypeScriptCompile Include="Code\Components\FacesMouse.ts" />
+    <TypeScriptCompile Include="Code\Components\MovePlatformWithIJKL.ts" />
+    <TypeScriptCompile Include="Code\Components\Preloader.ts" />
+    <TypeScriptCompile Include="Code\Components\Template.ts" />
+    <TypeScriptCompile Include="Code\Components\TestRectOverlap.ts" />
+    <TypeScriptCompile Include="Code\Components\TestSound.ts" />
+    <TypeScriptCompile Include="Code\Components\Thing2.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\Sealime.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\TestPlatform.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\TestPlatform2.ts" />
     <TypeScriptCompile Include="Tygem\AABBPlatform.ts" />
     <TypeScriptCompile Include="Tygem\AABBPlatformObject.ts" />
     <TypeScriptCompile Include="Tygem\Actor.ts" />
@@ -76,11 +76,11 @@
     <TypeScriptCompile Include="Tygem\TiledMapTileLayerPlatform.ts" />
     <TypeScriptCompile Include="Tygem\TiledMapTileLayerPlatformObject.ts" />
     <TypeScriptCompile Include="Tygem\TiledMapTileLayerRenderer.ts" />
-    <TypeScriptCompile Include="Assets\Prefabs\Thing1.ts" />
-    <TypeScriptCompile Include="Assets\Prefabs\Thing2.ts" />
-    <TypeScriptCompile Include="Assets\Scenes\Preload.ts" />
-    <TypeScriptCompile Include="Assets\Scenes\TestScene.ts" />
-    <TypeScriptCompile Include="Assets\Scenes\TestScene2.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\Thing1.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\Thing2.ts" />
+    <TypeScriptCompile Include="Code\Scenes\Preload.ts" />
+    <TypeScriptCompile Include="Code\Scenes\TestScene.ts" />
+    <TypeScriptCompile Include="Code\Scenes\TestScene2.ts" />
     <TypeScriptCompile Include="Tygem\Camera.ts" />
     <TypeScriptCompile Include="Tygem\Component.ts" />
     <TypeScriptCompile Include="Tygem\DrawerComponent.ts" />
@@ -141,9 +141,10 @@
     <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
     <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
     <TypeScriptModuleKind>None</TypeScriptModuleKind>
-    <TypeScriptOutFile>game.js</TypeScriptOutFile>
-    <TypeScriptOutDir />
-    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptOutFile>JS/game.js</TypeScriptOutFile>
+    <TypeScriptOutDir>
+    </TypeScriptOutDir>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
     <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
     <TypeScriptMapRoot />
     <TypeScriptSourceRoot>

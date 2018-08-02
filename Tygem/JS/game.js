@@ -3888,11 +3888,12 @@ var TiledMap;
      * @param mapJSON The JSON object to be parsed to create the map.
      */
     function addMap(name, mapJSON) {
-        if (mapJSONDictionary.hasOwnProperty(name)) {
-            console.error("Cannot add map \"" + name + "\" because a map with that name already exists.");
+        let n = name.toLowerCase();
+        if (mapJSONDictionary.hasOwnProperty(n)) {
+            console.error("Cannot add map \"" + n + "\" because a map with that name already exists.");
             return;
         }
-        mapJSONDictionary[name] = mapJSON;
+        mapJSONDictionary[n] = mapJSON;
     }
     TiledMap.addMap = addMap;
     // Creating maps:
@@ -3901,11 +3902,12 @@ var TiledMap;
      * @param mapName Name of the tiledMap to create.
      */
     function createTiledMapData(mapName) {
-        if (!mapJSONDictionary.hasOwnProperty(mapName)) {
-            console.error("TiledMap " + mapName + " doesn't exist.");
+        let mn = mapName.toLowerCase();
+        if (!mapJSONDictionary.hasOwnProperty(mn)) {
+            console.error("TiledMap " + mn + " doesn't exist.");
             return null;
         }
-        let mapJSON = mapJSONDictionary[mapName];
+        let mapJSON = mapJSONDictionary[mn];
         let map = new MapData();
         map.parse(mapJSON);
         return map;
@@ -8735,15 +8737,15 @@ TiledMap.addMap("test4", { "height": 40,
     "version": 1,
     "width": 60
 });
-/// <reference path="tygem/_ref.ts" />
+/// <reference path="Tygem/_ref.ts" />
 // typescript handbook: http://www.typescriptlang.org/docs/handbook/basic-types.html
 // typescript game tutorial: http://www.typescriptgames.com/
 // adding assets:
-/// <reference path="assets/add_Materials.ts" />
-/// <reference path="assets/add_Textures.ts" />
-/// <reference path="assets/add_Sounds.ts" />
-/// <reference path="assets/add_Scenes.ts" />
-/// <reference path="assets/add_Tilemaps.ts" />
+/// <reference path="Code/add_Materials.ts" />
+/// <reference path="Code/add_Textures.ts" />
+/// <reference path="Code/add_Sounds.ts" />
+/// <reference path="Code/add_Scenes.ts" />
+/// <reference path="Code/add_Tilemaps.ts" />
 Game.preloadScene = "Preload"; // this is optional, default is "BasePreloadScene" which will automatically start Game.startScene once the game is done loading.
 Game.startScene = "TestScene2"; // this must be set.
 window.onload = () => {
