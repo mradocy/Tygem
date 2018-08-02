@@ -33,8 +33,7 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
      */
     cameraCulling: boolean = true;
 
-
-
+    
     onAwake = (): void => {
         this._transform = this.getTransform();
     }

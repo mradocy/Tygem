@@ -1,67 +1,66 @@
 ﻿/// <reference path="_ref.ts" />
 
-
-class Keys {
+namespace Keys {
 
     /**
      * Initializes Keys.  To be called at the start of Game.
      * @param document The webpage document, which event listeners will be added to.
      */
-    static _initialize(document: Document): void {
-        if (Keys.initialized) {
+    export function _initialize(document: Document): void {
+        if (initialized) {
             console.warn("Keys already initialized");
             return;
         }
 
-        document.addEventListener("keydown", Keys.keyDown);
-        document.addEventListener("keyup", Keys.keyUp);
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
         
-        Keys.initialized = true;
+        initialized = true;
     }
 
     /**
      * Gets if the key was pressed this frame.
      */
-    static keyPressed(key: Key): boolean {
-        return Keys.keyCodePressed(key);
+    export function keyPressed(key: Key): boolean {
+        return keyCodePressed(key);
     }
     /**
      * Gets if the key with the given key code was pressed this frame.
      */
-    static keyCodePressed(keyCode: number): boolean {
-        return Keys.keysPressed.indexOf(keyCode) != -1;
+    export function keyCodePressed(keyCode: number): boolean {
+        return keysPressed.indexOf(keyCode) != -1;
     }
 
     /**
      * Gets if the key is being held.
      */
-    static keyHeld(key: Key): boolean {
-        return Keys.keyCodeHeld(key);
+    export function keyHeld(key: Key): boolean {
+        return keyCodeHeld(key);
     }
     /**
      * Gets if the key with the given key code is being held.
      */
-    static keyCodeHeld(keyCode: number): boolean {
-        return Keys.keysHeld.indexOf(keyCode) != -1;
+    export function keyCodeHeld(keyCode: number): boolean {
+        return keysHeld.indexOf(keyCode) != -1;
     }
 
     /**
      * Gets if the key was released this frame.
      */
-    static keyReleased(key: Key): boolean {
-        return Keys.keyCodeReleased(key);
+    export function keyReleased(key: Key): boolean {
+        return keyCodeReleased(key);
     }
     /**
      * Gets if the key with the given key code was released this frame.
      */
-    static keyCodeReleased(keyCode: number): boolean {
-        return Keys.keysReleased.indexOf(keyCode) != -1;
+    export function keyCodeReleased(keyCode: number): boolean {
+        return keysReleased.indexOf(keyCode) != -1;
     }
 
     /**
      * Gets a string representation of the given Key.
      */
-    static keyToString(key: Key): string {
+    export function keyToString(key: Key): string {
         let s: string = Key[key];
         return s;
     }
@@ -69,38 +68,38 @@ class Keys {
     /**
      * Gets the key codes of all the keys that were pressed this frame.
      */
-    static getKeyCodesPressed(): Array<number> {
-        return Keys.keysPressed.concat([]);
+    export function getKeyCodesPressed(): Array<number> {
+        return keysPressed.concat([]);
     }
 
 
     /**
      * To be called late in the game loop by Game.
      */
-    static _lateUpdate(): void {
+    export function _lateUpdate(): void {
 
         // clear key records
-        Keys.keysPressed.splice(0);
-        Keys.keysReleased.splice(0);
+        keysPressed.splice(0);
+        keysReleased.splice(0);
 
     }
 
-    private static keyDown(event: KeyboardEvent): void {
+    function keyDown(event: KeyboardEvent): void {
 
         // prevent space and arrow keys from scrolling the screen around
         if ([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
             event.preventDefault();
         }
 
-        if (Keys.keysHeld.indexOf(event.keyCode) != -1)
+        if (keysHeld.indexOf(event.keyCode) != -1)
             // key was already being held down.  Return to prevent additional keypresses when holding down a key for a while
             return;
 
-        if (Keys.keysPressed.indexOf(event.keyCode) == -1) {
-            Keys.keysPressed.push(event.keyCode);
+        if (keysPressed.indexOf(event.keyCode) == -1) {
+            keysPressed.push(event.keyCode);
         }
-        if (Keys.keysHeld.indexOf(event.keyCode) == -1) {
-            Keys.keysHeld.push(event.keyCode);
+        if (keysHeld.indexOf(event.keyCode) == -1) {
+            keysHeld.push(event.keyCode);
         }
         
         // fullscreen.  Should be moved to a menu at some point
@@ -115,24 +114,23 @@ class Keys {
         }
     }
 
-    private static keyUp(event: KeyboardEvent): void {
+    function keyUp(event: KeyboardEvent): void {
 
-        if (Keys.keysReleased.indexOf(event.keyCode) == -1) {
-            Keys.keysReleased.push(event.keyCode);
+        if (keysReleased.indexOf(event.keyCode) == -1) {
+            keysReleased.push(event.keyCode);
         }
-        let index: number = Keys.keysHeld.indexOf(event.keyCode);
+        let index: number = keysHeld.indexOf(event.keyCode);
         if (index != -1) {
-            Keys.keysHeld.splice(index, 1);
+            keysHeld.splice(index, 1);
         }
 
     }
 
-    private static initialized: boolean = false;
+    let initialized: boolean = false;
 
-    private static keysPressed: Array<number> = [];
-    private static keysHeld: Array<number> = [];
-    private static keysReleased: Array<number> = [];
-
+    let keysPressed: Array<number> = [];
+    let keysHeld: Array<number> = [];
+    let keysReleased: Array<number> = [];
     
 }
 

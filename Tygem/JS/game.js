@@ -1709,90 +1709,101 @@ SaveBox.newLine = "|";
 SaveBox.separator1 = "<";
 SaveBox.separator2 = ">";
 /// <reference path="_ref.ts" />
-class Keys {
+var Keys;
+(function (Keys) {
     /**
      * Initializes Keys.  To be called at the start of Game.
      * @param document The webpage document, which event listeners will be added to.
      */
-    static _initialize(document) {
-        if (Keys.initialized) {
+    function _initialize(document) {
+        if (initialized) {
             console.warn("Keys already initialized");
             return;
         }
-        document.addEventListener("keydown", Keys.keyDown);
-        document.addEventListener("keyup", Keys.keyUp);
-        Keys.initialized = true;
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
+        initialized = true;
     }
+    Keys._initialize = _initialize;
     /**
      * Gets if the key was pressed this frame.
      */
-    static keyPressed(key) {
-        return Keys.keyCodePressed(key);
+    function keyPressed(key) {
+        return keyCodePressed(key);
     }
+    Keys.keyPressed = keyPressed;
     /**
      * Gets if the key with the given key code was pressed this frame.
      */
-    static keyCodePressed(keyCode) {
-        return Keys.keysPressed.indexOf(keyCode) != -1;
+    function keyCodePressed(keyCode) {
+        return keysPressed.indexOf(keyCode) != -1;
     }
+    Keys.keyCodePressed = keyCodePressed;
     /**
      * Gets if the key is being held.
      */
-    static keyHeld(key) {
-        return Keys.keyCodeHeld(key);
+    function keyHeld(key) {
+        return keyCodeHeld(key);
     }
+    Keys.keyHeld = keyHeld;
     /**
      * Gets if the key with the given key code is being held.
      */
-    static keyCodeHeld(keyCode) {
-        return Keys.keysHeld.indexOf(keyCode) != -1;
+    function keyCodeHeld(keyCode) {
+        return keysHeld.indexOf(keyCode) != -1;
     }
+    Keys.keyCodeHeld = keyCodeHeld;
     /**
      * Gets if the key was released this frame.
      */
-    static keyReleased(key) {
-        return Keys.keyCodeReleased(key);
+    function keyReleased(key) {
+        return keyCodeReleased(key);
     }
+    Keys.keyReleased = keyReleased;
     /**
      * Gets if the key with the given key code was released this frame.
      */
-    static keyCodeReleased(keyCode) {
-        return Keys.keysReleased.indexOf(keyCode) != -1;
+    function keyCodeReleased(keyCode) {
+        return keysReleased.indexOf(keyCode) != -1;
     }
+    Keys.keyCodeReleased = keyCodeReleased;
     /**
      * Gets a string representation of the given Key.
      */
-    static keyToString(key) {
+    function keyToString(key) {
         let s = Key[key];
         return s;
     }
+    Keys.keyToString = keyToString;
     /**
      * Gets the key codes of all the keys that were pressed this frame.
      */
-    static getKeyCodesPressed() {
-        return Keys.keysPressed.concat([]);
+    function getKeyCodesPressed() {
+        return keysPressed.concat([]);
     }
+    Keys.getKeyCodesPressed = getKeyCodesPressed;
     /**
      * To be called late in the game loop by Game.
      */
-    static _lateUpdate() {
+    function _lateUpdate() {
         // clear key records
-        Keys.keysPressed.splice(0);
-        Keys.keysReleased.splice(0);
+        keysPressed.splice(0);
+        keysReleased.splice(0);
     }
-    static keyDown(event) {
+    Keys._lateUpdate = _lateUpdate;
+    function keyDown(event) {
         // prevent space and arrow keys from scrolling the screen around
         if ([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
             event.preventDefault();
         }
-        if (Keys.keysHeld.indexOf(event.keyCode) != -1)
+        if (keysHeld.indexOf(event.keyCode) != -1)
             // key was already being held down.  Return to prevent additional keypresses when holding down a key for a while
             return;
-        if (Keys.keysPressed.indexOf(event.keyCode) == -1) {
-            Keys.keysPressed.push(event.keyCode);
+        if (keysPressed.indexOf(event.keyCode) == -1) {
+            keysPressed.push(event.keyCode);
         }
-        if (Keys.keysHeld.indexOf(event.keyCode) == -1) {
-            Keys.keysHeld.push(event.keyCode);
+        if (keysHeld.indexOf(event.keyCode) == -1) {
+            keysHeld.push(event.keyCode);
         }
         // fullscreen.  Should be moved to a menu at some point
         if (event.keyCode == Key.F10) {
@@ -1804,20 +1815,20 @@ class Keys {
             }
         }
     }
-    static keyUp(event) {
-        if (Keys.keysReleased.indexOf(event.keyCode) == -1) {
-            Keys.keysReleased.push(event.keyCode);
+    function keyUp(event) {
+        if (keysReleased.indexOf(event.keyCode) == -1) {
+            keysReleased.push(event.keyCode);
         }
-        let index = Keys.keysHeld.indexOf(event.keyCode);
+        let index = keysHeld.indexOf(event.keyCode);
         if (index != -1) {
-            Keys.keysHeld.splice(index, 1);
+            keysHeld.splice(index, 1);
         }
     }
-}
-Keys.initialized = false;
-Keys.keysPressed = [];
-Keys.keysHeld = [];
-Keys.keysReleased = [];
+    let initialized = false;
+    let keysPressed = [];
+    let keysHeld = [];
+    let keysReleased = [];
+})(Keys || (Keys = {}));
 var Key;
 (function (Key) {
     Key[Key["Backspace"] = 8] = "Backspace";
@@ -1920,116 +1931,120 @@ var Key;
     Key[Key["Quote"] = 222] = "Quote";
 })(Key || (Key = {}));
 /// <reference path="_ref.ts" />
-class Mouse {
+var Mouse;
+(function (Mouse) {
     /**
      * Initializes Mouse.  To be called at the start of Game.
      * @param document The webpage document, which event listeners will be added to.
      */
-    static _initialize(canvas) {
-        if (Mouse.initialized) {
+    function _initialize(_canvas) {
+        if (initialized) {
             console.warn("Mouse already initialized");
             return;
         }
-        Mouse.canvas = canvas;
-        canvas.addEventListener("mousedown", Mouse.mouseDown);
-        document.addEventListener("mouseup", Mouse.mouseUp);
-        canvas.addEventListener("contextmenu", Mouse.preventContextMenu);
-        document.addEventListener("mousemove", Mouse.mouseMove);
-        Mouse.initialized = true;
+        canvas = _canvas;
+        canvas.addEventListener("mousedown", mouseDown);
+        document.addEventListener("mouseup", mouseUp);
+        canvas.addEventListener("contextmenu", preventContextMenu);
+        document.addEventListener("mousemove", mouseMove);
+        initialized = true;
     }
+    Mouse._initialize = _initialize;
     /**
      * The x position of the mouse in the canvas space.
+     * Please do not modify.
      */
-    static get x() {
-        return Mouse._mouseX;
-    }
+    Mouse.x = 0;
     /**
      * The y position of the mouse in the canvas space.
+     * Please do not modify.
      */
-    static get y() {
-        return Mouse._mouseY;
-    }
+    Mouse.y = 0;
     /**
      * Gets if the given button was pressed this frame.
      */
-    static buttonPressed(button) {
-        return Mouse.buttonsPressed.indexOf(button) !== -1;
+    function buttonPressed(button) {
+        return buttonsPressed.indexOf(button) !== -1;
     }
+    Mouse.buttonPressed = buttonPressed;
     /**
      * Gets if the given button was held this frame.
      */
-    static buttonHeld(button) {
-        return Mouse.buttonsHeld.indexOf(button) !== -1;
+    function buttonHeld(button) {
+        return buttonsHeld.indexOf(button) !== -1;
     }
+    Mouse.buttonHeld = buttonHeld;
     /**
      * Gets if the given button was released this frame.
      */
-    static buttonReleased(button) {
-        return Mouse.buttonsReleased.indexOf(button) !== -1;
+    function buttonReleased(button) {
+        return buttonsReleased.indexOf(button) !== -1;
     }
-    static hideCursor() {
-        Mouse.canvas.style.cursor = "none";
+    Mouse.buttonReleased = buttonReleased;
+    function hideCursor() {
+        canvas.style.cursor = "none";
     }
-    static showCursor() {
-        Mouse.canvas.style.cursor = "";
+    Mouse.hideCursor = hideCursor;
+    function showCursor() {
+        canvas.style.cursor = "";
     }
+    Mouse.showCursor = showCursor;
     /**
      * To be called late in the game loop by Game.
      */
-    static _lateUpdate() {
+    function _lateUpdate() {
         // clear button records
-        Mouse.buttonsPressed.splice(0);
-        Mouse.buttonsReleased.splice(0);
+        buttonsPressed.splice(0);
+        buttonsReleased.splice(0);
     }
-    static mouseDown(event) {
-        Mouse.updateMousePosition(event);
+    Mouse._lateUpdate = _lateUpdate;
+    function mouseDown(event) {
+        updateMousePosition(event);
         // prevents middle mouse from scrolling
         if ([1, 2].indexOf(event.button) > -1) {
             event.preventDefault();
         }
-        if (Mouse.buttonsPressed.indexOf(event.button) == -1) {
-            Mouse.buttonsPressed.push(event.button);
+        if (buttonsPressed.indexOf(event.button) == -1) {
+            buttonsPressed.push(event.button);
         }
-        if (Mouse.buttonsHeld.indexOf(event.button) == -1) {
-            Mouse.buttonsHeld.push(event.button);
+        if (buttonsHeld.indexOf(event.button) == -1) {
+            buttonsHeld.push(event.button);
         }
     }
-    static mouseUp(event) {
-        let index = Mouse.buttonsHeld.indexOf(event.button);
+    function mouseUp(event) {
+        let index = buttonsHeld.indexOf(event.button);
         if (index == -1) {
             // button not previously held
             return;
         }
-        Mouse.buttonsHeld.splice(index, 1);
-        if (Mouse.buttonsReleased.indexOf(event.button) == -1) {
-            Mouse.buttonsReleased.push(event.button);
+        buttonsHeld.splice(index, 1);
+        if (buttonsReleased.indexOf(event.button) == -1) {
+            buttonsReleased.push(event.button);
         }
     }
-    static mouseMove(event) {
-        Mouse.updateMousePosition(event);
+    function mouseMove(event) {
+        updateMousePosition(event);
     }
-    static preventContextMenu(event) {
+    function preventContextMenu(event) {
         event.preventDefault();
     }
-    static updateMousePosition(event) {
-        let x = event.pageX;
-        let y = event.pageY;
-        if (x === undefined) {
-            x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-            y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    function updateMousePosition(event) {
+        let mx = event.pageX;
+        let my = event.pageY;
+        if (mx === undefined) {
+            mx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+            my = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
         // should these be using client values instead of offset values?
-        Mouse._mouseX = (x - Mouse.canvas.offsetLeft) * Mouse.canvas.width / Mouse.canvas.offsetWidth;
-        Mouse._mouseY = (y - Mouse.canvas.offsetTop) * Mouse.canvas.height / Mouse.canvas.offsetHeight;
+        Mouse.x = (mx - canvas.offsetLeft) * canvas.width / canvas.offsetWidth;
+        Mouse.y = (my - canvas.offsetTop) * canvas.height / canvas.offsetHeight;
     }
-}
-Mouse._mouseX = 0;
-Mouse._mouseY = 0;
-Mouse.buttonsPressed = [];
-Mouse.buttonsHeld = [];
-Mouse.buttonsReleased = [];
-Mouse.initialized = false;
-Mouse.canvas = null;
+    let buttonsPressed = [];
+    let buttonsHeld = [];
+    let buttonsReleased = [];
+    let initialized = false;
+    let canvas = null;
+})(Mouse || (Mouse = {}));
 /// <reference path="_ref.ts" />
 /**
 * Note that a button must be pressed on the gamepad before it will be recognized.  Pressing the button will send the "gamepadconnected" event.
