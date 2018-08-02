@@ -9126,14 +9126,17 @@ var Comps;
             // called once per frame, during the update step.  Is not called if the component is disabled.
             this.onUpdate = () => {
                 if (Keys.keyPressed(Key.Num2)) {
-                    let sn = "Music/level_white";
+                    let sn = "music/level_white";
                     if (AudioManager.isSoundPlaying(sn)) {
                         console.log("Sound already playing");
                     }
                     else {
                         console.log("Sound not playing yet");
-                        AudioManager.playMusic(sn, 1, 1, true);
+                        AudioManager.playMusic(sn, .7, 1, true);
                     }
+                }
+                if (Keys.keyPressed(Key.Num3)) {
+                    AudioManager.playSFX("sfx/boop1", .8);
                 }
             };
             // called just before the component is destroyed.

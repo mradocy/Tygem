@@ -17,13 +17,17 @@ namespace Comps {
         onUpdate = (): void => {
 
             if (Keys.keyPressed(Key.Num2)) {
-                let sn: string = "Music/level_white";
+                let sn: string = "music/level_white";
                 if (AudioManager.isSoundPlaying(sn)) {
                     console.log("Sound already playing");
                 } else {
                     console.log("Sound not playing yet");
-                    AudioManager.playMusic(sn, 1, 1, true);
+                    AudioManager.playMusic(sn, .7, 1, true);
                 }
+            }
+
+            if (Keys.keyPressed(Key.Num3)) {
+                AudioManager.playSFX("sfx/boop1", .8);
             }
             
         }
