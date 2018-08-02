@@ -8547,8 +8547,14 @@ var Scenes;
                 go.addComponent(Comps.ControlCameraWithWASD);
                 go = new GameObject();
                 go.addComponent(Comps.DotFollowsMouse);
+                // test sound
                 go = new GameObject();
                 go.addComponent(Comps.TestSound);
+                // test button
+                go = new GameObject();
+                let button = go.addComponent(Comps.Button);
+                go.transform.x = 300;
+                go.transform.y = 200;
             };
             this.onUnload = () => { };
         }
@@ -8866,6 +8872,45 @@ var Comps;
         }
     }
     Comps.ArrowTestPlatController = ArrowTestPlatController;
+})(Comps || (Comps = {}));
+/// <reference path="../../Tygem/_ref.ts" />
+var Comps;
+(function (Comps) {
+    class Button extends DrawerComponent {
+        constructor() {
+            super();
+            /**
+             * Color/style used for the fill of the rectangle.
+             */
+            this.fillStyle = "#FF0000";
+            /**
+             * Color/style used for the stroke of the rectangle.
+             */
+            this.borderStyle = "#00FF00";
+            this.borderWidth = 1;
+            this.width = 100;
+            this.height = 50;
+            this.textFont = "12px Verdana";
+            this.textColor = "#FFFFFF";
+            this.draw = (context) => {
+                // draw rectangle
+                context.fillStyle = this.fillStyle;
+                context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                context.lineWidth = this.borderWidth;
+                context.strokeStyle = this.borderStyle;
+                context.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                // draw text
+                context.font = this.textFont;
+                context.textAlign = "center";
+                context.textBaseline = "middle";
+                context.fillStyle = this.textColor;
+                context.fillText("test text", 0, 0);
+            };
+            this.name = "Button";
+            this.anchored = true;
+        }
+    }
+    Comps.Button = Button;
 })(Comps || (Comps = {}));
 /// <reference path="../../Tygem/_ref.ts" />
 var Comps;
