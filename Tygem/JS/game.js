@@ -4567,7 +4567,9 @@ var Collision;
                         t = (x - originX) / direction.x;
                         y = originY + t * direction.y;
                         row = Math.floor(y / tileHeight);
-                        if (row < 0 || row >= numRows)
+                        if (direction.y <= 0 && row < 0)
+                            break;
+                        if (direction.y >= 0 && row >= numRows)
                             break;
                         if (t > distance)
                             break;
@@ -4587,7 +4589,9 @@ var Collision;
                         t = (x - originX) / direction.x;
                         y = originY + t * direction.y;
                         row = Math.floor(y / tileHeight);
-                        if (row < 0 || row >= numRows)
+                        if (direction.y <= 0 && row < 0)
+                            break;
+                        if (direction.y >= 0 && row >= numRows)
                             break;
                         if (t > distance)
                             break;
@@ -4610,7 +4614,9 @@ var Collision;
                         t = (y - originY) / direction.y;
                         x = originX + t * direction.x;
                         col = Math.floor(x / tileWidth);
-                        if (col < 0 || col >= numCols)
+                        if (direction.x <= 0 && col < 0)
+                            break;
+                        if (direction.x >= 0 && col >= numCols)
                             break;
                         if (t > distance)
                             break;
@@ -4630,7 +4636,9 @@ var Collision;
                         t = (y - originY) / direction.y;
                         x = originX + t * direction.x;
                         col = Math.floor(x / tileWidth);
-                        if (col < 0 || col >= numCols)
+                        if (direction.x <= 0 && col < 0)
+                            break;
+                        if (direction.x >= 0 && col >= numCols)
                             break;
                         if (t > distance)
                             break;
@@ -4723,7 +4731,9 @@ var Collision;
                         yBottom = aBottom + t * aDiffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        if (rowBottom < 0 || rowTop >= numRows)
+                        if (aDiffY <= 0 && rowBottom < 0)
+                            break;
+                        if (aDiffY >= 0 && rowTop >= numRows)
                             break;
                         if (t > 1)
                             break;
@@ -4749,7 +4759,9 @@ var Collision;
                         yBottom = aBottom + t * aDiffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        if (rowBottom < 0 || rowTop >= numRows)
+                        if (aDiffY <= 0 && rowBottom < 0)
+                            break;
+                        if (aDiffY >= 0 && rowTop >= numRows)
                             break;
                         if (t > 1)
                             break;
@@ -4775,7 +4787,9 @@ var Collision;
                         xRight = aRight + t * aDiffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        if (colLeft < 0 || colRight >= numCols)
+                        if (aDiffX <= 0 && colLeft < 0)
+                            break;
+                        if (aDiffX >= 0 && colRight >= numCols)
                             break;
                         if (t > 1)
                             break;
@@ -4801,7 +4815,9 @@ var Collision;
                         xRight = aRight + t * aDiffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        if (colLeft < 0 || colRight >= numCols)
+                        if (aDiffX <= 0 && colLeft < 0)
+                            break;
+                        if (aDiffX >= 0 && colRight >= numCols)
                             break;
                         if (t > 1)
                             break;
@@ -4937,7 +4953,9 @@ var Collision;
                         yBottom = aBottom + t * -diffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        if (rowBottom < 0 || rowTop >= numRows)
+                        if (diffY <= 0 && rowBottom < 0)
+                            break;
+                        if (diffY >= 0 && rowTop >= numRows)
                             break;
                         if (t > 1)
                             break;
@@ -4963,7 +4981,9 @@ var Collision;
                         yBottom = aBottom + t * -diffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        if (rowBottom < 0 || rowTop >= numRows)
+                        if (diffY <= 0 && rowBottom < 0)
+                            break;
+                        if (diffY >= 0 && rowTop >= numRows)
                             break;
                         if (t > 1)
                             break;
@@ -4989,7 +5009,9 @@ var Collision;
                         xRight = aRight + t * -diffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        if (colRight < 0 || colLeft >= numCols)
+                        if (diffX <= 0 && colLeft < 0)
+                            break;
+                        if (diffX >= 0 && colRight >= numCols)
                             break;
                         if (t > 1)
                             break;
@@ -5015,7 +5037,9 @@ var Collision;
                         xRight = aRight + t * -diffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        if (colRight < 0 || colLeft >= numCols)
+                        if (diffX <= 0 && colLeft < 0)
+                            break;
+                        if (diffX >= 0 && colRight >= numCols)
                             break;
                         if (t > 1)
                             break;
@@ -5807,8 +5831,6 @@ var Scenes;
                 go.addComponent(Comps.ControlCameraWithWASD);
                 go = new GameObject();
                 go.addComponent(Comps.DotFollowsMouse);
-                go = new GameObject();
-                go.addComponent(Comps.TestSound);
                 go = new GameObject();
                 let button = go.addComponent(Comps.Button);
                 go.transform.x = 300;

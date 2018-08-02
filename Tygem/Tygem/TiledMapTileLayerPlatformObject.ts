@@ -64,8 +64,8 @@ namespace Collision {
                     row = Math.floor(y / tileHeight);
 
                     // break if y is going off the map
-                    if (row < 0 || row >= numRows)
-                        break;
+                    if (direction.y <= 0 && row < 0) break;
+                    if (direction.y >= 0 && row >= numRows) break;
 
                     // break if going too far
                     if (t > distance)
@@ -96,8 +96,8 @@ namespace Collision {
                     row = Math.floor(y / tileHeight);
 
                     // break if y is going off the map
-                    if (row < 0 || row >= numRows)
-                        break;
+                    if (direction.y <= 0 && row < 0) break;
+                    if (direction.y >= 0 && row >= numRows) break;
 
                     // break if going too far
                     if (t > distance)
@@ -134,8 +134,8 @@ namespace Collision {
                     col = Math.floor(x / tileWidth);
 
                     // break if x is going off the map
-                    if (col < 0 || col >= numCols)
-                        break;
+                    if (direction.x <= 0 && col < 0) break;
+                    if (direction.x >= 0 && col >= numCols) break;
 
                     // break if going too far
                     if (t > distance)
@@ -166,8 +166,8 @@ namespace Collision {
                     col = Math.floor(x / tileWidth);
 
                     // break if x is going off the map
-                    if (col < 0 || col >= numCols)
-                        break;
+                    if (direction.x <= 0 && col < 0) break;
+                    if (direction.x >= 0 && col >= numCols) break;
 
                     // break if going too far
                     if (t > distance)
@@ -298,8 +298,8 @@ namespace Collision {
                     rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
 
                     // break if y is going off the map
-                    if (rowBottom < 0 || rowTop >= numRows)
-                        break;
+                    if (aDiffY <= 0 && rowBottom < 0) break;
+                    if (aDiffY >= 0 && rowTop >= numRows) break;
 
                     // break if going past aDiffX
                     if (t > 1)
@@ -341,8 +341,8 @@ namespace Collision {
                     rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
 
                     // break if y is going off the map
-                    if (rowBottom < 0 || rowTop >= numRows)
-                        break;
+                    if (aDiffY <= 0 && rowBottom < 0) break;
+                    if (aDiffY >= 0 && rowTop >= numRows) break;
 
                     // break if going past aDiffX
                     if (t > 1)
@@ -389,8 +389,8 @@ namespace Collision {
                     colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
 
                     // break if x is going off the map
-                    if (colLeft < 0 || colRight >= numCols)
-                        break;
+                    if (aDiffX <= 0 && colLeft < 0) break;
+                    if (aDiffX >= 0 && colRight >= numCols) break;
 
                     // break if going past aDiffY
                     if (t > 1)
@@ -432,8 +432,8 @@ namespace Collision {
                     colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
 
                     // break if x is going off the map
-                    if (colLeft < 0 || colRight >= numCols)
-                        break;
+                    if (aDiffX <= 0 && colLeft < 0) break;
+                    if (aDiffX >= 0 && colRight >= numCols) break;
 
                     // break if going past aDiffY
                     if (t > 1)
@@ -689,8 +689,8 @@ namespace Collision {
                     rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
 
                     // break if y is going off the map
-                    if (rowBottom < 0 || rowTop >= numRows)
-                        break;
+                    if (diffY <= 0 && rowBottom < 0) break;
+                    if (diffY >= 0 && rowTop >= numRows) break;
 
                     // break if going past diffX
                     if (t > 1)
@@ -732,8 +732,8 @@ namespace Collision {
                     rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
 
                     // break if y is going off the map
-                    if (rowBottom < 0 || rowTop >= numRows)
-                        break;
+                    if (diffY <= 0 && rowBottom < 0) break;
+                    if (diffY >= 0 && rowTop >= numRows) break;
 
                     // break if going past diffX
                     if (t > 1)
@@ -777,8 +777,8 @@ namespace Collision {
                     colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
 
                     // break if x is going off the map
-                    if (colRight < 0 || colLeft >= numCols)
-                        break;
+                    if (diffX <= 0 && colLeft < 0) break;
+                    if (diffX >= 0 && colRight >= numCols) break;
 
                     // break if going past diffY
                     if (t > 1)
@@ -820,8 +820,8 @@ namespace Collision {
                     colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
 
                     // break if x is going off the map
-                    if (colRight < 0 || colLeft >= numCols)
-                        break;
+                    if (diffX <= 0 && colLeft < 0) break;
+                    if (diffX >= 0 && colRight >= numCols) break;
 
                     // break if going past diffY
                     if (t > 1)

@@ -79,8 +79,8 @@ namespace Scenes {
 
 
             // test sound
-            go = new GameObject();
-            go.addComponent(Comps.TestSound);
+            //go = new GameObject();
+            //go.addComponent(Comps.TestSound);
 
             // test button
             go = new GameObject();
