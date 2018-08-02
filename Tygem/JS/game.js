@@ -1,16 +1,9 @@
-/// <reference path="_ref.ts" />
 class Vec2 {
     constructor(x = 0, y = 0) {
-        /**
-         * Sets the values of this Vec2.
-         */
         this.setValues = (x, y) => {
             this.x = x;
             this.y = y;
         };
-        /**
-         * Sets the values of the Vec2 from a Vec2
-         */
         this.setValuesVec2 = (v) => {
             this.x = v.x;
             this.y = v.y;
@@ -21,9 +14,6 @@ class Vec2 {
         this.equalsVec2 = (v) => {
             return this.x === v.x && this.y === v.y;
         };
-        /**
-         * Resizes the vector to have a magnitude of 1.
-         */
         this.normalize = () => {
             let mag = Math.sqrt(this.x * this.x + this.y * this.y);
             if (mag > 0.000001) {
@@ -31,9 +21,6 @@ class Vec2 {
                 this.y /= mag;
             }
         };
-        /**
-         * Creates a new Vec2 with the same values.
-         */
         this.clone = () => {
             return new Vec2(this.x, this.y);
         };
@@ -43,160 +30,75 @@ class Vec2 {
         this.x = x;
         this.y = y;
     }
-    /**
-     * Calculates distance between the two given vectors.
-     */
     static distance(v1, v2) {
         return Math.sqrt((v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y));
     }
-    /**
-     * Calculates the dot product of two vectors.
-     */
     static dot(v1, v2) {
         return v1.x * v2.x + v1.y * v2.y;
     }
 }
-/// <reference path="_ref.ts" />
 var M;
 (function (M) {
-    /**
-     * Multiply a degree value by this to get its equivalent in radians.
-     */
     M.degToRad = 0.017453292519943295;
-    /**
-     * Multiply a radian value by this to get its equivalent in degrees.
-     */
     M.radToDeg = 57.295779513082323;
-    /**
-     * Epsilon value used for floating point comparisons.
-     */
     M.EPSILON = .0001;
-    /**
-     * Calculates the distance between 2 points.
-     * @param v1x x of vector 1
-     * @param v1y y of vector 1
-     * @param v2x x of vector 2
-     * @param v2y y of vector 2
-     */
     function distance(v1x, v1y, v2x, v2y) {
         return Math.sqrt((v2x - v1x) * (v2x - v1x) + (v2y - v1y) * (v2y - v1y));
     }
     M.distance = distance;
-    /**
-     * Calculates the magnitude of a vector.
-     * @param vx x of the vector
-     * @param vy y of the vector
-     */
     function magnitude(vx, vy) {
         return Math.sqrt(vx * vx + vy * vy);
     }
     M.magnitude = magnitude;
-    /**
-     * Calculates the square of the magnitude of a vector.
-     * @param vx x of the vector
-     * @param vy y of the vector
-     */
     function sqrMagnitude(vx, vy) {
         return vx * vx + vy * vy;
     }
     M.sqrMagnitude = sqrMagnitude;
-    /**
-     * Calculates the dot product of two vectors.
-     * @param ax x of vector a
-     * @param ay y of vector a
-     * @param bx x of vector b
-     * @param by y of vector b
-     */
     function dot(ax, ay, bx, by) {
         return ax * bx + ay * by;
     }
     M.dot = dot;
-    /**
-     * Returns the result of projecting vector a onto vector b.
-     * @param ax x of vector a
-     * @param ay y of vector a
-     * @param bx x of vector b
-     * @param by y of vector b
-     */
     function vectorProject(ax, ay, bx, by) {
         let s = dot(ax, ay, bx, by) / dot(bx, by, bx, by);
         return new Vec2(s * bx, s * by);
     }
     M.vectorProject = vectorProject;
-    /**
-     * Calculates x mod y for floats.  Always returns a positive value.
-     */
     function fmod(x, y) {
         return x - Math.floor(x / y) * y;
     }
     M.fmod = fmod;
-    /**
-     * Literally just the classic atan2 function, but takes a Vec2 as an argument.  Returns angle in radians.
-     */
     function atan2(v) {
         return Math.atan2(v.y, v.x);
     }
     M.atan2 = atan2;
-    /**
-     * Wraps a value in [0, 2*PI)
-     */
     function wrap2PI(angleRadians) {
         return fmod(angleRadians, Math.PI * 2);
     }
     M.wrap2PI = wrap2PI;
-    /**
-     * Wraps a value in [-PI, PI)
-     */
     function wrapPI(angleRadians) {
         return fmod(angleRadians + Math.PI, Math.PI * 2) - Math.PI;
     }
     M.wrapPI = wrapPI;
-    /**
-     * Wraps a value in [0, 360)
-     */
     function wrap360(angleDegrees) {
         return fmod(angleDegrees, 360);
     }
     M.wrap360 = wrap360;
-    /**
-     * Wraps a value in [-180, 180)
-     */
     function wrap180(angleDegrees) {
         return fmod(angleDegrees + 180, 360) - 180;
     }
     M.wrap180 = wrap180;
-    /**
-     * Returns the value (in radians) to be added to angleStart to reach angleEnd.  This value is wrappen in [-PI, PI)
-     */
     function angleDiffRadians(angleStartRadians, angleEndRadians) {
         return wrapPI(angleEndRadians - angleStartRadians);
     }
     M.angleDiffRadians = angleDiffRadians;
-    /**
-     * Returns the value (in degrees) to be added to angleStart to reach angleEnd.  This value is wrappen in [-180, 180)
-     */
     function angleDiffDegrees(angleStartDegrees, angleEndDegrees) {
         return wrap180(angleEndDegrees - angleStartDegrees);
     }
     M.angleDiffDegrees = angleDiffDegrees;
-    /**
-     * Given a sector defined by a center angle and spread, return if the given test angle is contained in the sector (all in degrees).
-     * @param sectorAngle Angle defining the center of the sector.
-     * @param sectorAngleSpread The angular size of the sector.
-     * @param testAngle The angle to test if it's contained in the sector.
-     */
     function angleInSectorDegrees(sectorAngle, sectorAngleSpread, testAngle) {
         return Math.abs(angleDiffDegrees(testAngle, sectorAngle)) <= sectorAngleSpread / 2;
     }
     M.angleInSectorDegrees = angleInSectorDegrees;
-    /**
-     * Returns a Vec2 that's the rotation of a given vector around a given point.
-     * @param vx x of the vector to rotate.
-     * @param vy y of the vector to rotate.
-     * @param pointX x of the point to rotate around.
-     * @param pointY y of the point to rotate around.
-     * @param rotationRadians Angle to rotate, in radians.
-     */
     function rotateAroundPoint(vx, vy, pointX, pointY, rotationRadians) {
         let ret = new Vec2();
         let c = Math.cos(rotationRadians);
@@ -206,15 +108,6 @@ var M;
         return ret;
     }
     M.rotateAroundPoint = rotateAroundPoint;
-    /**
-     * Returns the point on the line defined by lineP0 and lineP1 that is closest to the given point.
-     * @param lineP0x x of the first point that defines the line.
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the other point that defines the line.
-     * @param lineP1y y of the other point that defines the line.
-     * @param pointX x of the point to consider.
-     * @param pointY y of the point to consider.
-     */
     function pointOnLineClosestToPoint(lineP0x, lineP0y, lineP1x, lineP1y, pointX, pointY) {
         let ret = vectorProject(pointX - lineP0x, pointY - lineP0y, lineP1x - lineP0x, lineP1y - lineP0y);
         ret.x += lineP0x;
@@ -222,15 +115,6 @@ var M;
         return ret;
     }
     M.pointOnLineClosestToPoint = pointOnLineClosestToPoint;
-    /**
-     * Calculates the intersection points between circle 1 and circle 2.  Returns array of the 2 Vec2 intersections.  If there are no intersections, null is returned.
-     * @param c1x x of circle 1
-     * @param c1y y of circle 1
-     * @param r1 radius of circle 1
-     * @param c2x x of circle 2
-     * @param c2y y of circle 2
-     * @param r2 radius of circle 2
-     */
     function circleCircleIntersection(c1x, c1y, r1, c2x, c2y, r2) {
         let d = distance(c1x, c1y, c2x, c2y);
         if (d > r1 + r2)
@@ -247,16 +131,6 @@ var M;
         ];
     }
     M.circleCircleIntersection = circleCircleIntersection;
-    /**
-     * Calculates the intersection points between a line (defined by 2 points on the line) and a circle.  Returns array of the 2 Vector2 intersections.  If there are no intersections, the array is null.
-     * @param lineP0x x of the first point that defines the line.
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the second point that defines the line.
-     * @param lineP1y y of the second point that defines the line.
-     * @param cx x of the center of the circle.
-     * @param cy y of the center of the circle.
-     * @param r radius of the circle.
-     */
     function lineCircleIntersection(lineP0x, lineP0y, lineP1x, lineP1y, cx, cy, r) {
         let mid = pointOnLineClosestToPoint(lineP0x, lineP0y, lineP1x, lineP1y, cx, cy);
         let dist2 = r * r - sqrMagnitude(cx - mid.x, cy - mid.y);
@@ -271,78 +145,30 @@ var M;
         ];
     }
     M.lineCircleIntersection = lineCircleIntersection;
-    /**
-     * Given elements in a line, all spaced a specified distance from each other, with the average displacement being 0, what's the position of each element?
-     * @param spacing Distance between each element.
-     * @param index Index of the given element.
-     * @param numElements Total number of elements
-     */
     function centeredSpacing(spacing, index, numElements) {
         if (numElements <= 1)
             return 0;
         return (index - (numElements - 1) / 2) * spacing;
     }
     M.centeredSpacing = centeredSpacing;
-    /**
-     * Returns of vector 2 is position clockwise to vector 1
-     * @param v1x x of vector 1
-     * @param v1y y of vector 1
-     * @param v2x x of vector 2
-     * @param v2y y of vector 2
-     */
     function isClockwise(v1x, v1y, v2x, v2y) {
         return -v1x * v2y + v1y * v2x > 0;
     }
     M.isClockwise = isClockwise;
-    /**
-     * Returns the angle (in radians) formed from the two given vectors.
-     * @param v0x x of the first vector to compare.
-     * @param v0y y of the first vector to compare.
-     * @param v1x x of the other vector to compare.
-     * @param v1y y of the other vector to compare.
-     */
     function angleBetweenVectors(v0x, v0y, v1x, v1y) {
         return Math.acos(dot(v0x, v0y, v1x, v1y) / (magnitude(v0x, v0y) * magnitude(v1x, v1y)));
     }
     M.angleBetweenVectors = angleBetweenVectors;
-    /**
-     * Returns the normal (with magnitude of 1) of the given vector.  If looking in the direction of the given vector, the normal will face to the "left".
-     * @param vx x of the vector
-     * @param vy y of the vector
-     */
     function normalVector(vx, vy) {
         let ret = new Vec2(-vy, vx);
         ret.normalize();
         return ret;
     }
     M.normalVector = normalVector;
-    /**
-     * Returns if the two given lines are parallel.
-     * @param line0P0x x of the first point that defines the first line.
-     * @param line0P0y y of the first point that defines the first line.
-     * @param line0P1x x of the other point that defines the first line.
-     * @param line0P1y y of the other point that defines the first line.
-     * @param line1P0x x of the first point that defines the other line.
-     * @param line1P0y y of the first point that defines the other line.
-     * @param line1P1x x of the other point that defines the other line.
-     * @param line1P1y y of the other point that defines the other line.
-     */
     function linesParallel(line0P0x, line0P0y, line0P1x, line0P1y, line1P0x, line1P0y, line1P1x, line1P1y) {
         return !isFinite(lineLineIntersection(line0P0x, line0P0y, line0P1x, line0P1y, line1P0x, line1P0y, line1P1x, line1P1y));
     }
     M.linesParallel = linesParallel;
-    /**
-     * Returns t, which is "when" two lines intersect.  The point of intersection is line0P0 + (line0P1 - line0P0) * t.
-     * Returns Number.POSITIVE_INFINITY if the lines don't intersect (i.e. are parallel).
-     * @param line0P0x x of the first point that defines the first line.
-     * @param line0P0y y of the first point that defines the first line.
-     * @param line0P1x x of the other point that defines the first line.
-     * @param line0P1y y of the other point that defines the first line.
-     * @param line1P0x x of the first point that defines the other line.
-     * @param line1P0y y of the first point that defines the other line.
-     * @param line1P1x x of the other point that defines the other line.
-     * @param line1P1y y of the other point that defines the other line.
-     */
     function lineLineIntersection(line0P0x, line0P0y, line0P1x, line0P1y, line1P0x, line1P0y, line1P1x, line1P1y) {
         let line0x = line0P1x - line0P0x;
         let line0y = line0P1y - line0P0y;
@@ -350,23 +176,11 @@ var M;
         let perpLine1y = line1P1x - line1P0x;
         let div = dot(perpLine1x, perpLine1y, line0x, line0y);
         if (Math.abs(div) < M.EPSILON) {
-            // lines are parallel
             return Number.POSITIVE_INFINITY;
         }
         return dot(perpLine1x, perpLine1y, line1P0x - line0P0x, line1P0y - line0P0y) / div;
     }
     M.lineLineIntersection = lineLineIntersection;
-    /**
-     * Returns the point where two infinite lines intersect.  Returns null if they don't (i.e. are parallel).
-     * @param line0P0x x of the first point that defines the first line.
-     * @param line0P0y y of the first point that defines the first line.
-     * @param line0P1x x of the other point that defines the first line.
-     * @param line0P1y y of the other point that defines the first line.
-     * @param line1P0x x of the first point that defines the other line.
-     * @param line1P0y y of the first point that defines the other line.
-     * @param line1P1x x of the other point that defines the other line.
-     * @param line1P1y y of the other point that defines the other line.
-     */
     function lineLineIntersectionPoint(line0P0x, line0P0y, line0P1x, line0P1y, line1P0x, line1P0y, line1P1x, line1P1y) {
         let t = lineLineIntersection(line0P0x, line0P0y, line0P1x, line0P1y, line1P0x, line1P0y, line1P1x, line1P1y);
         if (!isFinite(t))
@@ -374,33 +188,17 @@ var M;
         return new Vec2(line0P0x + (line0P1x - line0P0x) * t, line0P0y + (line0P1y - line0P0y) * t);
     }
     M.lineLineIntersectionPoint = lineLineIntersectionPoint;
-    /**
-     * Returns time t > -EPSILON when a ray will intersect a line of infinite length.  Returns -1 if ray won't intersect the line.
-     * The point of the intersection is rayOrigin + rayDirection * t.
-     * @param rayOriginX x of the origin point of the ray.
-     * @param rayOriginY y of the origin point of the ray.
-     * @param rayDirectionX x of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param rayDirectionY y of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param lineP0x x of the first point that defines the line.
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the other point that defines the line.
-     * @param lineP1y y of the other point that defines the line.
-     * @param rayDistance How long the ray is.  The ray is considered to be of infinite length if this value is positive infinity.
-     */
     function rayLineIntersection(rayOriginX, rayOriginY, rayDirectionX, rayDirectionY, lineP0x, lineP0y, lineP1x, lineP1y, rayDistance = Number.POSITIVE_INFINITY) {
         let t = lineLineIntersection(rayOriginX, rayOriginY, rayOriginX + rayDirectionX, rayOriginY + rayDirectionY, lineP0x, lineP0y, lineP1x, lineP1y);
         if (!isFinite(t))
-            return -1; // lines are parallel
+            return -1;
         if (t <= -M.EPSILON)
-            return -1; // ray would hit before the origin
+            return -1;
         if (rayDistance > 0 && !isFinite(rayDistance)) {
-            // ray is infinite, sure to hit line
             return t;
         }
-        // ray isn't infinte, check if intersection would happen within the rayDistance
         let directionMagnitude = sqrMagnitude(rayDirectionX, rayDirectionY);
         if (Math.abs(directionMagnitude - 1) >= M.EPSILON) {
-            // direction wasn't normalized
             directionMagnitude = Math.sqrt(directionMagnitude);
         }
         let intersectDistance = directionMagnitude * t;
@@ -409,24 +207,10 @@ var M;
         return -1;
     }
     M.rayLineIntersection = rayLineIntersection;
-    /**
-     * Returns time t > -EPSILON when a ray will intersect a segment.  Returns -1 if ray won't intersect the segment.
-     * The point of the intersection is rayOrigin + rayDirection * t.
-     * @param rayOriginX x of the origin point of the ray.
-     * @param rayOriginY y of the origin point of the ray.
-     * @param rayDirectionX x of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param rayDirectionY y of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param segmentP0x x of the first point that defines the segment.
-     * @param segmentP0y y of the first point that defines the segment.
-     * @param segmentP1x x of the other point that defines the segment.
-     * @param segmentP1y y of the other point that defines the segment.
-     * @param rayDistance How long the ray is.  The ray is considered to be of infinite length if this value is positive infinity.
-     */
     function raySegmentIntersection(rayOriginX, rayOriginY, rayDirectionX, rayDirectionY, segmentP0x, segmentP0y, segmentP1x, segmentP1y, rayDistance = Number.POSITIVE_INFINITY) {
         let t = rayLineIntersection(rayOriginX, rayOriginY, rayDirectionX, rayDirectionY, segmentP0x, segmentP0y, segmentP1x, segmentP1y, rayDistance);
         if (t == -1)
             return -1;
-        // check that intersect point is contained in the segment
         let px = rayOriginX + rayDirectionX * t;
         let py = rayOriginY + rayDirectionY * t;
         if (Math.min(segmentP0x, segmentP1x) - M.EPSILON < px && px < Math.max(segmentP0x, segmentP1x) + M.EPSILON &&
@@ -436,26 +220,12 @@ var M;
         return -1;
     }
     M.raySegmentIntersection = raySegmentIntersection;
-    /**
-     * Returns time t > -EPSILON when a ray will intersect a vertical segment.  Returns -1 if ray won't intersect the segment.
-     * The point of the intersection is rayOrigin + rayDirection * t.
-     * @param rayOriginX x of the origin point of the ray.
-     * @param rayOriginY y of the origin point of the ray.
-     * @param rayDirectionX x of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param rayDirectionY y of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param segmentX x of both points of the segment.
-     * @param segmentP0y y of the first point that defines the segment.
-     * @param segmentP1y y of the other point that defines the segment.
-     * @param rayDistance How long the ray is.  The ray is considered to be of infinite length if this value is positive infinity.
-     */
     function rayVerticalSegmentIntersection(rayOriginX, rayOriginY, rayDirectionX, rayDirectionY, segmentX, segmentP0y, segmentP1y, rayDistance = Number.POSITIVE_INFINITY) {
-        // vertical ray won't intersect
         if (Math.abs(rayDirectionX) < M.EPSILON)
             return -1;
         let t = (segmentX - rayOriginX) / rayDirectionX;
         if (t <= -M.EPSILON)
             return -1;
-        // check that intersect point is contained in the segment
         let py = rayOriginY + rayDirectionY * t;
         if (Math.min(segmentP0y, segmentP1y) - M.EPSILON < py && py < Math.max(segmentP0y, segmentP1y) + M.EPSILON) {
             return t;
@@ -463,26 +233,12 @@ var M;
         return -1;
     }
     M.rayVerticalSegmentIntersection = rayVerticalSegmentIntersection;
-    /**
-     * Returns time t > -EPSILON when a ray will intersect a horizontal segment.  Returns -1 if ray won't intersect the segment.
-     * The point of the intersection is rayOrigin + rayDirection * t.
-     * @param rayOriginX x of the origin point of the ray.
-     * @param rayOriginY y of the origin point of the ray.
-     * @param rayDirectionX x of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param rayDirectionY y of the direction vector of the ray.  This value should be normalized, but this is not required.
-     * @param segmentY y of both points of the segment.
-     * @param segmentP0x x of the first point that defines the segment.
-     * @param segmentP1x x of the other point that defines the segment.
-     * @param rayDistance How long the ray is.  The ray is considered to be of infinite length if this value is positive infinity.
-     */
     function rayHorizontalSegmentIntersection(rayOriginX, rayOriginY, rayDirectionX, rayDirectionY, segmentY, segmentP0x, segmentP1x, rayDistance = Number.POSITIVE_INFINITY) {
-        // horizontal ray won't intersect
         if (Math.abs(rayDirectionY) < M.EPSILON)
             return -1;
         let t = (segmentY - rayOriginY) / rayDirectionY;
         if (t <= -M.EPSILON)
             return -1;
-        // check that intersect point is contained in the segment
         let px = rayOriginX + rayDirectionX * t;
         if (Math.min(segmentP0x, segmentP1x) - M.EPSILON < px && px < Math.max(segmentP0x, segmentP1x) + M.EPSILON) {
             return t;
@@ -490,17 +246,6 @@ var M;
         return -1;
     }
     M.rayHorizontalSegmentIntersection = rayHorizontalSegmentIntersection;
-    /**
-     * Returns t in (-EPSILON, 1] if the two segments intersect, and -1 if they don't.  The point of intersection is segment0P0 + (segment0P1 - segment0P0) * t.
-     * @param segment0P0x x of the first point that defines the first segment.
-     * @param segment0P0y y of the first point that defines the first segment.
-     * @param segment0P1x x of the other point that defines the first segment.
-     * @param segment0P1y y of the other point that defines the first segment.
-     * @param segment1P0x x of the first point that defines the other segment.
-     * @param segment1P0y y of the first point that defines the other segment.
-     * @param segment1P1x x of the other point that defines the other segment.
-     * @param segment1P1y y of the other point that defines the other segment.
-     */
     function segmentSegmentIntersection(segment0P0x, segment0P0y, segment0P1x, segment0P1y, segment1P0x, segment1P0y, segment1P1x, segment1P1y) {
         let t = raySegmentIntersection(segment0P0x, segment0P0y, segment0P1x - segment0P0x, segment0P1y - segment0P0y, segment1P0x, segment1P0y, segment1P1x, segment1P1y);
         if (t == -1)
@@ -510,42 +255,14 @@ var M;
         return t;
     }
     M.segmentSegmentIntersection = segmentSegmentIntersection;
-    /**
-     * Given a line defined by p0 and p1, returns if the point is to the left of the line ("left" when facing p1 from p0).
-     * @param lineP0x x of the first point that defines the line
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the other point that defines the line.
-     * @param lineP1y y of the other point that defines the line.
-     * @param pointX x of the point to test.
-     * @param pointY y of the point to test.
-     */
     function pointToLeft(lineP0x, lineP0y, lineP1x, lineP1y, pointX, pointY) {
         return ((lineP1x - lineP0x) * (pointY - lineP0y) - (lineP1y - lineP0y) * (pointX - lineP0x)) > 0;
     }
     M.pointToLeft = pointToLeft;
-    /**
-     * Given a line and two points, returns if the points are on the same side of the line.
-     * @param lineP0x x of the first point that defines the line
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the other point that defines the line.
-     * @param lineP1y y of the other point that defines the line.
-     * @param point0x x of the first point to test.
-     * @param point0y y of the first point to test.
-     * @param point1x x of the other point to test.
-     * @param point1y y of the other point to test.
-     */
     function pointsOnSameSideOfLine(lineP0x, lineP0y, lineP1x, lineP1y, point0x, point0y, point1x, point1y) {
         return pointToLeft(lineP0x, lineP0y, lineP1x, lineP1y, point0x, point0y) == pointToLeft(lineP0x, lineP0y, lineP1x, lineP1y, point1x, point1y);
     }
     M.pointsOnSameSideOfLine = pointsOnSameSideOfLine;
-    /**
-     * Given a line, returns the point on the line with the given x coordinate.  Returns positive infinity if the line is vertical.
-     * @param lineP0x x of the first point that defines the line
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the other point that defines the line.
-     * @param lineP1y y of the other point that defines the line.
-     * @param x the x coordinate to consider
-     */
     function yFromXOnLine(lineP0x, lineP0y, lineP1x, lineP1y, x) {
         if (Math.abs(lineP1x - lineP0x) < M.EPSILON)
             return Number.POSITIVE_INFINITY;
@@ -554,14 +271,6 @@ var M;
         return slope * x + yInt;
     }
     M.yFromXOnLine = yFromXOnLine;
-    /**
-     * Given a line, returns the point on the line with the given y coordinate.  Returns positive infinity if the line is horizontal.
-     * @param lineP0x x of the first point that defines the line
-     * @param lineP0y y of the first point that defines the line.
-     * @param lineP1x x of the other point that defines the line.
-     * @param lineP1y y of the other point that defines the line.
-     * @param y the y coordinate to consider
-     */
     function xFromYOnLine(lineP0x, lineP0y, lineP1x, lineP1y, y) {
         if (Math.abs(lineP1y - lineP0y) < M.EPSILON)
             return Number.POSITIVE_INFINITY;
@@ -571,7 +280,6 @@ var M;
     }
     M.xFromYOnLine = xFromYOnLine;
 })(M || (M = {}));
-/// <reference path="_ref.ts" />
 class Rect {
     constructor(x = 0, y = 0, width = 0, height = 0) {
         this.setValues = (x, y, width, height) => {
@@ -586,9 +294,6 @@ class Rect {
         this.toString = () => {
             return "x: " + this.x + " y: " + this.y + " width: " + this.width + " height: " + this.height;
         };
-        /**
-            * Returns if this rectangle overlaps the given rectangle.
-            */
         this.overlaps = (rect) => {
             if (this.x + this.width < rect.x)
                 return false;
@@ -600,9 +305,6 @@ class Rect {
                 return false;
             return true;
         };
-        /**
-            * Returns if this rectangle contains the given point.
-            */
         this.containsPoint = (x, y) => {
             return this.x <= x && x <= this.x + this.width &&
                 this.y <= y && y <= this.y + this.height;
@@ -613,15 +315,8 @@ class Rect {
         this.height = height;
     }
 }
-/// <reference path="_ref.ts" />
-/**
-* Matrix used for 2D transformations, e.g. setting the transform of CanvasRenderingContext2D.
-*/
 class Matrix2x3 {
     constructor(a = 1, b = 0, c = 0, d = 1, e = 0, f = 0) {
-        /**
-         * Sets this to the identity matrix.
-         */
         this.setIdentity = () => {
             this.a = 1;
             this.b = 0;
@@ -630,9 +325,6 @@ class Matrix2x3 {
             this.e = 0;
             this.f = 0;
         };
-        /**
-         * Sets all values of this matrix at once.
-         */
         this.setValues = (a, b, c, d, e, f) => {
             this.a = a;
             this.b = b;
@@ -641,9 +333,6 @@ class Matrix2x3 {
             this.e = e;
             this.f = f;
         };
-        /**
-         * Sets all values of this matrix at once, from the given matrix.
-         */
         this.setValuesFromMatrix = (m) => {
             this.a = m.a;
             this.b = m.b;
@@ -652,17 +341,11 @@ class Matrix2x3 {
             this.e = m.e;
             this.f = m.f;
         };
-        /**
-         * Returns a clone of this matrix.
-         */
         this.clone = () => {
             let ret = new Matrix2x3();
             ret.setValues(this.a, this.b, this.c, this.d, this.e, this.f);
             return ret;
         };
-        /**
-         * Multiplies current matrix by new matrix values.
-         */
         this.multiply = (a2, b2, c2, d2, e2, f2) => {
             let a1 = this.a;
             let b1 = this.b;
@@ -677,9 +360,6 @@ class Matrix2x3 {
             this.e = a1 * e2 + c1 * f2 + e1;
             this.f = b1 * e2 + d1 * f2 + f1;
         };
-        /**
-         * Inverts this matrix in place (doesn't return anything).
-         */
         this.invert = () => {
             let a = this.a;
             let b = this.b;
@@ -695,41 +375,23 @@ class Matrix2x3 {
             this.e = (c * f - d * e) / dt;
             this.f = -(a * f - b * e) / dt;
         };
-        /**
-         * Scales this matrix by the given scale x and scale y.
-         */
         this.scale = (sx, sy) => {
             this.multiply(sx, 0, 0, sy, 0, 0);
         };
-        /**
-         * Rotates this matrix by the given angle, in radians.
-         */
         this.rotate = (angleRadians) => {
             let cos = Math.cos(angleRadians);
             let sin = Math.sin(angleRadians);
             this.multiply(cos, sin, -sin, cos, 0, 0);
         };
-        /**
-         * Translates this matrix by the given amount.
-         */
         this.translate = (tx, ty) => {
             this.multiply(1, 0, 0, 1, tx, ty);
         };
-        /**
-         * Transforms the given point in place, modifying it.
-         */
         this.transformVec2 = (v) => {
             let vx = v.x;
             let vy = v.y;
             v.x = vx * this.a + vy * this.c + this.e;
             v.y = vx * this.b + vy * this.d + this.f;
         };
-        /**
-         * matrix order (used by canvas):
-         *   ace
-         *   bdf
-         *   001
-         */
         this.a = 1;
         this.b = 0;
         this.c = 0;
@@ -741,20 +403,11 @@ class Matrix2x3 {
         };
         this.setValues(a, b, c, d, e, f);
     }
-    /**
-     * The identity matrix.
-     */
     static get identity() { return Matrix2x3._identity; }
 }
 Matrix2x3._identity = new Matrix2x3();
-/// <reference path="_ref.ts" />
 var Material;
 (function (Material) {
-    /**
-     * Adds the given material object.
-     * @param name Name of the material.
-     * @param object Generic object containing properties of the material.
-     */
     function addMaterial(name, object) {
         if (materialDictionary.hasOwnProperty(name)) {
             console.error("Material " + name + " not added because there already exists a material with that name.");
@@ -763,10 +416,6 @@ var Material;
         materialDictionary[name] = object;
     }
     Material.addMaterial = addMaterial;
-    /**
-     * Gets the material object with the given name.  Returns null (and displays an error) if the material doesn't exist.
-     * @param name Name given to the material when added with addMaterial().
-     */
     function getMaterial(name) {
         if (!materialDictionary.hasOwnProperty(name)) {
             console.error("Material " + name + " has not been added.");
@@ -775,12 +424,6 @@ var Material;
         return materialDictionary[name];
     }
     Material.getMaterial = getMaterial;
-    /**
-     * Gets property of a material.
-     * @param materialName Name of the material.
-     * @param propertyName Name of the property.
-     * @param defaultValue The value that's returned if propertyName is not defined by the material.
-     */
     function getProperty(materialName, propertyName, defaultValue = "") {
         let mat = getMaterial(materialName);
         if (mat === null || !mat.hasOwnProperty(propertyName)) {
@@ -789,12 +432,6 @@ var Material;
         return mat[propertyName];
     }
     Material.getProperty = getProperty;
-    /**
-     * Gets property of a material as a number.  Does not check if the value is a number first.
-     * @param materialName Name of the material.
-     * @param propertyName Name of the property.
-     * @param defaultValue The value that's returned if propertyName is not defined by the material.
-     */
     function getNumber(materialName, propertyName, defaultValue = 0) {
         let mat = getMaterial(materialName);
         if (mat === null || !mat.hasOwnProperty(propertyName)) {
@@ -805,35 +442,14 @@ var Material;
     Material.getNumber = getNumber;
     let materialDictionary = {};
 })(Material || (Material = {}));
-/// <reference path="_ref.ts" />
-// based on https://github.com/deanm/css-color-parser-js by Dean McNamee
 class ColorParser {
     constructor() {
-        /**
-         * red value of color.  Integer from [0, 255].
-         */
         this.r = 0;
-        /**
-         * green value of color.  Integer from [0, 255].
-         */
         this.g = 0;
-        /**
-         * blue value of color.  Integer from [0, 255].
-         */
         this.b = 0;
-        /**
-         * alpha value of color.  Number from [0, 1].
-         */
         this.alpha = 1;
-        /**
-         * Parses a CSS color string.  If the parse is successful, rgb and alpha values are stored here in this ColorParser instance.
-         * Examples: "rgb(255, 128, 12)", "rgba(255, 128, 12, 0.5)", "#fff", "#ff0011", "slateblue", "hsla(900, 15%, 90%, 0.5)", "hsl(900, 15%, 90%)"
-         * Returns true if parse was successful, false if there was a problem.
-         */
         this.parseCSSColor = (cssStr) => {
-            // Remove all whitespace, not compliant, but should just be more accepting.
             let str = cssStr.replace(/ /g, '').toLowerCase();
-            // Color keywords (and transparent) lookup.
             if (str in ColorParser.kCSSColorTable) {
                 let colorInfo = ColorParser.kCSSColorTable[str];
                 this.r = colorInfo[0];
@@ -842,12 +458,11 @@ class ColorParser {
                 this.alpha = colorInfo[3];
                 return true;
             }
-            // #abc and #abc123 syntax.
             if (str[0] === '#') {
                 if (str.length === 4) {
-                    var iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
+                    var iv = parseInt(str.substr(1), 16);
                     if (!(iv >= 0 && iv <= 0xfff))
-                        return false; // Covers NaN.
+                        return false;
                     this.r = ((iv & 0xf00) >> 4) | ((iv & 0xf00) >> 8);
                     this.g = (iv & 0xf0) | ((iv & 0xf0) >> 4);
                     this.b = (iv & 0xf) | ((iv & 0xf) << 4);
@@ -855,9 +470,9 @@ class ColorParser {
                     return true;
                 }
                 else if (str.length === 7) {
-                    var iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
+                    var iv = parseInt(str.substr(1), 16);
                     if (!(iv >= 0 && iv <= 0xffffff))
-                        return false; // Covers NaN.
+                        return false;
                     this.r = (iv & 0xff0000) >> 16;
                     this.g = (iv & 0xff00) >> 8;
                     this.b = iv & 0xff;
@@ -870,13 +485,12 @@ class ColorParser {
             if (op !== -1 && ep + 1 === str.length) {
                 let fname = str.substr(0, op);
                 let params = str.substr(op + 1, ep - (op + 1)).split(',');
-                let alpha = 1; // To allow case fallthrough.
+                let alpha = 1;
                 switch (fname) {
                     case 'rgba':
                         if (params.length !== 4)
                             return false;
                         alpha = ColorParser.parse_css_float(params.pop());
-                    // Fall through.
                     case 'rgb':
                         if (params.length !== 3)
                             return false;
@@ -889,13 +503,10 @@ class ColorParser {
                         if (params.length !== 4)
                             return false;
                         alpha = ColorParser.parse_css_float(params.pop());
-                    // Fall through.
                     case 'hsl':
                         if (params.length !== 3)
                             return false;
-                        let h = (((parseFloat(params[0]) % 360) + 360) % 360) / 360; // 0 .. 1
-                        // NOTE(deanm): According to the CSS spec s/l should only be
-                        // percentages, but we don't bother and let float or percentage.
+                        let h = (((parseFloat(params[0]) % 360) + 360) % 360) / 360;
                         let s = ColorParser.parse_css_float(params[1]);
                         let l = ColorParser.parse_css_float(params[2]);
                         let m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
@@ -911,10 +522,6 @@ class ColorParser {
             }
             return false;
         };
-        /**
-         * Returns the color as a css string.
-         * rgba() format, or rgb() if alpha is 1.
-         */
         this.toString = () => {
             if (this.alpha == 1) {
                 return "rgb(" +
@@ -930,7 +537,7 @@ class ColorParser {
         };
     }
     static clamp_css_byte(i) {
-        i = Math.round(i); // Seems to be what Chrome does (vs truncation).
+        i = Math.round(i);
         return i < 0 ? 0 : i > 255 ? 255 : i;
     }
     static clamp_css_float(f) {
@@ -1037,19 +644,11 @@ ColorParser.kCSSColorTable = {
     "white": [255, 255, 255, 1], "whitesmoke": [245, 245, 245, 1],
     "yellow": [255, 255, 0, 1], "yellowgreen": [154, 205, 50, 1]
 };
-/// <reference path="_ref.ts" />
 class Transform {
     constructor() {
-        /**
-         * Gets this transform's parent, or null if has no parent.
-         */
         this.getParent = () => {
             return this.parent;
         };
-        /**
-         * Sets a new parent.  Set to null to remove from previous parent.  Does not change the local transform.
-         * @param parent The transform's new parent.  Cannot be undefined.  Cannot be this own transform nor a child of this transform.
-         */
         this.setParent = (parent) => {
             if (parent === undefined) {
                 console.warn("Cannot set parent transform to undefined.");
@@ -1065,27 +664,18 @@ class Transform {
             }
             if (this.parent === parent)
                 return;
-            // remove child from old parent
             if (this.parent !== null) {
                 let index = this.parent.children.indexOf(this);
                 this.parent.children.splice(index, 1);
             }
-            // set new parent
             this.parent = parent;
-            // add child to new parent
             if (this.parent !== null) {
                 this.parent.children.push(this);
             }
         };
-        /**
-         * Returns an array of all the children of this transform (shallow copy).
-         */
         this.getChildren = () => {
             return this.children.slice();
         };
-        /**
-         * Gets if this is a child of the given transform (checking upwards through the hierarchy of parents).
-         */
         this.isChildOf = (parent) => {
             if (parent == null)
                 return false;
@@ -1100,52 +690,25 @@ class Transform {
             }
             return false;
         };
-        /**
-         * Reference to a GameObject.  Please don't change.
-         */
         this.gameObject = null;
-        /**
-         * x position of the transform in the local space.
-         */
         this.x = 0;
-        /**
-         * y position of the transform in the local space.
-         */
         this.y = 0;
-        /**
-         * Rotation of the transform, in degrees, in the local space.
-         */
         this.rotation = 0;
-        /**
-         * scale x of the transform in the local space.
-         */
         this.scaleX = 1;
-        /**
-         * scale y of the transform in the local space.
-         */
         this.scaleY = 1;
-        /**
-         * Gets position of this transform in the global space.
-         * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-         */
         this.getGlobalPosition = (outPos = null) => {
             this.updateGlobalMatrix();
             if (outPos == null) {
-                // return position as new Vec2
                 this.tempVec2.setValues(0, 0);
                 this.globalMatrix.transformVec2(this.tempVec2);
                 return this.tempVec2.clone();
             }
             else {
-                // fill outPos with the position
                 outPos.setValues(0, 0);
                 this.globalMatrix.transformVec2(outPos);
                 return null;
             }
         };
-        /**
-         * Sets position of this transform in the global space.
-         */
         this.setGlobalPosition = (x, y) => {
             if (this.parent == null) {
                 this.x = x;
@@ -1158,10 +721,6 @@ class Transform {
             this.x = this.tempVec2.x;
             this.y = this.tempVec2.y;
         };
-        /**
-         * Gets rotation (degrees) of this transfrom in the global space.
-         * Calculated by adding up all the rotations in the parent transforms.  Is this correct?
-         */
         this.getGlobalRotation = () => {
             let ret = 0;
             let trans = this;
@@ -1171,10 +730,6 @@ class Transform {
             }
             return ret;
         };
-        /**
-         * Sets rotation (degrees) of this transform in the global space.
-         * Calculated by subtracting all the rotations in the parent transforms.  Is this correct?
-         */
         this.setGlobalRotation = (rotationDegrees) => {
             let parentRot = 0;
             let trans = this.parent;
@@ -1183,10 +738,6 @@ class Transform {
             }
             this.rotation = rotationDegrees - parentRot;
         };
-        /**
-         * Takes a point in local space, and returns its equivalent position in the global space.
-         * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-         */
         this.localToGlobal = (x, y, outPos = null) => {
             this.updateGlobalMatrix();
             if (outPos === null) {
@@ -1200,10 +751,6 @@ class Transform {
                 return null;
             }
         };
-        /**
-         * Takes a point in global space, and returns its equivalent position in the local space.
-         * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-         */
         this.globalToLocal = (x, y, outPos = null) => {
             this.updateInverseGlobalMatrix();
             if (outPos === null) {
@@ -1217,46 +764,28 @@ class Transform {
                 return null;
             }
         };
-        /**
-         * Gets a clone of the local transformation matrix.
-         */
         this.getLocalMatrix = () => {
             this.updateLocalMatrix();
             return this.localMatrix.clone();
         };
-        /**
-         * Gets a clone of the combained transformation matrices to the root.
-         */
         this.getGlobalMatrix = () => {
             this.updateGlobalMatrix();
             return this.globalMatrix.clone();
         };
-        /**
-         * Gets a clone of the inverse of the combained transformation matrices to the root.
-         */
         this.getInverseGlobalMatrix = () => {
             this.updateInverseGlobalMatrix();
             return this.inverseGlobalMatrix.clone();
         };
-        /**
-         * Multiplies the given matrix by the global matrix.  The given matrix is modified; this function returns nothing.
-         */
         this.multiplyByGlobalMatrix = (matrix) => {
             this.updateGlobalMatrix();
             matrix.multiply(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.e, this.globalMatrix.f);
         };
-        /**
-         * Updates localMatrix based on translation, rotation, scale (in that order)
-         */
         this.updateLocalMatrix = () => {
             this.localMatrix.setIdentity();
             this.localMatrix.translate(this.x, this.y);
             this.localMatrix.rotate(this.rotation * 0.017453292519943295);
             this.localMatrix.scale(this.scaleX, this.scaleY);
         };
-        /**
-         * Updates globalMatrix by consecutively multiplying parent's local matrices (from root parent to here)
-         */
         this.updateGlobalMatrix = () => {
             this.updateLocalMatrix();
             let tm = this.tempMatrix;
@@ -1272,94 +801,56 @@ class Transform {
                 p = p.parent;
             }
         };
-        /**
-         * Updates inverseGlobalMatrix to be the inverse of globalMatrix.
-         */
         this.updateInverseGlobalMatrix = () => {
             this.updateGlobalMatrix();
             let m = this.globalMatrix;
             this.inverseGlobalMatrix.setValues(m.a, m.b, m.c, m.d, m.e, m.f);
             this.inverseGlobalMatrix.invert();
         };
-        this.localMatrix = new Matrix2x3(); // must be updated with updateLocalMatrix();
-        this.globalMatrix = new Matrix2x3(); // must be updated with updateGlobalMatrix();
-        this.inverseGlobalMatrix = new Matrix2x3(); // must be updated with updateInverseGlobalMatrix();
-        this.tempMatrix = new Matrix2x3(); // used for calculations
-        this.tempVec2 = new Vec2(); // used for calculations
+        this.localMatrix = new Matrix2x3();
+        this.globalMatrix = new Matrix2x3();
+        this.inverseGlobalMatrix = new Matrix2x3();
+        this.tempMatrix = new Matrix2x3();
+        this.tempVec2 = new Vec2();
         this.parent = null;
         this.children = [];
     }
 }
-/// <reference path="_ref.ts" />
 class SaveBox {
     constructor() {
-        /**
-            * Index used to differentiate multiple save files.
-            */
         this.fileIndex = 0;
-        /**
-            * Sets a boolean value.
-            */
         this.setBool = (key, value) => {
             this.bools[key] = value;
         };
-        /**
-            * Gets a boolean value.
-            * @param defaultValue If the given key doesn't exist, this value will be returned instead.
-            */
         this.getBool = (key, defaultValue = false) => {
             if (!this.bools.hasOwnProperty(key))
                 return defaultValue;
             return this.bools[key];
         };
-        /**
-            * Sets a number value.
-            */
         this.setNumber = (key, value) => {
             this.numbers[key] = value;
         };
-        /**
-            * Gets a number value.
-            * @param defaultValue If the given key doesn't exist, this value will be returned instead.
-            */
         this.getNumber = (key, defaultValue = 0) => {
             if (!this.numbers.hasOwnProperty(key))
                 return defaultValue;
             return this.numbers[key];
         };
-        /**
-            * Sets a string value.
-            */
         this.setString = (key, value) => {
             this.strings[key] = value;
         };
-        /**
-            * Converts the given object to a JSON string, then saves it as a string.
-            */
         this.setStringObject = (key, value) => {
             this.strings[key] = JSON.stringify(value);
         };
-        /**
-            * Gets a string value.
-            * @param defaultValue If the given key doesn't exist, this value will be returned instead.
-            */
         this.getString = (key, defaultValue = "") => {
             if (!this.strings.hasOwnProperty(key))
                 return defaultValue;
             return this.strings[key];
         };
-        /**
-            * Gets a string value, parses it into a JSON object and returns it.
-            * @param defaultValue If the given key doesn't exist, this value will be returned instead.
-            */
         this.getStringObject = (key, defaultValue = undefined) => {
             if (!this.strings.hasOwnProperty(key))
                 return defaultValue;
             return JSON.parse(this.strings[key]);
         };
-        /**
-            * Returns the value stored at the given index for the given bool list.  If the index is invalid, defaultValue is returned.
-            */
         this.getBoolListElement = (key, index, defaultValue = false) => {
             if (!this.boolLists.hasOwnProperty(key))
                 return defaultValue;
@@ -1368,26 +859,17 @@ class SaveBox {
                 return defaultValue;
             return boolList[index];
         };
-        /**
-            * Returns a copy of the stored bool list.
-            */
         this.getBoolListElements = (key, defaultValue = []) => {
             if (!this.boolLists.hasOwnProperty(key))
                 return defaultValue;
             let boolList = this.boolLists[key];
             return boolList.concat([]);
         };
-        /**
-            * Returns count of the given bool list, or 0 if list does not exist.
-            */
         this.getBoolListCount = (key) => {
             if (!this.boolLists.hasOwnProperty(key))
                 return 0;
             return this.boolLists[key].length;
         };
-        /**
-            * Sets all elements of the bool list (clearing the elements that were there originally).
-            */
         this.setBoolListElements = (key, values) => {
             let boolList = null;
             if (this.boolLists.hasOwnProperty(key)) {
@@ -1402,17 +884,11 @@ class SaveBox {
                 boolList.push(values[i]);
             }
         };
-        /**
-            * Pushes the given element to the end of the specified bool list.  Automatically creates the list if it's not made already.
-            */
         this.addBoolListElement = (key, value) => {
             if (!this.boolLists.hasOwnProperty(key))
                 this.boolLists[key] = [];
             this.boolLists[key].push(value);
         };
-        /**
-            * Returns the value stored at the given index for the given number list.  If the index is invalid, defaultValue is returned.
-            */
         this.getNumberListElement = (key, index, defaultValue = 0) => {
             if (!this.numberLists.hasOwnProperty(key))
                 return defaultValue;
@@ -1421,34 +897,22 @@ class SaveBox {
                 return defaultValue;
             return numberList[index];
         };
-        /**
-            * Returns a copy of the stored number list.
-            */
         this.getNumberListElements = (key, defaultValue = []) => {
             if (!this.numberLists.hasOwnProperty(key))
                 return defaultValue;
             let numberList = this.numberLists[key];
             return numberList.concat([]);
         };
-        /**
-            * Returns count of the given number list, or 0 if list does not exist.
-            */
         this.getNumberListCount = (key) => {
             if (!this.numberLists.hasOwnProperty(key))
                 return 0;
             return this.numberLists[key].length;
         };
-        /**
-            *  Returns if the given value is contained in the given number list.
-            */
         this.getNumberListContains = (key, value) => {
             if (!this.numberLists.hasOwnProperty(key))
                 return false;
             return this.numberLists[key].indexOf(value) != -1;
         };
-        /**
-            * Sets all elements of the number list (clearing the elements that were there originally).
-            */
         this.setNumberListElements = (key, values) => {
             let numberList = null;
             if (this.numberLists.hasOwnProperty(key)) {
@@ -1463,10 +927,6 @@ class SaveBox {
                 numberList.push(values[i]);
             }
         };
-        /**
-            * Pushes the given element to the end of the specified number list.  Automatically creates the list if it's not made already.
-            * @param ignoreIfDuplicate When set to true, first checks to see if the number is already in the list.  If it is, the number is not added again.
-            */
         this.addNumberListElement = (key, value, ignoreIfDuplicate = false) => {
             if (ignoreIfDuplicate) {
                 if (this.getNumberListContains(key, value))
@@ -1476,15 +936,9 @@ class SaveBox {
                 this.numberLists[key] = [];
             this.numberLists[key].push(value);
         };
-        /**
-            * Gets when this SaveBox was last saved (to a string or to localStorage).
-            */
         this.getDateSaved = () => {
             return new Date(this.dateSaved.getTime());
         };
-        /**
-            * Clears everything.
-            */
         this.clearAll = () => {
             this.bools = {};
             this.numbers = {};
@@ -1492,37 +946,21 @@ class SaveBox {
             this.boolLists = {};
             this.numberLists = {};
         };
-        /**
-            * Returns this saveBox converted to a string.
-            */
         this.saveToString = () => {
-            // getto string builder
             let sb = [];
-            // datetime saved (milliseconds since epoch)
             this.dateSaved = new Date();
             sb.push("" + this.dateSaved.getTime(), SaveBox.newLine);
-            // bools
             sb.push(JSON.stringify(this.bools), SaveBox.newLine);
-            // numbers
             sb.push(JSON.stringify(this.numbers), SaveBox.newLine);
-            // strings
             sb.push(SaveBox.sourceToValid(JSON.stringify(this.strings)), SaveBox.newLine);
-            // bool lists
             sb.push(JSON.stringify(this.boolLists), SaveBox.newLine);
-            // number lists
             sb.push(JSON.stringify(this.numberLists), SaveBox.newLine);
-            // get checksum of "string builder"
             let checksum = SaveBox.getChecksumFromArrStr(sb);
-            // append checksum in front
             sb.unshift(checksum + SaveBox.newLine);
             return sb.join("");
         };
-        /**
-            * Loads data from the given string.  Returns false if there was a problem.
-            */
         this.loadFromString = (str) => {
             this.clearAll();
-            // trim checksum
             let index = str.indexOf(SaveBox.newLine);
             if (index == -1)
                 return false;
@@ -1530,12 +968,9 @@ class SaveBox {
             let checksum = Number(checksumStr);
             if (isNaN(checksum))
                 return false;
-            // get content
             let content = str.substring(index + 1);
-            // check checksum of content
             if (checksum != SaveBox.getChecksumFromStr(content))
                 return false;
-            // parse content
             let lines = content.split(SaveBox.newLine);
             this.dateSaved = new Date(Number(lines[0]));
             this.bools = JSON.parse(lines[1]);
@@ -1545,18 +980,12 @@ class SaveBox {
             this.numberLists = JSON.parse(lines[5]);
             return true;
         };
-        /**
-            * Converts this saveBox to a string, then sets it to getLocalStorageKey() in localStorage.  Returns false if there was a problem.
-            */
         this.saveToLocalStorage = () => {
             if (localStorage === undefined)
                 return false;
             localStorage.setItem(SaveBox.getLocalStorageKey(this.fileIndex), this.saveToString());
             return true;
         };
-        /**
-            * Loads a string of key getLocalStorageKey() from localStorage, then parses it into this saveBox.  Returns false if there was a problem.
-            */
         this.loadFromLocalStorage = () => {
             if (localStorage === undefined)
                 return false;
@@ -1565,9 +994,6 @@ class SaveBox {
                 return false;
             return this.loadFromString(str);
         };
-        /**
-            * Creates a copy of this saveBox and returns it.  This does NOT save the clone to a file.
-            */
         this.clone = (newFileIndex) => {
             let ret = new SaveBox();
             if (newFileIndex == this.fileIndex) {
@@ -1584,9 +1010,6 @@ class SaveBox {
         this.boolLists = {};
         this.numberLists = {};
     }
-    /**
-        * Gets a list of indexes of save files currently stored in localStorage.
-        */
     static getSaveFileIndices() {
         let ret = [];
         if (localStorage == undefined)
@@ -1605,16 +1028,11 @@ class SaveBox {
         }
         return ret;
     }
-    /**
-        * Creates a new SaveBox with a fileIndex that doesn't match any other save file.  The created SaveBox is NOT saved to a file.
-        */
     static createNewSaveBox() {
         let existingSaveFiles = SaveBox.getSaveFileIndices();
-        // find index that doesn't collide
         let fileIndex = existingSaveFiles.length;
         let collision = true;
         while (collision) {
-            // check collisions
             collision = false;
             for (let i = 0; i < existingSaveFiles.length; i++) {
                 if (existingSaveFiles[i] == fileIndex) {
@@ -1626,14 +1044,10 @@ class SaveBox {
                 fileIndex++;
             }
         }
-        // create new SaveBox
         let saveBox = new SaveBox();
         saveBox.fileIndex = fileIndex;
         return saveBox;
     }
-    /**
-        * Creates a SaveBox loaded from localStorage with the given file index.  Returns null if there was a problem (e.g. if there's no file with the given index)
-        */
     static openSaveBox(fileIndex) {
         let saveBox = new SaveBox();
         saveBox.fileIndex = fileIndex;
@@ -1642,23 +1056,14 @@ class SaveBox {
             return null;
         return saveBox;
     }
-    /**
-        * Deletes the saveBox file with the given fileIndex from local storage.
-        */
     static deleteSaveBox(fileIndex) {
         if (localStorage == undefined)
             return;
         localStorage.removeItem(SaveBox.getLocalStorageKey(fileIndex));
     }
-    /**
-        * Gets the key used when saving a SaveBox with the given fileIndex to localStorage.
-        */
     static getLocalStorageKey(fileIndex) {
         return SaveBox.saveboxPrefix + fileIndex;
     }
-    /**
-        * Sums up characters of the given "string builder"
-        */
     static getChecksumFromArrStr(sb) {
         let ret = 0;
         for (let i = 0; i < sb.length; i++) {
@@ -1675,9 +1080,6 @@ class SaveBox {
         }
         return ret;
     }
-    /**
-        * Returns the given string with all invalid characters replaced with %x, making it valid.  If the string contains no invalid characters, nothing is changed.
-        */
     static sourceToValid(str) {
         let s = SaveBox.replaceAll(str, "%", "%0");
         s = SaveBox.replaceAll(s, SaveBox.newLine, "%1");
@@ -1685,9 +1087,6 @@ class SaveBox {
         s = SaveBox.replaceAll(s, SaveBox.separator2, "%3");
         return s;
     }
-    /**
-        * Returns the given string with all %x sequences replaced with their invalid characters.
-        */
     static validToSource(str) {
         let s = SaveBox.replaceAll(str, "%3", SaveBox.separator2);
         s = SaveBox.replaceAll(s, "%2", SaveBox.separator1);
@@ -1695,9 +1094,6 @@ class SaveBox {
         s = SaveBox.replaceAll(s, "%0", "%");
         return s;
     }
-    /**
-        * str.replace(), but works correctly.
-        */
     static replaceAll(str, searchValue, replaceValue) {
         let sv = searchValue.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         var re = new RegExp(sv, 'g');
@@ -1708,13 +1104,8 @@ SaveBox.saveboxPrefix = "savebox";
 SaveBox.newLine = "|";
 SaveBox.separator1 = "<";
 SaveBox.separator2 = ">";
-/// <reference path="_ref.ts" />
 var Keys;
 (function (Keys) {
-    /**
-     * Initializes Keys.  To be called at the start of Game.
-     * @param document The webpage document, which event listeners will be added to.
-     */
     function _initialize(document) {
         if (initialized) {
             console.warn("Keys already initialized");
@@ -1725,79 +1116,49 @@ var Keys;
         initialized = true;
     }
     Keys._initialize = _initialize;
-    /**
-     * Gets if the key was pressed this frame.
-     */
     function keyPressed(key) {
         return keyCodePressed(key);
     }
     Keys.keyPressed = keyPressed;
-    /**
-     * Gets if the key with the given key code was pressed this frame.
-     */
     function keyCodePressed(keyCode) {
         return keysPressed.indexOf(keyCode) != -1;
     }
     Keys.keyCodePressed = keyCodePressed;
-    /**
-     * Gets if the key is being held.
-     */
     function keyHeld(key) {
         return keyCodeHeld(key);
     }
     Keys.keyHeld = keyHeld;
-    /**
-     * Gets if the key with the given key code is being held.
-     */
     function keyCodeHeld(keyCode) {
         return keysHeld.indexOf(keyCode) != -1;
     }
     Keys.keyCodeHeld = keyCodeHeld;
-    /**
-     * Gets if the key was released this frame.
-     */
     function keyReleased(key) {
         return keyCodeReleased(key);
     }
     Keys.keyReleased = keyReleased;
-    /**
-     * Gets if the key with the given key code was released this frame.
-     */
     function keyCodeReleased(keyCode) {
         return keysReleased.indexOf(keyCode) != -1;
     }
     Keys.keyCodeReleased = keyCodeReleased;
-    /**
-     * Gets a string representation of the given Key.
-     */
     function keyToString(key) {
         let s = Key[key];
         return s;
     }
     Keys.keyToString = keyToString;
-    /**
-     * Gets the key codes of all the keys that were pressed this frame.
-     */
     function getKeyCodesPressed() {
         return keysPressed.concat([]);
     }
     Keys.getKeyCodesPressed = getKeyCodesPressed;
-    /**
-     * To be called late in the game loop by Game.
-     */
     function _lateUpdate() {
-        // clear key records
         keysPressed.splice(0);
         keysReleased.splice(0);
     }
     Keys._lateUpdate = _lateUpdate;
     function keyDown(event) {
-        // prevent space and arrow keys from scrolling the screen around
         if ([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
             event.preventDefault();
         }
         if (keysHeld.indexOf(event.keyCode) != -1)
-            // key was already being held down.  Return to prevent additional keypresses when holding down a key for a while
             return;
         if (keysPressed.indexOf(event.keyCode) == -1) {
             keysPressed.push(event.keyCode);
@@ -1805,7 +1166,6 @@ var Keys;
         if (keysHeld.indexOf(event.keyCode) == -1) {
             keysHeld.push(event.keyCode);
         }
-        // fullscreen.  Should be moved to a menu at some point
         if (event.keyCode == Key.F10) {
             if (Game.isFullscreen) {
                 Game.exitFullscreen();
@@ -1930,13 +1290,8 @@ var Key;
     Key[Key["ClosedBracket"] = 221] = "ClosedBracket";
     Key[Key["Quote"] = 222] = "Quote";
 })(Key || (Key = {}));
-/// <reference path="_ref.ts" />
 var Mouse;
 (function (Mouse) {
-    /**
-     * Initializes Mouse.  To be called at the start of Game.
-     * @param document The webpage document, which event listeners will be added to.
-     */
     function _initialize(_canvas) {
         if (initialized) {
             console.warn("Mouse already initialized");
@@ -1950,33 +1305,16 @@ var Mouse;
         initialized = true;
     }
     Mouse._initialize = _initialize;
-    /**
-     * The x position of the mouse in the canvas space.
-     * Please do not modify.
-     */
     Mouse.x = 0;
-    /**
-     * The y position of the mouse in the canvas space.
-     * Please do not modify.
-     */
     Mouse.y = 0;
-    /**
-     * Gets if the given button was pressed this frame.
-     */
     function buttonPressed(button) {
         return buttonsPressed.indexOf(button) !== -1;
     }
     Mouse.buttonPressed = buttonPressed;
-    /**
-     * Gets if the given button was held this frame.
-     */
     function buttonHeld(button) {
         return buttonsHeld.indexOf(button) !== -1;
     }
     Mouse.buttonHeld = buttonHeld;
-    /**
-     * Gets if the given button was released this frame.
-     */
     function buttonReleased(button) {
         return buttonsReleased.indexOf(button) !== -1;
     }
@@ -1989,18 +1327,13 @@ var Mouse;
         canvas.style.cursor = "";
     }
     Mouse.showCursor = showCursor;
-    /**
-     * To be called late in the game loop by Game.
-     */
     function _lateUpdate() {
-        // clear button records
         buttonsPressed.splice(0);
         buttonsReleased.splice(0);
     }
     Mouse._lateUpdate = _lateUpdate;
     function mouseDown(event) {
         updateMousePosition(event);
-        // prevents middle mouse from scrolling
         if ([1, 2].indexOf(event.button) > -1) {
             event.preventDefault();
         }
@@ -2014,7 +1347,6 @@ var Mouse;
     function mouseUp(event) {
         let index = buttonsHeld.indexOf(event.button);
         if (index == -1) {
-            // button not previously held
             return;
         }
         buttonsHeld.splice(index, 1);
@@ -2035,7 +1367,6 @@ var Mouse;
             mx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
             my = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
-        // should these be using client values instead of offset values?
         Mouse.x = (mx - canvas.offsetLeft) * canvas.width / canvas.offsetWidth;
         Mouse.y = (my - canvas.offsetTop) * canvas.height / canvas.offsetHeight;
     }
@@ -2045,15 +1376,7 @@ var Mouse;
     let initialized = false;
     let canvas = null;
 })(Mouse || (Mouse = {}));
-/// <reference path="_ref.ts" />
-/**
-* Note that a button must be pressed on the gamepad before it will be recognized.  Pressing the button will send the "gamepadconnected" event.
-*/
 class Gamepads {
-    /**
-        * Initializes Gamepad.  To be called at the start of Game.
-        * @param window The webpage window, which event listeners will be added to.
-        */
     static _initialize(window) {
         if (Gamepads.initialized) {
             console.warn("Gamepads already initialized");
@@ -2063,45 +1386,23 @@ class Gamepads {
         window.addEventListener("gamepaddisconnected", Gamepads.gamepadDisconnected);
         Gamepads.initialized = true;
     }
-    /**
-        * Gets if a gamepad is currently connected.
-        */
     static isGamepadConnected() {
         return Gamepads.getGamepad() !== null;
     }
-    /**
-        * Gets if the given button was pressed this frame.
-        * @param index Index of the button to check.
-        */
     static buttonPressed(index) {
         return Gamepads.buttonsPressed.indexOf(index) !== -1;
     }
-    /**
-        * Gets if the given button is currently being held.
-        * @param index Index of the button to check.
-        */
     static buttonHeld(index) {
         return Gamepads.buttonsHeld.indexOf(index) !== -1;
     }
-    /**
-        * Gets if the given button was released this frame.
-        * @param index Index of the button to check.
-        */
     static buttonReleased(index) {
         return Gamepads.buttonsReleased.indexOf(index) !== -1;
     }
-    /**
-        * Gets array of the indexes of the buttons that were pressed this frame.
-        */
     static getButtonsPressed() {
         let ret = [];
         Gamepads.copyValues(Gamepads.buttonsPressed, ret);
         return ret;
     }
-    /**
-        * Gets value [-1, 1] from a gamepad axis.  Returns 0 if the index is out of bounds.
-        * @param index Index of the axis to check.
-        */
     static axisValue(index) {
         if (index < 0 || index >= Gamepads.axisValues.length)
             return 0;
@@ -2111,61 +1412,34 @@ class Gamepads {
         }
         return val;
     }
-    /**
-        * Gets if gamepad axis is currently being held in the positive direction.
-        * @param index Index of the axis to check.
-        */
     static axisPositiveHeld(index) {
         let val = Gamepads.axisValue(index);
         return val > Gamepads.AXIS_PRESS_THRESHOLD;
     }
-    /**
-        * Gets if gamepad axis is currently being held in the negative direction.
-        * @param index Index of the axis to check.
-        */
     static axisNegativeHeld(index) {
         let val = Gamepads.axisValue(index);
         return val < -Gamepads.AXIS_PRESS_THRESHOLD;
     }
-    /**
-        * Gets if gamepad axis was pressed in the positive direction.
-        * @param index Index of the axis to check.
-        */
     static axisPositivePressed(index) {
         let val = Gamepads.axisValue(index);
         let prevVal = Gamepads.axisPreviousValue(index);
         return val > Gamepads.AXIS_PRESS_THRESHOLD && prevVal <= Gamepads.AXIS_PRESS_THRESHOLD;
     }
-    /**
-        * Gets if gamepad axis was pressed in the negative direction.
-        * @param index Index of the axis to check.
-        */
     static axisNegativePressed(index) {
         let val = Gamepads.axisValue(index);
         let prevVal = Gamepads.axisPreviousValue(index);
         return val < -Gamepads.AXIS_PRESS_THRESHOLD && prevVal >= -Gamepads.AXIS_PRESS_THRESHOLD;
     }
-    /**
-        * Gets if gamepad axis was released from the positive direction.
-        * @param index Index of the axis to check.
-        */
     static axisPositiveReleased(index) {
         let val = Gamepads.axisValue(index);
         let prevVal = Gamepads.axisPreviousValue(index);
         return val <= Gamepads.AXIS_PRESS_THRESHOLD && prevVal > Gamepads.AXIS_PRESS_THRESHOLD;
     }
-    /**
-        * Gets if gamepad axis was released from the negative direction.
-        * @param index Index of the axis to check.
-        */
     static axisNegativeReleased(index) {
         let val = Gamepads.axisValue(index);
         let prevVal = Gamepads.axisPreviousValue(index);
         return val >= -Gamepads.AXIS_PRESS_THRESHOLD && prevVal < -Gamepads.AXIS_PRESS_THRESHOLD;
     }
-    /**
-        * Gets array of axes that were positively pressed this frame
-        */
     static getAxesPositivePressed() {
         let ret = [];
         for (let index = 0; index < Gamepads.axisValues.length; index++) {
@@ -2175,9 +1449,6 @@ class Gamepads {
         }
         return ret;
     }
-    /**
-        * Gets array of axes that were negatively pressed this frame
-        */
     static getAxesNegativePressed() {
         let ret = [];
         for (let index = 0; index < Gamepads.axisValues.length; index++) {
@@ -2187,43 +1458,33 @@ class Gamepads {
         }
         return ret;
     }
-    /**
-        * To be called by Game in the gameloop.
-        */
     static _earlyUpdate() {
-        // clear button and axis values
         Gamepads.buttonsPressed.splice(0);
         Gamepads.copyValues(Gamepads.buttonsHeld, Gamepads.buttonsPreviouslyHeld);
         Gamepads.buttonsHeld.splice(0);
         Gamepads.buttonsReleased.splice(0);
         Gamepads.copyValues(Gamepads.axisValues, Gamepads.axisPreviousValues);
         Gamepads.axisValues.splice(0);
-        // getting gamepad
         let gamepad = Gamepads.getGamepad();
-        // return if no gamepad connected
         if (gamepad == null)
             return;
-        // get buttons currently held
         for (let index = 0; index < gamepad.buttons.length; index++) {
             if (gamepad.buttons[index].pressed) {
                 Gamepads.buttonsHeld.push(index);
             }
         }
-        // get buttons pressed
         for (let i = 0; i < Gamepads.buttonsHeld.length; i++) {
             let button = Gamepads.buttonsHeld[i];
             if (Gamepads.buttonsPreviouslyHeld.indexOf(button) === -1) {
                 Gamepads.buttonsPressed.push(button);
             }
         }
-        // get buttons released
         for (let i = 0; i < Gamepads.buttonsPreviouslyHeld.length; i++) {
             let button = Gamepads.buttonsPreviouslyHeld[i];
             if (Gamepads.buttonsHeld.indexOf(button) === -1) {
                 Gamepads.buttonsReleased.push(button);
             }
         }
-        // get axis values
         Gamepads.copyValues(gamepad.axes, Gamepads.axisValues);
     }
     static gamepadConnected(e) {
@@ -2262,13 +1523,7 @@ class Gamepads {
         }
     }
 }
-/**
-    * If the abs of an axis value is less than this, it is rounded down to 0.
-    */
 Gamepads.AXIS_DEAD_ZONE = .1;
-/**
-    * An axis will be considered "held" if the abs of its value is more than this.
-    */
 Gamepads.AXIS_PRESS_THRESHOLD = .6;
 Gamepads.initialized = false;
 Gamepads.buttonsPressed = [];
@@ -2277,12 +1532,8 @@ Gamepads.buttonsPreviouslyHeld = [];
 Gamepads.buttonsReleased = [];
 Gamepads.axisValues = [];
 Gamepads.axisPreviousValues = [];
-/// <reference path="_ref.ts" />
 class JSONLoadObject {
     constructor() {
-        /**
-         * Loads json from the given url.
-         */
         this.loadFromUrl = (url, onLoad = null) => {
             if (this.isLoaded()) {
                 console.warn("JSON already loaded");
@@ -2295,9 +1546,6 @@ class JSONLoadObject {
             this.request.onload = this.requestOnLoad;
             this.request.send();
         };
-        /**
-            * Loads (parses) json from the given string.
-            */
         this.loadFromString = (jsonString) => {
             if (this.isLoaded()) {
                 console.warn("JSON already loaded");
@@ -2306,15 +1554,9 @@ class JSONLoadObject {
             this._json = JSON.parse(jsonString);
             this._loaded = true;
         };
-        /**
-            * Gets the JSON, or null if it hasn't loaded.
-            */
         this.getJSON = () => {
             return this._json;
         };
-        /**
-            * Gets if the JSON is loaded.
-            */
         this.isLoaded = () => {
             return this._loaded;
         };
@@ -2339,12 +1581,6 @@ class JSONLoadObject {
     }
 }
 class JSONManager {
-    /**
-     * Loads a JSON from the given local url.
-     * @param name Key of the json to use when getting it later.
-     * @param localPath local url of the JSON.
-     * @param onLoad function to call once the JSON has been loaded correctly.
-     */
     static addFromUrl(name, localPath, onLoad = null) {
         let n = name.toLowerCase();
         if (JSONManager.jsonExists(n)) {
@@ -2356,9 +1592,6 @@ class JSONManager {
         JSONManager._numJson++;
         jlo.loadFromUrl(localPath, onLoad);
     }
-    /**
-     * Loads (parses) a JSON from the given string.
-     */
     static addFromString(name, jsonString) {
         let n = name.toLowerCase();
         if (JSONManager.jsonExists(n)) {
@@ -2370,9 +1603,6 @@ class JSONManager {
         JSONManager._numJson++;
         jlo.loadFromString(jsonString);
     }
-    /**
-        * Gets if the JSON by the given name has been loaded.
-        */
     static getJsonLoaded(name) {
         let n = name.toLowerCase();
         if (!JSONManager.jsonExists(n)) {
@@ -2381,10 +1611,6 @@ class JSONManager {
         }
         return JSONManager.dictionary[n].isLoaded();
     }
-    /**
-        * Gets the JSON with the given name.  Returns null if it doesn't exist or hasn't been loaded.
-        * @param name
-        */
     static getJson(name) {
         let n = name.toLowerCase();
         if (!JSONManager.jsonExists(n)) {
@@ -2398,21 +1624,12 @@ class JSONManager {
         }
         return jlo.getJSON();
     }
-    /**
-     * Returns if there exists in the dictionary a JSON with the given name.
-     */
     static jsonExists(name) {
         return JSONManager.dictionary.hasOwnProperty(name.toLowerCase());
     }
-    /**
-        * Gets the number of JSON loaded.
-        */
     static get numJsonLoaded() {
         return JSONManager._numJsonLoaded;
     }
-    /**
-        * Gets the number of JSON.
-        */
     static get numJson() {
         return JSONManager._numJson;
     }
@@ -2420,14 +1637,8 @@ class JSONManager {
 JSONManager.dictionary = {};
 JSONManager._numJsonLoaded = 0;
 JSONManager._numJson = 0;
-/// <reference path="_ref.ts" />
 var AudioManager;
 (function (AudioManager) {
-    // Adding Sounds
-    /**
-     * Loads audio sprites from the json of the given url.  This can only be called once (the json should point to all the audio sprites).
-     * @param jsonUrl url pointing to the json mapping the audiosprites.
-     */
     function addAudioSprites(jsonUrl) {
         if (JSONManager.jsonExists(jsonUrl)) {
             console.warn("audio sprites " + jsonUrl.toLowerCase() + " already added");
@@ -2442,21 +1653,11 @@ var AudioManager;
         JSONManager.addFromUrl(jsonNameFromURL(jsonUrl), jsonUrl, onJSONLoad);
     }
     AudioManager.addAudioSprites = addAudioSprites;
-    // Playing sounds
-    /**
-     * Play a sound in the SFX sound channel.
-     * @param soundFileName The path of the sound before it was packed into the audio sprite.  The .wav extension is optional.
-     * @param volume Volume of the sound.  Default is 1.
-     * @param pitch Pitch of the sound (playback rate).  Default is 1.
-     * @param bypassGeneral Bypass the general SFX channel (affected by general sfx volume) and instead have the sound feed directly into the master SFX channel.  Default is false.
-     */
     function playSFX(soundFileName, volume = 1, pitch = 1, bypassGeneral = false) {
         let sourceNode = createSourceNode(soundFileName);
         if (sourceNode === null)
             return;
-        // setting pitch
         sourceNode.playbackRate.value = pitch;
-        // adding a gain node if volume is specified
         let node = sourceNode;
         if (volume !== 1) {
             let gainNode = _audioContext.createGain();
@@ -2464,33 +1665,20 @@ var AudioManager;
             node.connect(gainNode);
             node = gainNode;
         }
-        // connecting to the main node
         if (bypassGeneral) {
             connectToMasterSFXNode(node);
         }
         else {
             connectToGeneralSFXNode(node);
         }
-        // playing sound
         sourceNode.play();
     }
     AudioManager.playSFX = playSFX;
-    /**
-     * Play sound in the music channel.  Does not stop music currently playing.
-     * @param soundFileName The path of the sound before it was packed into the audio sprite.  The .wav extension is optional.
-     * @param volume Volume of the sound.  Default is 1.
-     * @param pitch Pitch of the sound (playback rate).  Default is 1.
-     * @param loop If the sound should be looped.  Default is true.
-     * @param loopOffset If looping, this is how long in seconds after the start of the sound it loops back to.  Default is 0.
-     * @param bypassGeneral Bypass the general music channel (affected by general music volume) and instead have the sound feed directly into the master music channel.  Default is false.
-     */
     function playMusic(soundFileName, volume = 1, pitch = 1, loop = true, loopOffset = 0, bypassGeneral = false) {
         let sourceNode = createSourceNode(soundFileName);
         if (sourceNode === null)
             return;
-        // setting pitch
         sourceNode.playbackRate.value = pitch;
-        // adding a gain node if volume is specified
         let node = sourceNode;
         if (volume !== 1) {
             let gainNode = _audioContext.createGain();
@@ -2498,7 +1686,6 @@ var AudioManager;
             node.connect(gainNode);
             node = gainNode;
         }
-        // looping
         if (loop) {
             sourceNode.loop = true;
             sourceNode.loopStart = sourceNode.startTime + loopOffset;
@@ -2506,21 +1693,15 @@ var AudioManager;
         else {
             sourceNode.loop = false;
         }
-        // connecting to the main node
         if (bypassGeneral) {
             connectToMusicNode(node);
         }
         else {
             connectToGeneralMusicNode(node);
         }
-        // playing sound
         sourceNode.play();
     }
     AudioManager.playMusic = playMusic;
-    /**
-     * Searches all AudioSpriteSourceNodes to see if there's a node that's playing the given sound.
-     * NOTE: Annoyingly calling start() on a node doesn't leave a record of the node playing.  To get around this, never call start(), and instead call play().  The playSFX() and playMusic() functions do this automatically.
-     */
     function isSoundPlaying(soundFileName) {
         let sound = getSound(soundFileName);
         if (sound === null) {
@@ -2535,9 +1716,6 @@ var AudioManager;
         return false;
     }
     AudioManager.isSoundPlaying = isSoundPlaying;
-    /**
-     * Stops all AudioSpriteSourceNodes that are playing the given sound.
-     */
     function stopSound(soundFileName) {
         let sound = getSound(soundFileName);
         if (sound === null) {
@@ -2551,9 +1729,6 @@ var AudioManager;
         }
     }
     AudioManager.stopSound = stopSound;
-    /**
-     * Stops all created AudioSpriteSourceNodes.
-     */
     function stopAllSounds() {
         let tempNodes = sourceNodes.concat([]);
         tempNodes.forEach((node) => {
@@ -2561,66 +1736,38 @@ var AudioManager;
         });
     }
     AudioManager.stopAllSounds = stopAllSounds;
-    /**
-     * Gets the volume of the gain node that all sound effects pass through.  This is a setting that'd be in an options menu.
-     */
     function getMasterSFXVolume() {
         return masterSFXGain.gain.value;
     }
     AudioManager.getMasterSFXVolume = getMasterSFXVolume;
-    /**
-     * Sets the volume of the gain node that all sound effects pass through.  This is a setting that'd be in an options menu.
-     */
     function setMasterSFXVolume(volume) {
         masterSFXGain.gain.value = volume;
     }
     AudioManager.setMasterSFXVolume = setMasterSFXVolume;
-    /**
-     * Gets the volume of the gain node that general sound effects pass through.  This would be set in-game as part of gameplay.
-     */
     function getGeneralSFXVolume() {
         return generalSFXGain.gain.value;
     }
     AudioManager.getGeneralSFXVolume = getGeneralSFXVolume;
-    /**
-     * Sets the volume of the gain node that general sound effects pass through.  This would be set in-game as part of gameplay.
-     */
     function setGeneralSFXVolume(volume) {
         generalSFXGain.gain.value = volume;
     }
     AudioManager.setGeneralSFXVolume = setGeneralSFXVolume;
-    /**
-     * Gets the volume of the gain node that general music passes through.  This would be set in-game as part of gameplay (e.g. fading in/out).
-     */
     function getGeneralMusicVolume() {
         return generalMusicGain.gain.value;
     }
     AudioManager.getGeneralMusicVolume = getGeneralMusicVolume;
-    /**
-     * Sets the volume of the gain node that general music passes through.  This would be set in-game as part of gameplay (e.g. fading in/out).
-     */
     function setGeneralMusicVolume(volume) {
         generalMusicGain.gain.value = volume;
     }
     AudioManager.setGeneralMusicVolume = setGeneralMusicVolume;
-    /**
-     * Gets the volume of the gain node that all music passes through.  This is a setting that'd be in an options menu.
-     */
     function getMasterMusicVolume() {
         return masterMusicGain.gain.value;
     }
     AudioManager.getMasterMusicVolume = getMasterMusicVolume;
-    /**
-     * Sets the volume of the gain node that all music passes through.  This is a setting that'd be in an options menu.
-     */
     function setMasterMusicVolume(volume) {
         masterMusicGain.gain.value = volume;
     }
     AudioManager.setMasterMusicVolume = setMasterMusicVolume;
-    /**
-     * Gets the duration of the given sound.
-     * @param fileName The path of the sound before it was packed into the audio sprite.  The .wav extension is optional.
-     */
     function getSoundDuration(fileName) {
         let sound = getSound(fileName);
         if (sound === null) {
@@ -2630,16 +1777,9 @@ var AudioManager;
         return soundDictionary[fileName].duration;
     }
     AudioManager.getSoundDuration = getSoundDuration;
-    // Playing sounds (advanced)
-    /**
-     * Extension of AudioBufferSourceNode with a few extra properties.
-     */
     class AudioSpriteSourceNode extends AudioBufferSourceNode {
         constructor(...args) {
             super(...args);
-            /**
-             * Simpler version of start() that automatically uses the correct variables.
-             */
             this.play = () => {
                 this._playCalled = true;
                 if (this.loop)
@@ -2647,22 +1787,10 @@ var AudioManager;
                 else
                     this.start(0, this.startTime, this.duration);
             };
-            /**
-             * Flag if play() was called.
-             */
             this._playCalled = false;
         }
     }
     AudioManager.AudioSpriteSourceNode = AudioSpriteSourceNode;
-    /**
-     * Creates an AudioBufferSourceNode for the given sound.  The node is not connected to anything.
-     * Source nodes can only be played once and are "very inexpensive to create".
-     * Automatically sets loopStart and loopEnd to the bounds of the sound within the audio sprite (but does not set loop).
-     * Call sourceNode.play() to play the sound at the correct position.
-     * IMPORTANT: Do not call sourceNode.start() manually.
-     * Returns null if the sound doesn't exist.
-     * @param soundFileName The path of the sound before it was packed into the audio sprite.  The .wav extension is optional.
-     */
     function createSourceNode(soundFileName) {
         let fn = soundFileName.toLowerCase();
         let sound = getSound(fn);
@@ -2670,7 +1798,6 @@ var AudioManager;
             console.error("Sound \"" + fn + "\" does not exist.");
             return null;
         }
-        // this compiles, but sourceNode doesn't have properties that AudioSpriteSourceNode defines.
         let sourceNode = _audioContext.createBufferSource();
         sourceNode.fileName = sound.fileName;
         sourceNode.startTime = sound.startTime;
@@ -2682,7 +1809,7 @@ var AudioManager;
                 sourceNode.start(0, sourceNode.startTime);
             else
                 sourceNode.start(0, sourceNode.startTime, sourceNode.duration);
-        }; // this is so whack
+        };
         sourceNode.buffer = audioSprites[sound.audioSpriteIndex].getAudioBuffer();
         if (sourceNode.buffer === null) {
             console.error("Audio sprite " + sound.audioSpriteIndex + " isn't ready to be played yet.");
@@ -2690,44 +1817,27 @@ var AudioManager;
         }
         sourceNode.loopStart = sound.startTime;
         sourceNode.loopEnd = sound.startTime + sound.duration;
-        // add record of source node
         sourceNodes.push(sourceNode);
         sourceNode.addEventListener("ended", audioSourceNodeOnEnd);
         return sourceNode;
     }
     AudioManager.createSourceNode = createSourceNode;
-    /**
-     * Connects the given AudioNode to the general SFX node.  This lets the node be played, and volume multiplied by the general and master SFX volumes.
-     */
     function connectToGeneralSFXNode(audioNode) {
         audioNode.connect(generalSFXGain);
     }
     AudioManager.connectToGeneralSFXNode = connectToGeneralSFXNode;
-    /**
-     * Connects the given AudioNode to the master SFX node.  This lets the node be played, and volume multiplied by the master SFX volume.
-     */
     function connectToMasterSFXNode(audioNode) {
         audioNode.connect(masterSFXGain);
     }
     AudioManager.connectToMasterSFXNode = connectToMasterSFXNode;
-    /**
-     * Connects the given AudioNode to the general Mmusic node.  This lets the node be played, and volume multiplied by the general and master music volumes.
-     */
     function connectToGeneralMusicNode(audioNode) {
         audioNode.connect(generalMusicGain);
     }
     AudioManager.connectToGeneralMusicNode = connectToGeneralMusicNode;
-    /**
-     * Connects the given AudioNode to the master music node.  This lets the node be played, and volume multiplied by the master music volume.
-     */
     function connectToMusicNode(audioNode) {
         audioNode.connect(masterMusicGain);
     }
     AudioManager.connectToMusicNode = connectToMusicNode;
-    // Instantiation
-    /**
-     * Gets number of audio sprites added.
-     */
     function getNumAudioSprites() {
         if (_waitForJsonLoad) {
             return audioSprites.length + 1;
@@ -2735,19 +1845,11 @@ var AudioManager;
         return audioSprites.length;
     }
     AudioManager.getNumAudioSprites = getNumAudioSprites;
-    /**
-     * Gets number of audio sprites currently ready to be played.
-     */
     function getNumAudioSpritesReady() {
         return _numAudioSpritesReady;
     }
     AudioManager.getNumAudioSpritesReady = getNumAudioSpritesReady;
-    /**
-     * To be called on user input to resume the AudioContext.
-     * @param onAudioContextRunCallback Function to be called once the AudioContext resumes, or called immediately if it's already running.
-     */
     function userInput(onAudioContextRunCallback) {
-        // needs user input to get AudioContext running
         let acAny = _audioContext;
         if (acAny.resume != undefined &&
             acAny.state === "suspended") {
@@ -2758,10 +1860,6 @@ var AudioManager;
         }
     }
     AudioManager.userInput = userInput;
-    /**
-     * Gets if the audio context is running, which is needed to play sounds.
-     * The audio context can only run if userInput() is called from an event function that was triggered by user input.
-     */
     function isAudioContextRunning() {
         let acAny = _audioContext;
         if (acAny.state != undefined) {
@@ -2770,26 +1868,15 @@ var AudioManager;
         return true;
     }
     AudioManager.isAudioContextRunning = isAudioContextRunning;
-    /**
-     * Directory containing the audio sprites and json file.
-     * Capitalization matters when getting images in the web browser.
-     */
     AudioManager.audioSpritesDirectory = "Assets/Audiosprites/";
-    /**
-     * Gets the AudioContext used to decode sound.
-     */
     function getAudioContext() {
         return _audioContext;
     }
     AudioManager.getAudioContext = getAudioContext;
-    /**
-     * Gets if the browser can play .ogg files.
-     */
     function canPlayOgg() {
         return dummyAudio.canPlayType("audio/ogg; codecs=\"vorbis\"") === "probably";
     }
     AudioManager.canPlayOgg = canPlayOgg;
-    // Private
     function jsonNameFromURL(jsonURL) {
         let index = Math.max(jsonURL.lastIndexOf("/"), jsonURL.lastIndexOf("\\"));
         let trimmedStr;
@@ -2813,7 +1900,6 @@ var AudioManager;
             console.error("The audioSprites field is null in the audio sprite json.");
             return;
         }
-        // create audio sprites
         for (let i = 0; i < json.audioSprites.length; i++) {
             let sourceURL;
             if (canPlayOgg()) {
@@ -2830,7 +1916,6 @@ var AudioManager;
             let audioSprite = new AudioSprite(i, sourceURL);
             audioSprites.push(audioSprite);
         }
-        // create sounds
         for (let i = 0; i < json.sounds.length; i++) {
             let soundJson = json.sounds[i];
             soundDictionary[soundJson.filename.toLowerCase()] = new Sound(soundJson.filename, soundJson.asIndex, soundJson.startTime, soundJson.duration);
@@ -2838,39 +1923,21 @@ var AudioManager;
     }
     class AudioSprite {
         constructor(index, url) {
-            /**
-             * Gets index of this audio sprite.
-             */
             this.getIndex = () => {
                 return this._index;
             };
-            /**
-             * Gets source url of this audio sprite.
-             */
             this.getUrl = () => {
                 return this._url;
             };
-            /**
-             * If the audio has been loaded.
-             */
             this.isLoaded = () => {
                 return this._loaded;
             };
-            /**
-             * If the audio has been decoded.
-             */
             this.isDecoded = () => {
                 return this._decoded;
             };
-            /**
-             * If the audio is ready to be played.
-             */
             this.isReady = () => {
                 return this.isLoaded() && this.isDecoded();
             };
-            /**
-             * Gets the AudioBuffer for this audio sprite.  Returns null if the sound isn't ready.
-             */
             this.getAudioBuffer = () => {
                 return this.buffer;
             };
@@ -2901,7 +1968,6 @@ var AudioManager;
             };
             this._index = index;
             this._url = url;
-            // load audio
             this.request.open('GET', url, true);
             this.request.responseType = 'arraybuffer';
             this.request.onload = this.requestOnLoad;
@@ -2924,7 +1990,6 @@ var AudioManager;
         let fn;
         let extIndex = soundFileName.lastIndexOf(".");
         if (extIndex === -1) {
-            // add wav extension
             fn = (soundFileName + ".wav").toLowerCase();
         }
         else {
@@ -2936,7 +2001,7 @@ var AudioManager;
         return soundDictionary[fn];
     }
     let _addAudioSpritesCalled = false;
-    let _waitForJsonLoad = false; // used to fudge number of audio sprites so the game doesn't load without them being ready
+    let _waitForJsonLoad = false;
     let _numAudioSpritesReady = 0;
     let _audioContext = new (window.AudioContext || window.webkitAudioContext)();
     let masterSFXGain = null;
@@ -2947,7 +2012,6 @@ var AudioManager;
         console.error("AudioContext could not be created.  This browser does not support this game's audio.");
     }
     else {
-        // setting up nodes to link sound through
         masterSFXGain = _audioContext.createGain();
         masterSFXGain.connect(_audioContext.destination);
         generalSFXGain = _audioContext.createGain();
@@ -2957,10 +2021,10 @@ var AudioManager;
         generalMusicGain = _audioContext.createGain();
         generalMusicGain.connect(masterMusicGain);
     }
-    let dummyAudio = new Audio(); // only used to check if the browser can play .ogg files or not.
+    let dummyAudio = new Audio();
     let audioSprites = [];
     let soundDictionary = {};
-    let sourceNodes = []; // record of source nodes formed.  Are removed when the source nodes stop playing.
+    let sourceNodes = [];
     function audioSourceNodeOnEnd(e) {
         let sourceNode = e.target;
         let index = sourceNodes.indexOf(sourceNode);
@@ -2970,73 +2034,27 @@ var AudioManager;
         sourceNode.removeEventListener("ended", audioSourceNodeOnEnd);
     }
 })(AudioManager || (AudioManager = {}));
-/// <reference path="_ref.ts" />
 var TexPackManager;
 (function (TexPackManager) {
-    /**
-     * An image that has been packed with the texture packer.
-     */
     class PackedImage {
         constructor() {
-            /**
-             * The original filename of the image.
-             */
             this.filename = "";
-            /**
-             * The texture atlas image to draw from.
-             */
             this.atlasImage = null;
-            /**
-             * Returns true if the atlas image has been loaded (and can be drawn from).
-             */
             this.isLoaded = () => {
                 return this._textureAtlas.isLoaded();
             };
-            /**
-             * x of the rectangle of the texture atlas that contains the image.
-             */
             this.frameX = 0;
-            /**
-             * y of the rectangle of the texture atlas that contains the image.
-             */
             this.frameY = 0;
-            /**
-             * width of the rectangle of the texture atlas that contains the image.
-             */
             this.frameWidth = 0;
-            /**
-             * height of the rectangle of the texture atlas that contains the image.
-             */
             this.frameHeight = 0;
-            /**
-             * Reference to the JSON defining the frame from the texture packer.
-             */
             this.frameJSON = null;
-            /**
-             * How much was trimmed off the left side when the image was packed.
-             */
             this.trimLeft = 0;
-            /**
-             * How much was trimmed off the top side when the image was packed.
-             */
             this.trimTop = 0;
-            /**
-             * How much was trimmed off the right side when the image was packed.
-             */
             this.trimRight = 0;
-            /**
-             * How much was trimmed off the bottom side when the image was packed.
-             */
             this.trimBottom = 0;
-            /**
-             * Gets the width of the original image before it was packed and trimmed.
-             */
             this.getOriginalWidth = () => {
                 return this.trimLeft + this.frameWidth + this.trimRight;
             };
-            /**
-             * Gets the height of the original image before it was packed and trimmed.
-             */
             this.getOriginalHeight = () => {
                 return this.trimTop + this.frameHeight + this.trimBottom;
             };
@@ -3044,10 +2062,6 @@ var TexPackManager;
         }
     }
     TexPackManager.PackedImage = PackedImage;
-    /**
-     * Loads a texture pack from the given url.
-     * @param packJsonUrl url pointing to the texture pack.
-     */
     function addTexturePack(packJsonUrl) {
         if (JSONManager.jsonExists(packJsonUrl)) {
             console.warn("texture pack " + packJsonUrl.toLowerCase() + " already added");
@@ -3057,10 +2071,6 @@ var TexPackManager;
         JSONManager.addFromUrl(jsonNameFromURL(packJsonUrl), packJsonUrl, onJSONLoad);
     }
     TexPackManager.addTexturePack = addTexturePack;
-    /**
-     * Gets an image that has been packed into a texture packer.
-     * @param filename The path of the image before it was packed.
-     */
     function getPackedImage(filename) {
         let fn = filename.toLowerCase();
         if (packedImageDictionary.hasOwnProperty(fn)) {
@@ -3072,28 +2082,15 @@ var TexPackManager;
         }
     }
     TexPackManager.getPackedImage = getPackedImage;
-    /**
-     * Directory containing the texpack texture images and json files.
-     * Capitalization matters when getting images in the web browser.
-     */
     TexPackManager.texpacksDirectory = "Assets/Texpacks/";
-    /**
-     * Gets the number of texture packs added.
-     */
     function getNumTexPacks() {
         return _numTexPacks;
     }
     TexPackManager.getNumTexPacks = getNumTexPacks;
-    /**
-     * Gets the number of texture packs loaded.
-     */
     function getNumTexPacksLoaded() {
         return _numTexPacksLoaded;
     }
     TexPackManager.getNumTexPacksLoaded = getNumTexPacksLoaded;
-    /**
-     * Writes all packed image filenames to the console.
-     */
     function consoleLogAllPackedImages() {
         console.log(packedImageDictionary);
     }
@@ -3120,7 +2117,6 @@ var TexPackManager;
             console.error("image url could not be found on the texture packer json.");
             return;
         }
-        // load texture atlas specified in the json.
         let imageURL = TexPackManager.texpacksDirectory + json.meta.image;
         let imageURLLower = imageURL.toLowerCase();
         let texAtlas = null;
@@ -3133,7 +2129,6 @@ var TexPackManager;
             texAtlas = new TextureAtlas(imageURL);
             texAtlasDictionary[imageURLLower] = texAtlas;
         }
-        // create packed images as specified in the json
         if (json.frames == null) {
             console.error("frames not given in the texture packer json.");
             return;
@@ -3161,14 +2156,7 @@ var TexPackManager;
         }
     }
     class TextureAtlas {
-        /**
-        * Handles loading of sprites packed into a single texture atlas image.  DO NOT CALL THIS DIRECTLY, use addTexture() instead.
-        * @param imageSource Source url (src) for the texture atlas being loaded.
-        */
         constructor(imageSource) {
-            /**
-             * Gets the image.
-             */
             this.getImage = () => {
                 return this._image;
             };
@@ -3190,17 +2178,9 @@ var TexPackManager;
     TexPackManager.TextureAtlas = TextureAtlas;
     let packedImageDictionary = {};
     let texAtlasDictionary = {};
-    let _numTexPacks = 0; // counter increments when a texture pack is added
-    let _numTexPacksLoaded = 0; // counter increments when a texture pack loads
+    let _numTexPacks = 0;
+    let _numTexPacksLoaded = 0;
 })(TexPackManager || (TexPackManager = {}));
-/// <reference path="_ref.ts" />
-/*
-
-Spritesheet.add("sealime.png", 64, 64, 8, 24);
-
-Animations.add("sealime_idle", "sealime.png", [0, 1, 2, 3, 4, 5]);
-
-*/
 class SpriteFrame {
     constructor() {
         this.imageFilename = "";
@@ -3218,18 +2198,10 @@ class SpriteFrame {
         this._image = null;
     }
 }
-/**
- * Spritesheets for an image.  Is merely a collection of SpriteFrames from this image.
- * spriteFrames can be customized to have different positions, sizes, and pivots.
- * An image can only have at most 1 spritesheet.
- */
 class Spritesheet {
     constructor() {
         this.imageFilename = "";
         this.frames = [];
-        /**
-         * Creates and returns a new SpriteFrame belonging to this spritesheet, and pushes it into frames.
-         */
         this.addFrame = () => {
             let sf = new SpriteFrame();
             sf.imageFilename = this.imageFilename;
@@ -3237,15 +2209,6 @@ class Spritesheet {
             return sf;
         };
     }
-    /**
-     * Creates a spritesheet, and automatically creates frames for it based on given parameters.
-     * The created spritesheet is returned, and its frames can be further customized.
-     * @param imageFilename Filename of the image the spritesheet belongs to.  Only one spritesheet can be made per image.
-     * @param frameWidth Width of the frames in pixels.
-     * @param frameHeight Height of the frames in pixels.
-     * @param numColumns Number of columns.
-     * @param numFrames Total number of frames to create.
-     */
     static addSpritesheet(imageFilename, frameWidth, frameHeight, numColumns, numFrames) {
         let ss = Spritesheet.addSpritesheetCustom(imageFilename);
         if (ss === null) {
@@ -3260,10 +2223,6 @@ class Spritesheet {
         }
         return ss;
     }
-    /**
-     * Creates a basic spritesheet.  Its frames will need to be created manually.
-     * @param imageFilename filename of the image for this spritesheet.  Only one spritesheet can be made per image.
-     */
     static addSpritesheetCustom(imageFilename) {
         if (Spritesheet.spritesheetDic.hasOwnProperty(imageFilename)) {
             console.warn("Cannot create spritesheet " + imageFilename + " because a spritesheet for that file has already been created.");
@@ -3274,20 +2233,11 @@ class Spritesheet {
         Spritesheet.spritesheetDic[imageFilename] = ret;
         return ret;
     }
-    /**
-     * Gets the spritesheet created for the given image, or null if it hasn't been created.
-     * @param imageFilename Filename of the original image.
-     */
     static getSpritesheet(imageFilename) {
         if (!Spritesheet.spritesheetDic.hasOwnProperty(imageFilename))
             return null;
         return Spritesheet.spritesheetDic[imageFilename];
     }
-    /**
-     * Gets a frame of a spritesheet for the given image, or null if it hasn't been created.
-     * @param imageFilename Filename of the original image.
-     * @param frameIndex frame of the spritesheet.
-     */
     static getSpriteFrame(imageFilename, frameIndex) {
         let ss = Spritesheet.getSpritesheet(imageFilename);
         if (ss === null)
@@ -3298,30 +2248,16 @@ class Spritesheet {
     }
 }
 Spritesheet.spritesheetDic = {};
-/**
- * A list of frames taken from spriteSheets.
- */
 class Animation {
     constructor() {
         this.name = "";
         this.frames = [];
         this.fps = 10;
         this.loops = false;
-        /**
-         * Returns the time (unscaled, in seconds) it would take for the animation to play.
-         */
         this.getDuration = () => {
             return this.frames.length / this.fps;
         };
     }
-    /**
-     * Creates an Animation, automatically filling in frames based on the given properties.
-     * @param name Name of the animation.
-     * @param spritesheetFilename Filename of the spritesheet to take frames from (spritesheet should already be created)
-     * @param frames Array of ints of the frames of the spritesheet to use.  An index of -1 means null.
-     * @param fps Frame rate of the animation.
-     * @param loops Whether or not the animation loops.
-     */
     static addAnimation(name, spritesheetFilename, frames, fps = 10, loops = false) {
         let anim = Animation.addAnimationCustom(name);
         if (anim === null) {
@@ -3355,10 +2291,6 @@ class Animation {
         }
         return anim;
     }
-    /**
-     * Creates and returns a basic Animation with the given name.  frames and other properties will need to be set manually.
-     * @param name Name of the animation.  No two animations can have the same name.
-     */
     static addAnimationCustom(name) {
         if (Animation.animationsDic.hasOwnProperty(name)) {
             console.warn("Animation already created with the name " + name + ".");
@@ -3369,9 +2301,6 @@ class Animation {
         Animation.animationsDic[name] = anim;
         return anim;
     }
-    /**
-     * Gets the animation with the given name, or null if it doesn't exist.
-     */
     static getAnimation(name) {
         if (!Animation.animationsDic.hasOwnProperty(name))
             return null;
@@ -3379,63 +2308,34 @@ class Animation {
     }
 }
 Animation.animationsDic = {};
-/// <reference path="_ref.ts" />
 class Camera {
-    /**
-     * Initializes the Camera, to be called once by Game.
-     */
     static _initialize(context) {
         if (Camera._initialized)
             return;
         Camera._context = context;
         Camera._initialized = true;
     }
-    /**
-     * Gets CanvasRenderingContext2D of the camera.
-     */
     static get context() {
         return Camera._context;
     }
-    /**
-     * Gets width of the canvas of the context.
-     */
     static get canvasWidth() {
         return Camera.context.canvas.width;
     }
-    /**
-     * Gets height of the canvas of the context.
-     */
     static get canvasHeight() {
         return Camera.context.canvas.height;
     }
-    /**
-     * Gets the x coordinate in the world space of the left edge of the screen.
-     */
     static get leftBound() {
         return Camera.centerX - Camera.canvasWidth / 2 / Camera.scale;
     }
-    /**
-     * Gets the y coordinate in the world space of the top edge of the screen.
-     */
     static get topBound() {
         return Camera.centerY - Camera.canvasHeight / 2 / Camera.scale;
     }
-    /**
-     * Gets the x coordinate in the world space of the right edge of the screen.
-     */
     static get rightBound() {
         return Camera.centerX + Camera.canvasWidth / 2 / Camera.scale;
     }
-    /**
-     * Gets the y coordinate in the world space of the bottom edge of the screen.
-     */
     static get bottomBound() {
         return Camera.centerY + Camera.canvasHeight / 2 / Camera.scale;
     }
-    /**
-     * Takes a point in the canvas space (e.g. mouse position), and returns its equivalent position in the global space.
-     * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-     */
     static canvasToGlobal(x, y, outPos = null) {
         Camera.setMat(Camera.tempMatrix);
         Camera.tempMatrix.invert();
@@ -3449,10 +2349,6 @@ class Camera {
             return null;
         }
     }
-    /**
-     * Takes a point in the global space and returns its equivalent position in the canvas space.
-     * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-     */
     static globalToCanvas(x, y, outPos = null) {
         Camera.setMat(Camera.tempMatrix);
         if (outPos === null) {
@@ -3465,34 +2361,20 @@ class Camera {
             return null;
         }
     }
-    // Transformation
-    /**
-     * Gets clone of the transformation matrix used by this camera.
-     */
     static get matrix() {
         Camera.setMat(Camera.tempMatrix);
         return Camera.tempMatrix.clone();
     }
-    /**
-     * Sets the transform of camera.context to be the camera's transformation multiplied by the global matrix of the given transform.
-     */
     static setContextTransform(transform) {
         if (Camera.context == null)
             return;
         let temp = Camera.tempMatrix;
         Camera.setMat(temp);
         transform.multiplyByGlobalMatrix(temp);
-        // might make camera smoother?
-        //let invScaleEstimate: number = temp.a;
-        //temp.e = Math.floor(temp.e / invScaleEstimate) * invScaleEstimate;
-        //temp.f = Math.floor(temp.f / invScaleEstimate) * invScaleEstimate;
         temp.e = Math.floor(temp.e);
         temp.f = Math.floor(temp.f);
         Camera.context.setTransform(temp.a, temp.b, temp.c, temp.d, temp.e, temp.f);
     }
-    /**
-     * Sets the transform of camera.context to be the camera's transformation multiplied by the given matrix.
-     */
     static setContextTransformFromMatrix(matrix) {
         if (Camera.context == null)
             return;
@@ -3501,72 +2383,33 @@ class Camera {
         temp.multiply(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
         Camera.context.setTransform(temp.a, temp.b, temp.c, temp.d, temp.e, temp.f);
     }
-    /**
-     * Sets the values of the given matrix to be the transform from this camera.
-     */
     static setMat(matrix) {
         let tx = Camera.canvasWidth / 2 - Camera.centerX * Camera.scale;
         let ty = Camera.canvasHeight / 2 - Camera.centerY * Camera.scale;
         matrix.setValues(Camera.scale, 0, 0, Camera.scale, tx, ty);
     }
 }
-// Position properties
-/**
- * x coordinate of the point the center of the camera points at.
- */
 Camera.centerX = 0;
-/**
- * y coordinate of the point the center of the camera points at.
- */
 Camera.centerY = 0;
-/**
- * scale of the camera.
- */
 Camera.scale = 1;
-// Private
 Camera._context = null;
 Camera._initialized = false;
 Camera.tempMatrix = new Matrix2x3();
-/// <reference path="_ref.ts" />
 class Scene {
-    /**
-     * Scene constructor.
-     */
     constructor() {
-        // Scene Properties
-        /**
-         * Gets ID for this Scene.  Each Scene is guaranteed to have a unique ID.
-         */
         this.getID = () => {
             return this._id;
         };
-        /**
-         * Gets name of the scene.  This is the name that was set when the scene was added.
-         */
         this.getName = () => {
             return this._name;
         };
-        /**
-            * Called when a scene is loaded.  Should be overridden to create the GameObjects in this scene.
-            */
         this.onLoad = () => { };
-        /**
-         * Called when a scene is unloaded.  GameObjects loaded by the scene will be automatically destroyed, so there's no need to do that here.
-         */
         this.onUnload = () => { };
-        // Private
         this._id = 0;
         this._name = "";
-        // give unique ID
         this._id = Scene.sceneIDCounter;
         Scene.sceneIDCounter++;
     }
-    // Static - Adding Scenes
-    /**
-     * Adds a scene to the list of scenes.  Intended to be done before Game is created.
-     * @param sceneName Name of the Scene.
-     * @param scene The just created Scene.
-     */
     static addScene(sceneName, scene) {
         if (sceneName == null || sceneName === "") {
             console.error("Scene must have a defined name.");
@@ -3583,18 +2426,11 @@ class Scene {
         Scene.dictionary[sceneName] = scene;
         Scene._numScenes++;
     }
-    // Static - Scene Management
-    /**
-     * Gets the name of the current scene, i.e. the scene last loaded.  Is "" when no scene is currently loaded.
-     */
     static get currentScene() {
         if (Scene.loadedScenes.length === 0)
             return null;
         return Scene.loadedScenes[Scene.loadedScenes.length - 1].getName();
     }
-    /**
-     * Get a list of all the scenes currently loaded.  The last element in the list is the current scene.
-     */
     static getLoadedScenes() {
         let ret = [];
         for (let i = 0; i < Scene.loadedScenes.length; i++) {
@@ -3602,22 +2438,13 @@ class Scene {
         }
         return ret;
     }
-    /**
-     * Unloads all scenes currently loaded, then loads the given scene.  Scene is loaded at the beginning of next frame.
-     * @param scene The scene to load.
-     */
     static loadScene(sceneName) {
         Scene.unloadAllScenes();
-        // prevent other scenes from loading
         if (Scene.scenesToLoad.length !== 0) {
             Scene.scenesToLoad.splice(0);
         }
         Scene.loadAdditionalScene(sceneName);
     }
-    /**
-     * Loads a scene without unloading any first.  Scene is loaded at the beginning of next frame.  If Scene is already loaded at that time, it will not be loaded again.
-     * @param scene The scene to load.
-     */
     static loadAdditionalScene(sceneName) {
         let scene = Scene._sceneFromName(sceneName);
         if (scene == null)
@@ -3628,11 +2455,6 @@ class Scene {
         }
         Scene.scenesToLoad.push(scene);
     }
-    /**
-     * Unloads the given scene.  Does nothing if the given scene is not currently loaded.
-     * Scene will be unloaded at the end of the frame.
-     * @param scene The scene to unload.  Leave as "" to unload the current scene.
-     */
     static unloadScene(sceneName = "") {
         let name = sceneName;
         if (sceneName == null || sceneName == "") {
@@ -3650,10 +2472,6 @@ class Scene {
             return;
         Scene.scenesToUnload.push(scene);
     }
-    /**
-     * Unloads all currently loaded scenes.
-     * Scenes will be unloaded at the end of the frame.
-     */
     static unloadAllScenes() {
         let scene;
         for (let i = 0; i < Scene.loadedScenes.length; i++) {
@@ -3663,19 +2481,12 @@ class Scene {
             Scene.scenesToUnload.push(scene);
         }
     }
-    /**
-     * Gets the unique ID of the scene with the given scene name.
-     * @param sceneName Name of the scene.
-     */
     static idFromSceneName(sceneName) {
         let scene = Scene._sceneFromName(sceneName);
         if (scene === null)
             return -1;
         return scene.getID();
     }
-    /**
-     * Returns the Scene with the given name, or null if no scene with the name exists.
-     */
     static sceneFromName(sceneName) {
         if (sceneName == null || sceneName == "")
             return null;
@@ -3683,17 +2494,9 @@ class Scene {
             return null;
         return Scene.dictionary[name];
     }
-    /**
-     * Gets the total number of scenes.
-     */
     static get numScenes() {
         return Scene._numScenes;
     }
-    // Static - Called from Game
-    /**
-     * Load scenes that have been marked to be loaded.
-     * Then starts all components that haven't been started yet.
-     */
     static _loadScenesToLoad() {
         let scene;
         for (let i = 0; i < Scene.scenesToLoad.length; i++) {
@@ -3702,20 +2505,12 @@ class Scene {
                 console.warn("Scene \"" + scene.getName() + "\" not loaded because it is already loaded.");
                 continue;
             }
-            // add scene to loaded scenes
             Scene.loadedScenes.push(scene);
-            // call scene's onLoad() (which should load its GameObjects)
             scene.onLoad();
         }
-        // clear list of scenes to load
         Scene.scenesToLoad.splice(0);
-        // start components that haven't been started
         GameObject._startAllUnstartedComponents();
     }
-    /**
-     * Destroys all GameObjects in scenes that are marked to be unloaded.
-     * Except for GameObjects where isDontDestroyOnUnload() is true.
-     */
     static _destroyGameObjectsInScenesToUnload() {
         let scene;
         for (let i = 0; i < Scene.scenesToUnload.length; i++) {
@@ -3728,9 +2523,6 @@ class Scene {
             });
         }
     }
-    /**
-     * Unloads all scenes in scenesToUnload.  Assumes all GameObjects from those scenes have been destroyed already.
-     */
     static _unloadMarkedScenes() {
         let scene;
         for (let i = 0; i < Scene.scenesToUnload.length; i++) {
@@ -3740,12 +2532,9 @@ class Scene {
                 console.error("Trying to unload scene that hasn't been loaded.");
                 continue;
             }
-            // call scene's onUnload
             scene.onUnload();
-            // remove scene from loaded scenes
             Scene.loadedScenes.splice(loadedScenesIndex, 1);
         }
-        // clear list of scenes to unload
         Scene.scenesToUnload.splice(0);
     }
     static sceneExists(name) {
@@ -3753,9 +2542,6 @@ class Scene {
             return false;
         return Scene.dictionary.hasOwnProperty(name);
     }
-    /**
-     * Gets scene from name.  Prints an error to the console if no scene with the name exists.
-     */
     static _sceneFromName(name) {
         if (!Scene.sceneExists(name)) {
             console.error("Scene \"" + name + "\" does not exist.");
@@ -3766,15 +2552,10 @@ class Scene {
 }
 Scene.sceneIDCounter = 0;
 Scene.dictionary = {};
-Scene._numScenes = 0; // counter goes up whenever a scene is added
+Scene._numScenes = 0;
 Scene.loadedScenes = [];
 Scene.scenesToUnload = [];
 Scene.scenesToLoad = [];
-/// <reference path="_ref.ts" />
-/// <reference path="_ref.ts" />
-/**
- * Sorting layer for IDrawer components.  Influences order in which IDrawers are drawn.
- */
 var DrawLayer;
 (function (DrawLayer) {
     DrawLayer[DrawLayer["BG"] = 10] = "BG";
@@ -3786,16 +2567,10 @@ var DrawLayer;
 })(DrawLayer || (DrawLayer = {}));
 var Drawers;
 (function (Drawers) {
-    /**
-     * Adds IDrawer to list, letting it be drawn in drawAll().  Careful: DOES NOT CHECK if drawer already exists in the list.
-     */
     function _add(drawer) {
         allDrawers.push(drawer);
     }
     Drawers._add = _add;
-    /**
-     * Removes IDrawer from list.
-     */
     function _remove(drawer) {
         let index = allDrawers.indexOf(drawer);
         if (index === -1)
@@ -3803,9 +2578,6 @@ var Drawers;
         allDrawers.splice(index, 1);
     }
     Drawers._remove = _remove;
-    /**
-     * To be called by Game in the game loop.  Sorts all the IDrawers, then draws them onto the Game context.
-     */
     function _drawAll() {
         let context = Game.context;
         let m = tempMatrix;
@@ -3818,35 +2590,27 @@ var Drawers;
             context.save();
             if (dispObj.anchored) {
                 if (dispObj.getTransform() == null) {
-                    // identity transform
                     context.setTransform(1, 0, 0, 1, 0, 0);
                 }
                 else {
-                    // transform of drawer without the camera
                     dispObj.getTransform().multiplyByGlobalMatrix(m);
                     context.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
                 }
             }
             else {
                 if (dispObj.getTransform() == null) {
-                    // transform of just the camera
                     Camera.setContextTransformFromMatrix(m);
                 }
                 else {
-                    // transform of the camera and the drawer
                     Camera.setContextTransform(dispObj.getTransform());
                 }
             }
-            // draw object
             dispObj.draw(context);
             context.restore();
         }
     }
     Drawers._drawAll = _drawAll;
     let tempMatrix = new Matrix2x3();
-    /**
-     * Sorts all the IDrawers based on their order.
-     */
     function sortDrawers() {
         allDrawers.sort((d1, d2) => {
             let lComp = d1.layer - d2.layer;
@@ -3858,37 +2622,9 @@ var Drawers;
     }
     let allDrawers = [];
 })(Drawers || (Drawers = {}));
-/// <reference path="_ref.ts" />
-/*/////////////////////////////////////////////////////////////////////////////////////
-
-Rules:
-- Maps and tilesets must both be exported in .json format.
-- No tilemap may have the same name (even in different folders).
-- No tileset may have the same name (even in different folders).
-- TiledMap.tilesetImageDirectory must be set to the directory containing the tileset images before creating maps.
-
-Recognized custom properties for tiles:
-- material: name of a material as added with Material.addMaterial().
-- col: set to "true" to enable collision for this tile.  Specifically sets its tileInfo.collisionLayers = 0x1.
-    - Not needed if material is set because setting material will grab its material's collisionLayers property.
-    - Set to "false" to disable collision for this tile.
-    - Set to a number (e.g. 2, 0xFF) to manually set tileInfo.collisionLayers to a specific value.
-
-
-*/ /////////////////////////////////////////////////////////////////////////////////////
 var TiledMap;
 (function (TiledMap) {
-    // Adding maps and tilesets:
-    /**
-     * The directory of the tileset images in TexPackManager.
-     * Must be set before creating maps.
-     */
     TiledMap.tilesetImageDirectory = "";
-    /**
-     * Adds a tileset.  No two tilesets may have the same name (even if they're in different folders).
-     * @param name Name of the tileset.  Must match the name the tileset is referred to by tilemaps.
-     * @param tilesetJSON The JSON object to be parsed to create the tileset.
-     */
     function addTileset(name, tilesetJSON) {
         if (tilesetJSONDictionary.hasOwnProperty(name) && tilesetJSONDictionary[name] !== "") {
             console.error("Cannot add tileset with name \"" + name + "\" because a tileset with that name has already been added.");
@@ -3897,11 +2633,6 @@ var TiledMap;
         tilesetJSONDictionary[name] = tilesetJSON;
     }
     TiledMap.addTileset = addTileset;
-    /**
-     * Adds a map.  No two maps may have the same name (even if they're in different folders).
-     * @param name Name of the map.
-     * @param mapJSON The JSON object to be parsed to create the map.
-     */
     function addMap(name, mapJSON) {
         let n = name.toLowerCase();
         if (mapJSONDictionary.hasOwnProperty(n)) {
@@ -3911,11 +2642,6 @@ var TiledMap;
         mapJSONDictionary[n] = mapJSON;
     }
     TiledMap.addMap = addMap;
-    // Creating maps:
-    /**
-     * Creates MapData for the TiledMap with the given name.  Assumes the JSON for the tiledMap and all tilesets used are already added and loaded.
-     * @param mapName Name of the tiledMap to create.
-     */
     function createTiledMapData(mapName) {
         let mn = mapName.toLowerCase();
         if (!mapJSONDictionary.hasOwnProperty(mn)) {
@@ -3928,11 +2654,6 @@ var TiledMap;
         return map;
     }
     TiledMap.createTiledMapData = createTiledMapData;
-    /**
-     * Maps the given type to a given function that will parse the objectProperties of all tiled objects that have the given type.
-     * @param type The type, as defined by the 'Type' field for an object's properties in Tiled.
-     * @param parseFunc Function that parses the objectProperties and returns the GameObject created from it.
-     */
     function addObjectParser(type, parseFunc) {
         if (type == null || type === "") {
             console.error("Cannot map an empty type to an object parse function");
@@ -3945,10 +2666,6 @@ var TiledMap;
         objectParserDictionary[type] = parseFunc;
     }
     TiledMap.addObjectParser = addObjectParser;
-    /**
-     * Uses parse functions added with addObjectParser() to parse the given mapObject.  Returns the GameObject created, or null if no parser for the given map object could be found.
-     * @param mapObject The map object to parse.  Its type property determines which parse function to use.
-     */
     function parseMapObject(mapObject) {
         if (mapObject == null)
             return null;
@@ -3963,42 +2680,15 @@ var TiledMap;
         return null;
     }
     TiledMap.parseMapObject = parseMapObject;
-    /**
-     * Represents a layer of a TiledMap.  Overridden by TileLayer and ObjectLayer.
-     */
     class Layer {
         constructor() {
-            /**
-             * Name of the layer.
-             */
             this.name = "";
-            /**
-             * Reference to the TiledMap the layer belongs to.
-             */
             this.mapData = null;
-            /**
-             * Index of this layer in the TiledMap the layer belongs to.
-             */
             this.layerIndex = 0;
-            /**
-             * Width of the layer in tiles.  Should be the same as the map's width.
-             */
             this.width = 0;
-            /**
-             * Width of the layer in tiles.  Should be the same as the map's width.
-             */
             this.height = 0;
-            /**
-             * Opacity of the layer as set in Tiled.  Not used currently.
-             */
             this.opacity = 1;
-            /**
-             * Visibility of the layer as set in Tiled.  Not used currently.
-             */
             this.visible = true;
-            /**
-             * Parses a JSON object exported from Tiled to construct the layer.  No error checking is done.
-             */
             this.parse = (jsonObj) => {
                 this.Layer_parse(jsonObj);
             };
@@ -4027,35 +2717,22 @@ var TiledMap;
     class TileLayer extends Layer {
         constructor() {
             super();
-            /**
-             * Gets the number at the given coordinates, or 0 if coordinates are invalid.
-             */
             this.getTileData = (x, y) => {
                 if (!this.coordinatesAreValid(x, y)) {
                     return 0;
                 }
                 return this.tileData[x + y * this.width];
             };
-            /**
-             * Gets the global tile id at the given coordinates, stripped of its transform flags.
-             */
             this.getGID = (x, y) => {
                 let data = this.getTileData(x, y);
-                // clear transform flags
                 let gid = data & ~(TiledMap.FLIPPED_HORIZONTALLY_FLAG |
                     TiledMap.FLIPPED_VERTICALLY_FLAG |
                     TiledMap.FLIPPED_DIAGONALLY_FLAG);
                 return gid;
             };
-            /**
-             * Gets the TileInfo of the tile at the given coordinates, or null if coordinates are invalid.
-             */
             this.getTileInfo = (x, y) => {
                 return this.mapData.getTileInfo(this.getGID(x, y));
             };
-            /**
-             * Sets the number at the given coordinates.
-             */
             this.setTileData = (x, y, data) => {
                 if (!this.coordinatesAreValid(x, y)) {
                     console.warn("Cannot set GID at x: " + x + " y: " + y + ", coordinates are invalid");
@@ -4063,9 +2740,6 @@ var TiledMap;
                 }
                 this.tileData[x + y * this.width] = data;
             };
-            /**
-             * Sets the global tile id at the given coordinates.
-             */
             this.setGID = (x, y, gid, flippedHoriz = false, flippedVert = false, flippedDiag = false) => {
                 let val = gid;
                 if (flippedHoriz)
@@ -4076,9 +2750,6 @@ var TiledMap;
                     val |= TiledMap.FLIPPED_DIAGONALLY_FLAG;
                 this.setTileData(x, y, val);
             };
-            /**
-             * Gets if the given coordinates are valid (i.e. are contained in the map).
-             */
             this.coordinatesAreValid = (x, y) => {
                 if (isNaN(x))
                     return false;
@@ -4090,18 +2761,10 @@ var TiledMap;
                     return false;
                 return true;
             };
-            /**
-             * Parses a JSON object exported from Tiled to construct the layer.  No error checking is done.
-             */
             this.parse = (jsonObj) => {
                 this.Layer_parse(jsonObj);
                 this.tileData = jsonObj.data;
             };
-            /*
-            bool flipped_horizontally = (global_tile_id & FLIPPED_HORIZONTALLY_FLAG);
-            bool flipped_vertically = (global_tile_id & FLIPPED_VERTICALLY_FLAG);
-            bool flipped_diagonally = (global_tile_id & FLIPPED_DIAGONALLY_FLAG);
-            */
             this.dispose = () => {
                 this.tileData.splice(0);
                 this.tileData = null;
@@ -4111,7 +2774,6 @@ var TiledMap;
         }
     }
     TiledMap.TileLayer = TileLayer;
-    // Flags used for tile rotation.  Currently these flags are removed from tile gids, but no tile rotation is supported.
     TiledMap.FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
     TiledMap.FLIPPED_VERTICALLY_FLAG = 0x40000000;
     TiledMap.FLIPPED_DIAGONALLY_FLAG = 0x20000000;
@@ -4122,41 +2784,15 @@ var TiledMap;
         LayerType[LayerType["IMAGE_LAYER"] = 3] = "IMAGE_LAYER";
     })(TiledMap.LayerType || (TiledMap.LayerType = {}));
     var LayerType = TiledMap.LayerType;
-    /**
-     * Class containing info for a tile.  Can be obtained with MapData.getTileInfo(gid).
-     */
     class TileInfo {
         constructor() {
-            /**
-             * id of the tile within its tileset.
-             */
             this.id = 0;
-            /**
-             * Reference to the tileset this tile belongs to.
-             */
             this.tileset = null;
-            /**
-             * Material of this tile.  Set by setting a custom property for a tile with the name "material" in Tiled.
-             * Value should match a tile added by Material.addMaterial().
-             */
             this.material = "";
-            /**
-             * Collision layers for this tile.  Set by grabbing the collisionLayers property from the material defined by the "material" custom property in Tiled.
-             * The bits of this integer represent the masks this PlatformObject will collide with.  Note that 0 means no collision.
-             * "I am a"
-             */
             this.collisionLayers = 0;
             this.recycled = false;
         }
-        /**
-         * TileInfo representing a tile with a gid of 0.
-         */
         static get empty() { return TileInfo._empty; }
-        /**
-         * Creates a new TileInfo, using a recycled TileInfo if possible.
-         * @param tileset Tileset the tile belongs to.
-         * @param id id of the tile in the Tileset.
-         */
         static createNew(tileset, id) {
             let ret = null;
             if (TileInfo.recycledTileInfos.length > 0) {
@@ -4173,16 +2809,11 @@ var TiledMap;
             ret.customProperties = null;
             return ret;
         }
-        /**
-         * Recycles a TileInfo to be used later.  Dereferences properties on the tileInfo as well.
-         * @param tileInfo
-         */
         static recycle(tileInfo) {
             if (tileInfo == null)
                 return;
             if (tileInfo.recycled)
                 return;
-            // dispose
             tileInfo.tileset = null;
             tileInfo.customProperties = null;
             TileInfo.recycledTileInfos.push(tileInfo);
@@ -4194,43 +2825,16 @@ var TiledMap;
     TiledMap.TileInfo = TileInfo;
     class Tileset {
         constructor() {
-            /**
-             * Key used to access the packed image for this tileset.
-             */
             this.packedImageFilename = "";
-            /**
-             * Reference to the packed image for this tileset.
-             */
             this.packedImage = null;
-            /**
-             * Number of tiles defined in this tileset.
-             */
             this.numTiles = 0;
-            /**
-             * Width of the image in pixels.
-             */
             this.imageWidth = 0;
-            /**
-             * Height of the image in pixels.
-             */
             this.imageHeight = 0;
-            /**
-             * Width of each tile, in pixels
-             */
             this.tileWidth = 0;
-            /**
-             * Height of each tile, in pixels
-             */
             this.tileHeight = 0;
-            /**
-             * Calculates the number of columns in this tileset (it's not provided for some reason).  Calculation currently does not take into account margin or spacing.
-             */
             this.getNumColumns = () => {
                 return Math.floor(this.imageWidth / this.tileWidth);
             };
-            /**
-             * Parses the tileset from a given JSON object made in Tiled for the tileset.
-             */
             this.parse = (tilesetJSON) => {
                 if (TiledMap.tilesetImageDirectory == null || TiledMap.tilesetImageDirectory == "") {
                     console.error("TiledMap.tilesetImageDirectory must be defined before creating tilesets.");
@@ -4255,7 +2859,6 @@ var TiledMap;
                 this.customProperties = tilesetJSON.properties;
                 if (this.customProperties == null)
                     this.customProperties = {};
-                // create tile infos
                 this.dispose();
                 this.tileInfos = [];
                 for (let i = 0; i < this.numTiles; i++) {
@@ -4266,7 +2869,6 @@ var TiledMap;
                     for (var id in tilesetJSON.tileproperties) {
                         let tileInfo = this.tileInfos[id];
                         let props = tilesetJSON.tileproperties[id];
-                        // parsing tile custom properties
                         tileInfo.customProperties = props;
                         if (props.hasOwnProperty("material")) {
                             tileInfo.material = props.material;
@@ -4296,10 +2898,6 @@ var TiledMap;
                     }
                 }
             };
-            /**
-             * Recycles all the TileInfos defined in this Tileset, then gets rid of the array containing them.
-             * Clears references.
-             */
             this.dispose = () => {
                 if (this.tileInfos == null)
                     return;
@@ -4317,39 +2915,18 @@ var TiledMap;
         }
     }
     TiledMap.Tileset = Tileset;
-    /**
-     * Class for parsed objects from Tiled object layers.
-     */
     class Object {
         constructor() {
-            /**
-             * Name of the object, as defined in Tiled.
-             */
             this.name = "";
-            /**
-             * Type as defined by the used in Tiled.
-             */
             this.type = "";
-            /**
-             * ID, which is automatically set in Tiled.
-             */
             this.id = 0;
             this.x = 0;
             this.y = 0;
             this.rotation = 0;
             this.width = 0;
             this.height = 0;
-            /**
-             * Points for the polygon/polyline, if this object is the POLYGON or POLYLINE type.
-             */
             this.points = [];
-            /**
-             * The ObjectGroup this object comes from.
-             */
             this.objectGroup = null;
-            /**
-             * Parses from a JSON exported from Tiled.
-             */
             this.parse = (jsonObject) => {
                 let objPoints = null;
                 this.name = jsonObject.name;
@@ -4375,7 +2952,6 @@ var TiledMap;
                     this.objectType = ObjectType.RECTANGLE;
                 }
                 if (objPoints != null) {
-                    // parse points
                     for (let i = 0; i < objPoints.length; i++) {
                         this.points.push(new Vec2(objPoints[i].x, objPoints[i].y));
                     }
@@ -4398,13 +2974,7 @@ var TiledMap;
     class ObjectGroup extends Layer {
         constructor() {
             super();
-            /**
-             * Array of all the TiledMapObjects defined in this group.
-             */
             this.mapObjects = [];
-            /**
-             * Parses a JSON object exported from Tiled to construct the object group.  No error checking is done.
-             */
             this.parse = (jsonObj) => {
                 this.Layer_parse(jsonObj);
                 for (let i = 0; i < jsonObj.objects.length; i++) {
@@ -4425,9 +2995,6 @@ var TiledMap;
     TiledMap.ObjectGroup = ObjectGroup;
     class MapData {
         constructor() {
-            /**
-             * Parse a JSON object exported from Tiled.
-             */
             this.parse = (jsonObj) => {
                 if (this._parsed) {
                     console.error("TileMap already parsed, cannot be parsed again.");
@@ -4442,7 +3009,6 @@ var TiledMap;
                     this.customProperties = {};
                 for (let i = 0; i < jsonObj.layers.length; i++) {
                     let layer = null;
-                    // get type of layer
                     let type;
                     let typeStr = jsonObj.layers[i].type;
                     if (typeStr === "tilelayer") {
@@ -4465,7 +3031,6 @@ var TiledMap;
                             layer = null;
                             break;
                     }
-                    // parse layer
                     if (layer == null) {
                         console.error("Layer type " + LayerType[type] + " not supported yet.");
                     }
@@ -4476,24 +3041,20 @@ var TiledMap;
                         this.layers.push(layer);
                     }
                 }
-                // parsing tilesets
                 this._tilesets.splice(0);
                 for (let i = 0; i < jsonObj.tilesets.length; i++) {
                     let firstGID = jsonObj.tilesets[i].firstgid;
                     let tileset = null;
                     if (jsonObj.tilesets[i].source == undefined) {
-                        // defines tileset
                         tileset = new Tileset();
                         tileset.parse(jsonObj.tilesets[i]);
                     }
                     else {
-                        // references external tileset
                         let tilesetName = nameFromUrl(jsonObj.tilesets[i].source);
                         if (MapData.externalTilesetExists(tilesetName)) {
                             tileset = MapData.getExternalTileset(tilesetName);
                         }
                         else {
-                            // need to create tileset first
                             tileset = new Tileset();
                             let tilesetJSON = null;
                             if (tilesetJSONDictionary.hasOwnProperty(tilesetName)) {
@@ -4504,42 +3065,21 @@ var TiledMap;
                                 continue;
                             }
                             tileset.parse(tilesetJSON);
-                            // adds external tileset for later use
                             MapData.addExternalTileset(tilesetName, tileset);
                         }
                     }
-                    // add to list of tilesets for this map
                     this._tilesets.push(new TilesetElement(firstGID, tileset));
                 }
-                // sort tilesets for this map by firstGID
                 this._tilesets.sort(function (t1, t2) {
                     return t1.firstGID - t2.firstGID;
                 });
                 this._parsed = true;
             };
-            /**
-             * Height of the map, in number of tiles.
-             */
             this.height = 0;
-            /**
-             * Width of the map, in number of tiles.
-             */
             this.width = 0;
-            /**
-             * Width of the tiles, in pixels.
-             */
             this.tileWidth = 0;
-            /**
-             * Height of the tiles, in pixels.
-             */
             this.tileHeight = 0;
-            /**
-             * The layers contained in this map.
-             */
             this.layers = [];
-            /**
-             * Returns the TiledMapLayer with the given name, or null if no layer with the name exists in this map.
-             */
             this.getLayerByName = (name) => {
                 for (let i = 0; i < this.layers.length; i++) {
                     if (this.layers[i].name === name)
@@ -4547,9 +3087,6 @@ var TiledMap;
                 }
                 return null;
             };
-            /**
-             * Returns the TiledMapTileLayer with the given name, or null if no tile layer with the name exists in this map.
-             */
             this.getTileLayerByName = (name) => {
                 for (let i = 0; i < this.layers.length; i++) {
                     if (this.layers[i].name === name &&
@@ -4558,17 +3095,11 @@ var TiledMap;
                 }
                 return null;
             };
-            /**
-             * Gets info for the tile with the given global id.
-             * Returns TileInfo.empty if the gid is 0.
-             * Returns null if the gid is invalid.
-             */
             this.getTileInfo = (gid) => {
                 if (gid < 0)
                     return null;
                 if (gid === 0)
                     return TileInfo.empty;
-                // get tileset
                 let tilesetElement = null;
                 for (let i = 1; i < this._tilesets.length; i++) {
                     if (gid < this._tilesets[i].firstGID) {
@@ -4578,17 +3109,11 @@ var TiledMap;
                 }
                 if (tilesetElement === null)
                     tilesetElement = this._tilesets[this._tilesets.length - 1];
-                // get info
                 let id = gid - tilesetElement.firstGID;
                 if (id < 0 || id >= tilesetElement.tileset.tileInfos.length)
                     return null;
                 return tilesetElement.tileset.tileInfos[id];
             };
-            /**
-             * Creates a GameObject, where each child is a GameObject with a TiledMapTileLayerRenderer component corresponding to each tile layer.
-             * Then every map Object is parsed with functions given by addObjectParser().
-             * Returns the created GameObject.
-             */
             this.createGameObject = () => {
                 if (!this._parsed) {
                     console.error("Cannot create GameObject, TiledMap hasn't been parsed");
@@ -4611,9 +3136,6 @@ var TiledMap;
                 this.callOnAllMapObjects(parseMapObject);
                 return rootGO;
             };
-            /**
-             * Calls a function on all TiledMapObjects in the map.
-             */
             this.callOnAllMapObjects = (func) => {
                 for (let i = 0; i < this.layers.length; i++) {
                     if (this.layers[i].type !== LayerType.OBJECT_GROUP)
@@ -4657,18 +3179,12 @@ var TiledMap;
     }
     MapData.externalTilesets = {};
     TiledMap.MapData = MapData;
-    /**
-     * Object containing a reference to a tileset and the first global id represented by that tileset in the current map.
-     */
     class TilesetElement {
         constructor(firstGID, tileset) {
             this.firstGID = firstGID;
             this.tileset = tileset;
         }
     }
-    /**
-     * Strips the directory and path from the given url, leaving only the name.
-     */
     function nameFromUrl(url) {
         let index = Math.max(url.lastIndexOf("/"), url.lastIndexOf("\\"));
         let trimmedStr;
@@ -4688,44 +3204,12 @@ var TiledMap;
     let tilesetJSONDictionary = {};
     let objectParserDictionary = {};
 })(TiledMap || (TiledMap = {}));
-/// <reference path="_ref.ts" />
-/**
- * Messages received:
-    
-    // Called when the Component is added to a GameObject.
-    onAwake = (): void => { }
-    
-    // Called once for a Component.  Either called when a scene finishes loading, or just before update().
-    onStart = (): void => { }
-    
-    // called once per frame, during the update step.  Is not called if the component is disabled.
-    onUpdate = (): void => { }
-    
-    // called when the component is enabled.
-    onEnable = (): void => { }
-    
-    // called when the component is disabled.
-    onDisable = (): void => { }
-    
-    // called just before the component is destroyed.
-    onDestroy = (): void => { }
-    
-*/
 class ComponentProperties {
     constructor() {
-        /**
-         * When true, there can only be 1 of this component on a GameObject.
-         */
         this.only1 = false;
-        /**
-         * Adds a Component constructor to the list of components that are required to be added before adding this one.
-         */
         this.requireComponent = (c) => {
             this._requireComponents.push(c);
         };
-        /**
-         * Adds a Component constructor to the list of components that are required to NOT be added when adding this one.
-         */
         this.excludeComponent = (c) => {
             this._excludeComponents.push(c);
         };
@@ -4735,41 +3219,23 @@ class ComponentProperties {
 }
 class Component {
     constructor() {
-        /**
-         * Name of the component.  Used for debugging.
-         */
         this.name = "";
-        /**
-         * The GameObject this Component belongs to.  Please don't change.
-         */
         this.gameObject = null;
         this.getTransform = () => {
             return this.gameObject.transform;
         };
-        /**
-         * Gets if this component is enabled.  Only active and enabled components receive calls to update() every frame.
-         */
         this.isEnabled = () => {
             return this._enabled;
         };
-        /**
-         * Gets if this component's gameObject is active and this component is enabled.  Only active and enabled components receive calls to update() every frame.
-         */
         this.isActiveAndEnabled = () => {
             return this._enabled && this.gameObject.isActive();
         };
-        /**
-         * Gets if onStarted() has been called yet for the component.
-         */
         this.isStarted = () => {
             return this._started;
         };
         this.getComponentProperties = () => {
             return this.componentProperties;
         };
-        /**
-         * Enables this component, calling onEnable() if defined.
-         */
         this.enable = () => {
             if (this._enabled)
                 return;
@@ -4778,9 +3244,6 @@ class Component {
                 this.onEnable();
             }
         };
-        /**
-         * Disables this component, calling onDisable() if defined.
-         */
         this.disable = () => {
             if (!this._enabled)
                 return;
@@ -4789,21 +3252,12 @@ class Component {
                 this.onDisable();
             }
         };
-        /**
-         * Gets a component of or derived from the given type from this component's gameObject, or returns null if it doesn't exist.
-         */
         this.getComponent = (c) => {
             return this.gameObject.getComponent(c);
         };
-        /**
-         * Gets an array of all components of or derived from the given type from this component's gameObject.
-         */
         this.getComponents = (c) => {
             return this.gameObject.getComponents(c);
         };
-        /**
-         * Returns a string describing the component.
-         */
         this.toString = () => {
             return "Component " + this.name + " started: " + this.isStarted() + " enabled: " + this.isEnabled();
         };
@@ -4811,9 +3265,6 @@ class Component {
         this._enabled = true;
         this._started = false;
     }
-    /**
-     * Starts the given component (if it's unstarted) and marks it as started.
-     */
     static _startUnstarted(component) {
         if (component._started)
             return;
@@ -4823,56 +3274,25 @@ class Component {
         }
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * DrawerComponents are automatically added to and removed from Drawers.
- */
 class DrawerComponent extends Component {
     constructor() {
         super();
-        /**
-         * Drawers are sorted by layer before being drawn.
-         */
         this.layer = DrawLayer.DEFAULT;
-        /**
-         * Drawers are sorted by this value (after Layer sorting) before being drawn.
-         */
         this.order = 0;
-        /**
-         * If draw() should be called for this DrawComponent.  Is false if this component is disabled or the gameObject is marked for destroy.
-         */
         this.isVisible = () => {
             return this.isActiveAndEnabled() && !this.gameObject.isMarkedForDestroy();
         };
-        /**
-         * When true, the position of the drawer when drawn will ignore the camera (e.g. UI elements).
-         */
         this.anchored = false;
-        /**
-         * Draws to the given context.
-         */
         this.draw = (context) => {
-            // to be overridden
         };
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * Renders a rectangle of a TextureAtlas.
- */
 class PackedImageRenderer extends DrawerComponent {
     constructor() {
         super();
-        /**
-         * Gets the TexPackManager.PackedImage this renderer draws from.
-         */
         this.getImage = () => {
             return this.image;
         };
-        /**
-         * Sets the image to draw.
-         * @param setRectFull Automatically set rectangular selection dimensions to be the size of the original image (default is true).
-         */
         this.setImage = (image, setRectFull = true) => {
             this.setImage_PackedImageRenderer(image, setRectFull);
         };
@@ -4882,40 +3302,13 @@ class PackedImageRenderer extends DrawerComponent {
                 this.setImageRectFull();
             }
         };
-        /**
-         * Sets image to draw based on its original filename.  image is set to null if no image with the name exists.
-         * @param setRectFull Automatically set rectangular selection dimensions to be the size of the original image (default is true).
-         */
         this.setImageByName = (filename, setRectFull = true) => {
             this.setImage(TexPackManager.getPackedImage(filename), setRectFull);
         };
-        /**
-         * The X coordinate of the top left corner of the sub-rectangle of the original image to draw into the destination context.
-         * Assumes the image wasn't trimmed.
-         */
         this.imageX = 0;
-        /**
-         * The Y coordinate of the top left corner of the sub-rectangle of the original image to draw into the destination context.
-         * Assumes the image wasn't trimmed.
-         */
         this.imageY = 0;
-        /**
-         * The width of the sub-rectangle of the original image to draw into the destination context.
-         * Assumes the image wasn't trimmed.
-         */
         this.imageWidth = 0;
-        /**
-         * The height of the sub-rectangle of the original image to draw into the destination context.
-         * Assumes the image wasn't trimmed.
-         */
         this.imageHeight = 0;
-        /**
-         * Sets the rectangular selection properties with one function.
-         * @param x x coordinate of top left corner of the rectangle.
-         * @param y y coordinate of top left corner of the rectangle.
-         * @param width width of the rectangle.
-         * @param height height of the rectangle.
-         */
         this.setImageRect = (x, y, width, height) => {
             this.setImageRect_PackedImageRenderer(x, y, width, height);
         };
@@ -4925,9 +3318,6 @@ class PackedImageRenderer extends DrawerComponent {
             this.imageWidth = width;
             this.imageHeight = height;
         };
-        /**
-         * Sets the rectangular selection properties to be the size of the original image.
-         */
         this.setImageRectFull = () => {
             if (this.image === null) {
                 this.setImageRect(0, 0, 0, 0);
@@ -4936,29 +3326,11 @@ class PackedImageRenderer extends DrawerComponent {
                 this.setImageRect(0, 0, this.image.getOriginalWidth(), this.image.getOriginalHeight());
             }
         };
-        /**
-         * x coordinate of the origin point of the displayed image, as a multiplier of the imageWidth.  0 is the left edge, 1 is the right edge.
-         */
         this.pivotX = .5;
-        /**
-         * y coordinate of the origin point of the displayed image, as a multiplier of the imageHeight.  0 is the top edge, 1 is the bottom edge.
-         */
         this.pivotY = .5;
-        /**
-         * Disable image smoothing for a pixel-art look.
-         */
         this.imageSmoothingEnabled = true;
-        /**
-         * CSS color string representing the color to tint the image.  Alpha is ignored.
-         */
         this.tintColor = "#000000";
-        /**
-         * Amount to apply tintColor when tinting the image.  Ranges from [0, 1].
-         */
         this.tintAmount = 0;
-        /**
-         * Draws the TextureRectRenderer on the given context.
-         */
         this.draw = (context) => {
             let packedImage = this.image;
             if (packedImage === null) {
@@ -4968,7 +3340,6 @@ class PackedImageRenderer extends DrawerComponent {
                 console.warn("Attempting to draw with PackedImage that hasn't finished loading");
                 return;
             }
-            // get positions from the packed image
             let piLeft = packedImage.frameX + Math.max(0, this.imageX - packedImage.trimLeft);
             let piRight = packedImage.frameX + Math.min(packedImage.frameWidth, this.imageX + this.imageWidth - packedImage.trimLeft);
             let piPivotX = packedImage.frameX + this.imageX + this.imageWidth * this.pivotX - packedImage.trimLeft;
@@ -4977,9 +3348,6 @@ class PackedImageRenderer extends DrawerComponent {
             let piPivotY = packedImage.frameY + this.imageY + this.imageHeight * this.pivotY - packedImage.trimTop;
             piPivotX = Math.floor(piPivotX + .001);
             piPivotY = Math.floor(piPivotY + .001);
-            // (can have effects here, e.g. setting context.shadowBlur, context.shadowColor, context.globalAlpha, (context as any).imageSmoothingEnabled, etc.)
-            // (don't need to reset effects afterward since context.restore() will be called)
-            // disable image smoothing
             if (!this.imageSmoothingEnabled) {
                 context.mozImageSmoothingEnabled = false;
                 context.webkitImageSmoothingEnabled = false;
@@ -4989,26 +3357,20 @@ class PackedImageRenderer extends DrawerComponent {
             let usingEffect = false;
             usingEffect = this.tintAmount > 0;
             if (usingEffect) {
-                // ready effects context
                 Game.effectsContext.clearRect(0, 0, this.imageWidth, this.imageHeight);
                 Game.effectsContext.save();
-                // draw image to effects context
                 Game.effectsContext.drawImage(packedImage.atlasImage, piLeft, piTop, piRight - piLeft, piBottom - piTop, 0, 0, piRight - piLeft, piBottom - piTop);
-                // apply tint
                 if (this.tintAmount > 0) {
-                    Game.effectsContext.globalCompositeOperation = "source-atop"; // new shape is drawn only where both the new shape and the destination canvas overlap.
+                    Game.effectsContext.globalCompositeOperation = "source-atop";
                     this.colorParser.parseCSSColor(this.tintColor);
                     this.colorParser.alpha = this.tintAmount;
                     Game.effectsContext.fillStyle = this.colorParser.toString();
                     Game.effectsContext.fillRect(0, 0, this.imageWidth, this.imageHeight);
                 }
-                // restore effects context
-                Game.effectsContext.restore(); // also sets globalCompositeOperation back to the default "source-over"
-                // draw image from the effects context to the canvas
+                Game.effectsContext.restore();
                 context.drawImage(Game.effectsCanvas, 0, 0, piRight - piLeft, piBottom - piTop, piLeft - piPivotX, piTop - piPivotY, piRight - piLeft, piBottom - piTop);
             }
             else {
-                // draw image normally, without effects
                 context.drawImage(packedImage.atlasImage, piLeft, piTop, piRight - piLeft, piBottom - piTop, piLeft - piPivotX, piTop - piPivotY, piRight - piLeft, piBottom - piTop);
             }
         };
@@ -5017,22 +3379,12 @@ class PackedImageRenderer extends DrawerComponent {
         this.name = "PackedImageRenderer";
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * An extension of PackedImageRenderer for rendering SpriteFrames and Animations.
- */
 class SpriteRenderer extends PackedImageRenderer {
     constructor() {
         super();
-        /**
-         * Reference to the spriteFrame the renderer is displaying.
-         */
         this.getSpriteFrame = () => {
             return this.spriteFrame;
         };
-        /**
-         * Sets renderer to display the given spriteFrame.
-         */
         this.setSpriteFrame = (spriteFrame) => {
             if (spriteFrame === null) {
                 this.setImage(null, false);
@@ -5043,38 +3395,17 @@ class SpriteRenderer extends PackedImageRenderer {
             }
             this.spriteFrame = spriteFrame;
         };
-        /**
-         * Sets renderer to display the the spriteFrame from a spritesheet at the given index.
-         */
         this.setSpriteFrameByName = (imageFilename, frameIndex) => {
             this.setSpriteFrame(Spritesheet.getSpriteFrame(imageFilename, frameIndex));
         };
-        /**
-         * Sets the image to draw.  Since this is isn't defined by a SpriteFrame, spriteFrame will be set to null.
-         * Calling this while an animation is playing probably won't do anything because the animation will almost immediately update the image.
-         * @param setRectFull Automatically set rectangular selection dimensions to be the size of the original image (default is true).
-         */
         this.setImage = (image, setRectFull = true) => {
             this.setImage_PackedImageRenderer(image, setRectFull);
             this.spriteFrame = null;
         };
-        /**
-         * Sets the rectangular selection properties with one function.  Since this is isn't defined by a SpriteFrame, spriteFrame will be set to null.
-         * Calling this while an animation is playing probably won't do anything because the animation will almost immediately update the image.
-         * @param x x coordinate of top left corner of the rectangle.
-         * @param y y coordinate of top left corner of the rectangle.
-         * @param width width of the rectangle.
-         * @param height height of the rectangle.
-         */
         this.setImageRect = (x, y, width, height) => {
             this.setImageRect_PackedImageRenderer(x, y, width, height);
             this.spriteFrame = null;
         };
-        /**
-         * Plays the given animation.
-         * @param animation The animation to play.  Can be null to stop the animation.
-         * @param nextAnimation (default is null) The animation to play after the other animation finishes (doesn't apply when playing backwards).  This won't happen when set to null.
-         */
         this.playAnimation = (animation, nextAnimation = null) => {
             if (animation !== null && (animation.frames == null || animation.frames.length === 0)) {
                 console.error("Cannot play animation " + animation.name + " because it has no frames");
@@ -5083,16 +3414,10 @@ class SpriteRenderer extends PackedImageRenderer {
             this.animation = animation;
             this.nextAnimation = nextAnimation;
             if (this.animSpeed < 0 && this.animation !== null) {
-                // playing backwards.  Start animation at the end
                 this.animTime = this.animation.getDuration() - .0001;
             }
             this.animPlaying = (animation !== null);
         };
-        /**
-         * Plays the given animation.  Animations are given by name.
-         * @param animation The animation to play.  Can be "" to stop the animation.
-         * @param nextAnimation (default is "") The animation to play after the other animation finishes (doesn't apply when playing backwards).  This won't happen when set to "".
-         */
         this.playAnimationByName = (animation, nextAnimation = "") => {
             let anim = null;
             if (animation != null && animation !== "") {
@@ -5110,41 +3435,23 @@ class SpriteRenderer extends PackedImageRenderer {
             }
             this.playAnimation(anim, nextAnim);
         };
-        /**
-         * Stops the animation.
-         */
         this.stopAnimation = () => {
             this.animPlaying = false;
         };
-        /**
-         * Gets the current animation.
-         */
         this.getAnimation = () => {
             return this.animation;
         };
-        /**
-         * Gets if an animation is playing.  Can return true even when animation speed is 0.
-         */
         this.isAnimationPlaying = () => {
             return this.animPlaying;
         };
-        /**
-         * Gets the current time for playing the current animation.
-         */
         this.getAnimationTime = () => {
             return this.animTime;
         };
-        /**
-         * Gets the current frame index of the current animation.
-         */
         this.getAnimationFrameIndex = () => {
             if (this.animation === null)
                 return 0;
             return Math.floor(this.animTime * this.animation.fps);
         };
-        /**
-         * Sets the time for playing the current animation.  Is automatically clamped to be within the animation duration.
-         */
         this.setAnimationTime = (time) => {
             if (this.animation === null) {
                 this.animTime = 0;
@@ -5153,40 +3460,28 @@ class SpriteRenderer extends PackedImageRenderer {
             let duration = this.animation.getDuration();
             this.animTime = M.fmod(time, duration);
         };
-        /**
-         * Gets the speed multiplier for playing an animation.
-         */
         this.getAnimationSpeed = () => {
             return this.animSpeed;
         };
-        /**
-         * Sets the speed multiplier for playing an animation (can be negative to play animation in reverse).
-         */
         this.setAnimationSpeed = (speed) => {
             this.animSpeed = speed;
         };
         this.onUpdate = () => {
-            // play animation
             if (this.animPlaying && this.animation !== null) {
                 this.animTime += this.animSpeed * Game.deltaTime;
                 let animDuration = this.animation.getDuration();
                 if (this.animSpeed >= 0) {
-                    // playing forward
                     if (this.animTime >= animDuration) {
-                        // reached end of animation.  Stop, loop, or move on to the next animation.
                         if (this.nextAnimation === null) {
                             if (this.animation.loops) {
-                                // loop around
                                 this.animTime = M.fmod(this.animTime, animDuration);
                             }
                             else {
-                                // stop animation at the end
                                 this.animTime = animDuration - .0001;
                                 this.animPlaying = false;
                             }
                         }
                         else {
-                            // move on to next animation
                             this.animation = this.nextAnimation;
                             this.nextAnimation = null;
                             this.animTime = M.fmod(this.animTime - animDuration, this.animation.getDuration());
@@ -5194,15 +3489,11 @@ class SpriteRenderer extends PackedImageRenderer {
                     }
                 }
                 else {
-                    // playing backward
                     if (this.animTime < 0) {
-                        // reached end of animation.  Stop or loop.
                         if (this.animation.loops) {
-                            // loop around
                             this.animTime = M.fmod(this.animTime, animDuration);
                         }
                         else {
-                            // stop animation at the start
                             this.animTime = 0;
                             this.animPlaying = false;
                         }
@@ -5230,30 +3521,16 @@ class SpriteRenderer extends PackedImageRenderer {
         this.name = "SpriteRenderer";
     }
 }
-/// <reference path="_ref.ts" />
 class TiledMapTileLayerRenderer extends DrawerComponent {
     constructor() {
         super();
-        /**
-         * The TileLayer data this renderer is drawing.
-         */
         this.tiledMapLayer = null;
-        /**
-         * Gets the map data this tile layer is a part of.
-         */
         this.getMapData = () => {
             return this.tiledMapLayer.mapData;
         };
-        /**
-         * Gets the TiledMapComponent representing the map data this tile layer is a part of.
-         * TiledMapComponent should be in the parent transform.
-         */
         this.getTiledMapComponent = () => {
             return this.getTransform().getParent().gameObject.getComponent(TiledMapComponent);
         };
-        /**
-         * Won't draw tiles that aren't on the camera.  Assumes the map doesn't scale or rotate, isn't the child of another Transform.
-         */
         this.cameraCulling = true;
         this.onAwake = () => {
             this._transform = this.getTransform();
@@ -5263,7 +3540,6 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
                 console.error("Must set TiledMapTileLayerRenderer.tiledMapLayer");
                 return;
             }
-            // disable image smoothing for a pixelated look.  Also helps with texture bleeding
             context.imageSmoothingEnabled = false;
             let tileXMin = 0;
             let tileXMax = this.tiledMapLayer.width;
@@ -5271,7 +3547,6 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
             let tileYMax = this.tiledMapLayer.height;
             let tileWidth = this.tiledMapLayer.mapData.tileWidth;
             let tileHeight = this.tiledMapLayer.mapData.tileHeight;
-            // restricting tiles drawn to only those visible on screen
             if (this.cameraCulling) {
                 let boundXMin = Camera.leftBound;
                 let boundYMin = Camera.topBound;
@@ -5326,7 +3601,6 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
                     rectHeight = tileset.tileHeight;
                     canvasOffsetX = x * this.tiledMapLayer.mapData.tileWidth;
                     canvasOffsetY = y * this.tiledMapLayer.mapData.tileHeight;
-                    // get positions from the packed image
                     packedImage = tileset.packedImage;
                     piLeft = packedImage.frameX + Math.max(0, rectX - packedImage.trimLeft);
                     piRight = packedImage.frameX + Math.min(packedImage.frameWidth, rectX + rectWidth - packedImage.trimLeft);
@@ -5336,8 +3610,6 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
                     piPivotY = packedImage.frameY + rectY + -packedImage.trimTop;
                     piPivotX = Math.floor(piPivotX + .001);
                     piPivotY = Math.floor(piPivotY + .001);
-                    // rotations not implemented
-                    // draw image normally, without effects
                     context.drawImage(packedImage.atlasImage, piLeft, piTop, piRight - piLeft, piBottom - piTop, canvasOffsetX + piLeft - piPivotX, canvasOffsetY + piTop - piPivotY, piRight - piLeft, piBottom - piTop);
                 }
             }
@@ -5348,11 +3620,6 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
         this.name = "TiledMapTileLayerRenderer";
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * Component containing the map data and layers for a tiled map.
- * The root GameObject created with TiledMap.createGameObject() has this component.
- */
 class TiledMapComponent extends Component {
     constructor() {
         super();
@@ -5364,10 +3631,6 @@ class TiledMapComponent extends Component {
         this.name = "TiledMapComponent";
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * Applies a filter covering the entire screen that makes it grayscale.
- */
 class ScreenFilter extends DrawerComponent {
     constructor() {
         super();
@@ -5389,19 +3652,11 @@ class ScreenFilter extends DrawerComponent {
         this.order = 999;
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * A basic component that loads Game.startScene when all the game's assets are finished loading.
- * Can be overridden.
- */
 class BasePreloader extends DrawerComponent {
     constructor() {
         super();
         this.textFont = "24px Verdana";
         this.textColor = "#FFFFFF";
-        /**
-         * Draws percent loaded to the context.
-         */
         this.draw = (context) => {
             context.font = this.textFont;
             context.textAlign = "center";
@@ -5419,7 +3674,6 @@ class BasePreloader extends DrawerComponent {
             this.onUpdate_BasePreloader();
         };
         this.onUpdate_BasePreloader = () => {
-            // wait for the game to finish loading
             if (Game.ready) {
                 if (Game.startScene == "") {
                     console.error("Game.startScene must be defined.  This is the scene that will start once the game finishes loading.");
@@ -5433,70 +3687,35 @@ class BasePreloader extends DrawerComponent {
         this.anchored = true;
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * The first scene loaded by the game by default.  Only contains one GameObject with the BasePreloader component, which starts Game.startScene when all the game's assets are finished loading.
- */
 class BasePreloadScene extends Scene {
     constructor(...args) {
         super(...args);
         this.onLoad = () => {
-            // wait for game to finish loading
             let go = new GameObject();
             go.addComponent(BasePreloader);
         };
         this.onUnload = () => { };
     }
 }
-/// <reference path="_ref.ts" />
 class GameObject {
-    /**
-     * GameObject constructor.
-     */
     constructor() {
-        // Properties
-        /**
-         * Name of this GameObject.  Used in functions that search for gameObjects by name.
-         */
         this.name = "";
-        /**
-         * Gets instance ID for this GameObject.  Guaranteed to be unique for every GameObject.
-         */
         this.getInstanceID = () => {
             return this._instanceID;
         };
-        /**
-         * Gets scene ID for this GameObject.  This is the ID of the scene last loaded when this GameObject was created.
-         * When the scene is unloaded, this GameObject will be destroyed, unless it's marked to not be destroyed on unload.
-         */
         this.getSceneID = () => {
             return this._sceneID;
         };
-        /**
-         * Transform for this GameObject.  Please don't change.
-         */
         this.transform = new Transform();
-        /**
-         * When true, this object will be deleted at the end of the frame.
-         */
         this.isMarkedForDestroy = () => {
             return this._markedForDestroy;
         };
-        /**
-         * When true, this object will not be destroyed when the scene it comes from unloads.
-         */
         this.isDontDestroyOnUnload = () => {
             return this._dontDestroyOnUnload;
         };
-        /**
-         * Sets the local active state of this GameObject (isActiveSelf).
-         */
         this.setActive = (active) => {
             this._activeSelf = active;
         };
-        /**
-         * If this and every parent above it is active.
-         */
         this.isActive = () => {
             let trans = this.transform;
             while (trans !== null) {
@@ -5506,33 +3725,23 @@ class GameObject {
             }
             return true;
         };
-        /**
-         * The local active state of this GameObject.  This GameObject still isn't active if a parent is inactive however.
-         */
         this.isActiveSelf = () => {
             return this._activeSelf;
         };
-        // Functions
-        /**
-         * Adds a Component of the given type.
-         */
         this.addComponent = (c) => {
             let component = new c();
             if (component == null)
                 return null;
             let compProps = component.getComponentProperties();
-            // check name
             if (component.name == null || component.name === "") {
                 console.warn("Component added without a name");
             }
-            // check only1
             if (compProps.only1) {
                 if (this.getComponent(c) !== null) {
                     console.error("Only 1 instance of component " + component.name + " can be added to a GameObject");
                     return;
                 }
             }
-            // check requireComponents        
             for (let i = 0; i < compProps._requireComponents.length; i++) {
                 if (this.getComponent(compProps._requireComponents[i]) === null) {
                     console.error("Component " + component.name + " requires component " +
@@ -5541,7 +3750,6 @@ class GameObject {
                     return;
                 }
             }
-            // check excludeComponents        
             for (let i = 0; i < compProps._excludeComponents.length; i++) {
                 if (this.getComponent(compProps._excludeComponents[i]) !== null) {
                     console.error("Component " + component.name + " requires component " +
@@ -5550,22 +3758,16 @@ class GameObject {
                     return;
                 }
             }
-            // make component part of this gameObject
             component.gameObject = this;
             this.components.push(component);
-            // add DrawerComponent to Drawers
             if (component instanceof DrawerComponent) {
                 Drawers._add(component);
             }
-            // call onAwake()
             if (component.onAwake != undefined) {
                 component.onAwake();
             }
             return component;
         };
-        /**
-         * Gets a component of or derived from the given type from this gameObject, or returns null if it doesn't exist.
-         */
         this.getComponent = (c) => {
             let component;
             for (let i = 0; i < this.components.length; i++) {
@@ -5576,9 +3778,6 @@ class GameObject {
             }
             return null;
         };
-        /**
-         * Gets an array of all components of or derived from the given type from this gameObject.
-         */
         this.getComponents = (c) => {
             let ret = [];
             let component;
@@ -5590,54 +3789,38 @@ class GameObject {
             }
             return ret;
         };
-        /**
-         * Gets an array of all components in children of or derived from the given type from this gameObject.
-         */
         this.getComponentsInChildren = (c) => {
             let ret = [];
             let children = this.transform.getChildren();
             children.forEach(function (child) {
-                let childComps = child.gameObject.getComponentsAndInChildren(c); // using helper function
+                let childComps = child.gameObject.getComponentsAndInChildren(c);
                 for (let i = 0; i < childComps.length; i++) {
                     ret.push(childComps[i]);
                 }
             });
             return ret;
         };
-        // (note: Components are automatically destroyed when the GameObject is destroyed.  There is currently no way to destroy a Component manually)
-        /**
-         * Marks object to be destroyed at the end of the frame.  Children will be recursively marked for destroy as well.  Won't do anything if already marked for destroy.
-         */
         this.markForDestroy = () => {
             if (this._markedForDestroy)
                 return;
             this._markedForDestroy = true;
             GameObject.gameObjectsMarkedForDestroy.push(this);
-            // mark children for destroy too
             this.transform.getChildren().forEach(function (transform) {
                 if (transform.gameObject != null) {
                     transform.gameObject.markForDestroy();
                 }
             });
         };
-        /**
-         * Marks object to not be destroyed when the scene it comes from unloads.  Children will recursively be marked the same way.
-         * Note this mark cannot be undone, and once this function is called this GameObject will need to be destroyed manually.
-         */
         this.dontDestroyOnUnload = () => {
             if (this._dontDestroyOnUnload)
                 return;
             this._dontDestroyOnUnload = true;
-            // mark children to not be destroyed on unload too
             this.transform.getChildren().forEach(function (transform) {
                 if (transform.gameObject != null) {
                     transform.gameObject.dontDestroyOnUnload();
                 }
             });
         };
-        /**
-         * Calls a function (if the function exists) on every component in this GameObject.
-         */
         this.sendMessage = (functionName, functionParam = undefined) => {
             this.components.forEach(function (component) {
                 if (component[functionName] != undefined) {
@@ -5651,13 +3834,11 @@ class GameObject {
             });
         };
         this._update = () => {
-            // start all components that haven't been started yet
             for (let i = 0; i < this.components.length; i++) {
                 if (!this.components[i].isStarted()) {
                     Component._startUnstarted(this.components[i]);
                 }
             }
-            // call onUpdate() for all components
             if (this.isActive()) {
                 for (let i = 0; i < this.components.length; i++) {
                     let component = this.components[i];
@@ -5669,12 +3850,8 @@ class GameObject {
                 }
             }
         };
-        /**
-         * Destroys an object immediately, removing it from the game object list.
-         */
         this.destroyImmediately = () => {
             if (this.transform != null) {
-                // disconnect transform children
                 let children = this.transform.getChildren();
                 children.forEach(function (transform) {
                     if (transform.gameObject != null) {
@@ -5682,32 +3859,23 @@ class GameObject {
                     }
                     transform.setParent(null);
                 });
-                // disconnect transform from parent
                 this.transform.setParent(null);
             }
-            // destroy components
             for (let i = 0; i < this.components.length; i++) {
                 let component = this.components[i];
-                // remove DrawerComponent from Drawers
                 if (component instanceof DrawerComponent) {
                     Drawers._remove(component);
                 }
-                // call onDestroy()
                 if (component.onDestroy != undefined) {
                     component.onDestroy();
                 }
             }
             this.components.splice(0);
-            // remove from allGameObjects
             let index = GameObject.allGameObjects.indexOf(this);
             GameObject.allGameObjects.splice(index, 1);
-            // null stuff
             this.transform = null;
             this.components = null;
         };
-        /**
-         * Helper function for getComponentsInChildren().
-         */
         this.getComponentsAndInChildren = (c) => {
             let ret = this.getComponents(c);
             let children = this.transform.getChildren();
@@ -5719,7 +3887,6 @@ class GameObject {
             });
             return ret;
         };
-        // Private properties
         this._instanceID = 0;
         this._sceneID = 0;
         this.components = [];
@@ -5727,23 +3894,16 @@ class GameObject {
         this._dontDestroyOnUnload = false;
         this._activeSelf = true;
         this.transform.gameObject = this;
-        // set instance ID
         this._instanceID = GameObject.instanceIDCounter;
         GameObject.instanceIDCounter++;
-        // set scene ID to the ID of the current scene
         if (Scene.currentScene === null) {
             this._sceneID = -1;
         }
         else {
             this._sceneID = Scene.idFromSceneName(Scene.currentScene);
         }
-        // adds GameObject to list
         GameObject.allGameObjects.push(this);
     }
-    // Static functions for getting objects
-    /**
-     * Searches all gameObjects for a component of or derived from the given type, or returns null if it doesn't exist.
-     */
     static findObjectOfType(c) {
         let go;
         let component;
@@ -5758,9 +3918,6 @@ class GameObject {
         }
         return null;
     }
-    /**
-     * Searches all gameObjects for components of or derived from the given type.
-     */
     static findObjectsOfType(c) {
         let ret = [];
         let go;
@@ -5776,10 +3933,6 @@ class GameObject {
         }
         return ret;
     }
-    /**
-     * Searches all gameObjects for one with the given name, or returns null if it doesn't exist.
-     * @param name Name of the gameObject to find.  null will be returned if name is null, undefined, or "".
-     */
     static findObject(name) {
         if (name == null)
             return null;
@@ -5794,24 +3947,14 @@ class GameObject {
         }
         return null;
     }
-    // Functions called by Game
-    /**
-     * Performs a forEach() on all the gameObjects.
-     */
     static _forEach(callbackFunction) {
         GameObject.allGameObjects.forEach(callbackFunction);
     }
-    /**
-     * Calls update() on all the gameObjects.
-     */
     static _updateAll() {
         GameObject._forEach(function (gameObject, index, array) {
             gameObject._update();
         });
     }
-    /**
-     * Starts every unstarted component.  Called after a scene loads in.
-     */
     static _startAllUnstartedComponents() {
         for (let i = 0; i < GameObject.allGameObjects.length; i++) {
             let go = GameObject.allGameObjects[i];
@@ -5822,9 +3965,6 @@ class GameObject {
             });
         }
     }
-    /**
-     * Destroys all GameObjects marked to be destroyed.  Should only be called by Game at the end of the frame.
-     */
     static _destroyAllMarked() {
         for (let i = 0; i < GameObject.gameObjectsMarkedForDestroy.length; i++) {
             let GO = GameObject.gameObjectsMarkedForDestroy[i];
@@ -5836,36 +3976,6 @@ class GameObject {
 GameObject.instanceIDCounter = 0;
 GameObject.allGameObjects = [];
 GameObject.gameObjectsMarkedForDestroy = [];
-/// <reference path="_ref.ts" />
-/**
- * - Actors are things that move around in the world.
- * - Actors only collide with PlatformObjects.
- * - Do not override Actor.
- *
- * Messages received:
-
-    // called when an Actor first begins colliding with a PlatformObject.  Note this can be called for different PlatformObjects belonging to the same Platform.
-    onCollisionEnter = (response: Collision.Response): void => { }
-
-    // called every frame the Actor collides with a PlatformObject.
-    onCollisionStay = (response: Collision.Response): void => { }
-    
-    // called when an Actor stops colliding with a PlatformObject.
-    onCollisionExit = (response: Collision.Response): void => { }
-    
-    // called when an Actor is attached from a MovingPlatformObject.
-    onPlatformAttach = (movingPlatformObject: Collision.MovingPlatformObject): void => { }
-    
-    // called when an Actor is detached from a MovingPlatformObject.
-    onPlatformDetach = (movingPlatformObject: Collision.MovingPlatformObject): void => { }
-    
-    // called when an Actor would be crushed between 2 PlatformObjects.  (Crush detections not working)
-    onCollisionCrush = (crush: Collision.Crush): void => { }
-    
- */
-/**
- *
- */
 var Team;
 (function (Team) {
     Team[Team["NONE"] = 0] = "NONE";
@@ -5873,111 +3983,46 @@ var Team;
     Team[Team["PLAYER_2"] = 2] = "PLAYER_2";
     Team[Team["PLAYER_3"] = 4] = "PLAYER_3";
     Team[Team["PLAYER_4"] = 8] = "PLAYER_4";
-    /**
-     * Represents all players.
-     */
     Team[Team["PLAYERS"] = 15] = "PLAYERS";
     Team[Team["ENEMY_1"] = 256] = "ENEMY_1";
     Team[Team["ENEMY_2"] = 512] = "ENEMY_2";
     Team[Team["ENEMY_3"] = 1024] = "ENEMY_3";
     Team[Team["ENEMY_4"] = 2048] = "ENEMY_4";
-    /**
-     * Represents all enemies.
-     */
     Team[Team["ENEMIES"] = 3840] = "ENEMIES";
-    /**
-     * Represents all players and all enemies.
-     */
     Team[Team["ALL"] = 2147483647] = "ALL";
 })(Team || (Team = {}));
 class Actor extends Component {
     constructor() {
         super();
-        /**
-         * Gets position of this transform in the global space.
-         * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-         */
         this.getGlobalPosition = (outPos = null) => {
             return this.getTransform().getGlobalPosition(outPos);
         };
-        /**
-         * Sets position of this transform in the global space.
-         */
         this.setGlobalPosition = (x, y) => {
             this.getTransform().setGlobalPosition(x, y);
         };
-        /**
-         * velocity x
-         */
         this.vx = 0;
-        /**
-         * velocity y
-         */
         this.vy = 0;
-        /**
-         * Collision.gravity accel is multiplied by this before being added to actor's velocity.
-         */
         this.gravityScale = 1;
-        /**
-         * Extra x velocity from the wind.
-         */
         this.windX = 0;
-        /**
-         * Extra y velocity from the wind.
-         */
         this.windY = 0;
         this.offsetX = 0;
         this.offsetY = 0;
         this.halfWidth = 0;
         this.halfHeight = 0;
-        /**
-         * The "team" this actor belongs to.  Affects which attacks this actor gets hit by.
-         */
         this.team = Team.PLAYER_1;
-        /**
-         * If this actor is included in the given team.
-         */
         this.isInTeam = (team) => {
             return (team & this.team) != 0;
         };
-        /**
-         * Determines how an Actor is repositioned upon hitting a platform.
-         * When false, Actors will stop immediately when hitting a platform.
-         */
         this.projectCollision = true;
-        /**
-         * When true, automatically sets x/y velocity to 0 upon hitting a horizontal/vertical wall.
-         */
         this.zeroVelocityOnCollision = true;
-        /**
-         * This actor's gameObject will be sent onCollisionCrush events if the angle (degrees) between collision normals is more than this amount.
-         */
         this.crushAngleThreshold = 91;
-        /**
-         * Angle (in degrees) of the diagonal of the dimensions
-         */
         this.getDimensionRatioAngle = () => {
             return Math.atan2(this.halfHeight, this.halfWidth) * M.radToDeg;
         };
-        /**
-         * A reference to the MovingPlatformObject this Actor is attached to, or null if isn't attached to a MovingPlatformObject.  Actors can only be attached to one platform at a time.
-         */
         this.getAttachedMovingPlatformObject = () => {
             return this.attachedMovingPlatformObject;
         };
-        /**
-         * The bits of this integer represent the layers this Actor will collide with.
-         * "I will collide with".
-         */
         this.collisionMask = 0x7FFFFFFF;
-        /**
-         * Performs a raycast.
-         * @param raycastHit put the results of the raycast here, rather than allocating a new RaycastHit.
-         * @param origin origin of the ray being cast.
-         * @param direction normalized direction of the ray being cast.
-         * @param distance distance of the ray being cast.
-         * @param teamMask collision will be detected only if this actor is included in this team.
-         */
         this.raycast = (raycastHit, origin, direction, distance = Number.POSITIVE_INFINITY, teamMask = Team.ALL) => {
             if (!this.isInTeam(teamMask)) {
                 raycastHit.hit = false;
@@ -5989,7 +4034,6 @@ class Actor extends Component {
             let top = pos.y + this.offsetY - this.halfHeight;
             let right = pos.x + this.offsetX + this.halfWidth;
             let bottom = pos.y + this.offsetY + this.halfHeight;
-            // do not consider a hit if ray starts inside the actor
             if (left < origin.x && origin.x < right &&
                 top < origin.y && origin.y < bottom) {
                 raycastHit.hit = false;
@@ -5998,24 +4042,19 @@ class Actor extends Component {
             let vertTime = -1;
             let horizTime = -1;
             if (direction.y < 0) {
-                // going up, hitting bottom side
                 vertTime = M.rayHorizontalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, bottom, left, right, distance);
             }
             else if (direction.y > 0) {
-                // going down, hitting top side
                 vertTime = M.rayHorizontalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, top, left, right, distance);
             }
             if (direction.x < 0) {
-                // going left, hitting right side
                 horizTime = M.rayVerticalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, right, top, bottom, distance);
             }
             else if (direction.x > 0) {
-                // going right, hitting left side
                 horizTime = M.rayVerticalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, left, top, bottom, distance);
             }
             let time = -1;
             if (horizTime != -1 && (vertTime == -1 || horizTime <= vertTime)) {
-                // hit horizontal wall
                 time = horizTime;
                 if (direction.x > 0) {
                     raycastHit.normal.setValues(-1, 0);
@@ -6025,7 +4064,6 @@ class Actor extends Component {
                 }
             }
             else if (vertTime != -1 && (horizTime == -1 || vertTime <= horizTime)) {
-                // hit vertical wall
                 time = vertTime;
                 if (direction.y > 0) {
                     raycastHit.normal.setValues(0, -1);
@@ -6035,26 +4073,20 @@ class Actor extends Component {
                 }
             }
             else {
-                // didn't hit anything
                 raycastHit.hit = false;
                 return;
             }
-            // fill rest of raycastHit
             raycastHit.hit = true;
             raycastHit.actor = this;
             raycastHit.t = time;
             raycastHit.point.setValues(origin.x + direction.x * time, origin.y + direction.y * time);
         };
-        /**
-         * Called when a Component is added to a GameObject.  Adds Actor to the list containing all Actors.
-         */
         this.onAwake = () => {
             Actor.allActors.push(this);
         };
         this.onUpdate = () => { };
         this.onEnable = () => { };
         this.onDisable = () => {
-            // detach from platform
             if (this.attachedMovingPlatformObject != null) {
                 this.attachedMovingPlatformObject.detachActor(this);
             }
@@ -6065,11 +4097,7 @@ class Actor extends Component {
         this.onPlatformDetach = (movingPlatformObject) => {
             this.attachedMovingPlatformObject = null;
         };
-        /**
-         * Removes this actor from the list of all actors.
-         */
         this.onDestroy = () => {
-            // detach from platform
             if (this.attachedMovingPlatformObject != null) {
                 this.attachedMovingPlatformObject.detachActor(this);
             }
@@ -6098,36 +4126,21 @@ class Actor extends Component {
         outRect.height = this.halfHeight * 2;
         return null;
     }
-    /**
-     * Calls forEach() on all the actors.
-     * @param callbackFn Function to call on all the actors.
-     */
     static forEach(callbackFn) {
         Actor.allActors.forEach(callbackFn);
     }
 }
 Actor.allActors = [];
-/// <reference path="_ref.ts" />
 var Collision;
 (function (Collision) {
     class PlatformObject {
         constructor(platform) {
-            /**
-             * Gets the Platform this PlatformObject belongs to.
-             */
             this.getPlatform = () => {
                 return this._platform;
             };
-            /**
-             * Gets position of this PlatformObject, which is the global position of the transform of the gameObject of the Platform component it belongs to.
-             * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-             */
             this.getPosition = (outPos = null) => {
                 return this._platform.getTransform().getGlobalPosition(outPos);
             };
-            /**
-             * PlatformObjects that aren't enabled won't be considered for collision.
-             */
             this.isEnabled = () => {
                 return this._enabled;
             };
@@ -6137,41 +4150,16 @@ var Collision;
             this.disable = () => {
                 this._enabled = false;
             };
-            /**
-             * The bits of this integer represent the layers this PlatformObject will collide with.
-             * "I am a"
-             */
             this.collisionLayers = 0x1;
-            /**
-             * Called by Handler.  Fills the given CollisionResponse, describing what happens when the given actor moves toward it.
-             * This assumes platformObject's position after movement.
-             */
             this.movingActorCollision = (response, movingActor, projectCollision) => {
-                // to be overridden
                 response.hit = false;
             };
-            /**
-             * Performs a raycast.
-             * @param raycastHit put the results of the raycast here, rather than allocating a new RaycastHit.
-             * @param origin origin of the ray being cast.
-             * @param direction normalized direction of the ray being cast.
-             * @param distance distance of the ray being cast.
-             * @param collisionMask Bits representing the collision layers the ray will collide with.  Default is 0x7FFFFFFF.
-             */
             this.raycast = (raycastHit, origin, direction, distance = Number.POSITIVE_INFINITY, collisionMask = 0x7FFFFFFF) => {
-                // to be overridden
                 raycastHit.hit = false;
             };
-            /**
-             * Returns if the given rectangle overlaps with this platform object.
-             */
             this.rectOverlaps = (rect, collisionMask = 0x7FFFFFFF) => {
-                // to be overridden
                 return false;
             };
-            /**
-             * Removes references, self from allPlatformObjects.
-             */
             this.destroy = () => {
                 this.PlatformObject_destroy();
             };
@@ -6189,10 +4177,6 @@ var Collision;
             this._platform = platform;
             PlatformObject._allPlatformObjects.push(this);
         }
-        /**
-         * Calls forEach() on all the platform objects.
-         * @param callbackFn Function to call on all the platform objects.
-         */
         static forEach(callbackFn) {
             PlatformObject._allPlatformObjects.forEach(callbackFn);
         }
@@ -6200,7 +4184,6 @@ var Collision;
     PlatformObject._allPlatformObjects = [];
     Collision.PlatformObject = PlatformObject;
 })(Collision || (Collision = {}));
-/// <reference path="_ref.ts" />
 var Collision;
 (function (Collision) {
     class MovingPlatformObject extends Collision.PlatformObject {
@@ -6212,25 +4195,16 @@ var Collision;
             this.disable = () => {
                 this.MovingPlatformObject_disable();
             };
-            /**
-             * Attach an actor.
-             */
             this.attachActor = (actor) => {
                 if (this.attachedActors.indexOf(actor) !== -1)
                     return;
-                // actors can only be attached to one PlatformObject at a time.  First detach actor from previous PlatformObject if needed.
                 if (actor.getAttachedMovingPlatformObject() !== null) {
                     actor.getAttachedMovingPlatformObject().detachActor(actor);
                 }
                 this.attachedActors.push(actor);
-                // send attach message
                 actor.gameObject.sendMessage("onPlatformAttach", this);
                 this._platform.gameObject.sendMessage("onPlatformAttach", actor);
             };
-            /**
-             * Detaches an actor from the platform object.  This sends the onPlatformDetach(movingPlatformObject: Collision.MovingPlatformObject) event to the actor.
-             * @param actor the Actor to detach.
-             */
             this.detachActor = (actor) => {
                 let index = this.attachedActors.indexOf(actor);
                 if (index !== -1) {
@@ -6240,26 +4214,15 @@ var Collision;
                     return;
                 }
             };
-            /**
-             * Detaches all actors from the platform object.
-             */
             this.detachAllActors = () => {
                 while (this.attachedActors.length > 0) {
                     this.detachActor(this.attachedActors[this.attachedActors.length - 1]);
                 }
             };
-            /**
-             * Called by Handler.  Fills the given CollisionResponse, describing what happens when this platform moves towards the given actor.
-             */
             this.movingPlatformCollision = (response, stationaryActor) => {
-                // to be overridden
                 response.hit = false;
             };
-            /**
-             * Called by Handler.  Fills the given newPosition Vec2 with the position the given attached actor should be next frame.
-             */
             this.moveAttachedActor = (newPosition, stationaryActor) => {
-                // can be overridden.  default code moves attached actor the same way the platform moved this frame.
                 let diffX = this._platform.vx * Game.deltaTime;
                 let diffY = this._platform.vy * Game.deltaTime;
                 newPosition.setValues(stationaryActor.pos.x + diffX, stationaryActor.pos.y + diffY);
@@ -6293,7 +4256,6 @@ var Collision;
     MovingPlatformObject._allMovingPlatformObjects = [];
     Collision.MovingPlatformObject = MovingPlatformObject;
 })(Collision || (Collision = {}));
-/// <reference path="_ref.ts" />
 var Collision;
 (function (Collision) {
     class AABBPlatformObject extends Collision.MovingPlatformObject {
@@ -6303,38 +4265,22 @@ var Collision;
             this.offsetY = 0;
             this.halfWidth = 0;
             this.halfHeight = 0;
-            /**
-             * Gets x coordinate of the left edge of the AABB.
-             */
             this.getLeft = () => {
                 this.getPosition(this.tempVec2);
                 return this.tempVec2.x + this.offsetX - this.halfWidth;
             };
-            /**
-             * Gets x coordinate of the right edge of the AABB.
-             */
             this.getRight = () => {
                 this.getPosition(this.tempVec2);
                 return this.tempVec2.x + this.offsetX + this.halfWidth;
             };
-            /**
-             * Gets y coordinate of the top edge of the AABB.
-             */
             this.getTop = () => {
                 this.getPosition(this.tempVec2);
                 return this.tempVec2.y + this.offsetY - this.halfHeight;
             };
-            /**
-             * Gets y coordinate of the bottom edge of the AABB.
-             */
             this.getBottom = () => {
                 this.getPosition(this.tempVec2);
                 return this.tempVec2.y + this.offsetY + this.halfHeight;
             };
-            /**
-             * Gets Rect defining the bounds of this AABBPlatformObject.
-             * @param outRect If given, this Rect will be filled instead of creating a new Rect (and null will be returned instead).
-             */
             this.getRect = (outRect) => {
                 this.getPosition(this.tempVec2);
                 if (outRect == null) {
@@ -6344,10 +4290,6 @@ var Collision;
                     outRect.setValues(this.tempVec2.x + this.offsetX - this.halfWidth, this.tempVec2.y + this.offsetY - this.halfHeight, this.halfWidth * 2, this.halfHeight * 2);
                 }
             };
-            /**
-             * Called by Handler.  Fills the given CollisionResponse, describing what happens when the given actor moves toward it.
-             * This assumes platformObject's position after movement.
-             */
             this.movingActorCollision = (response, movingActor, projectCollision) => {
                 response.hit = false;
                 response.actor = movingActor.actor;
@@ -6365,19 +4307,15 @@ var Collision;
                 let aBottom = movingActor.pos0.y + movingActor.offset.y + movingActor.halfHeight;
                 let EPSILON = .0001;
                 if (aDiffX > 0) {
-                    // test actor moving right to hit left side
                     let t = (left - aRight) / aDiffX - EPSILON;
                     if (-EPSILON < t && t <= 1) {
                         if (aTop + aDiffY * t <= bottom + EPSILON &&
                             aBottom + aDiffY * t >= top - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(-1, 0);
                             response.point.setValues(left, (Math.max(aTop + aDiffY * t, top) + Math.min(aBottom + aDiffY * t, bottom)) / 2);
-                            // bullet reposition
                             response.reposition.setValues(movingActor.pos0.x + aDiffX * t - EPSILON * 2, movingActor.pos0.y + aDiffY * t);
-                            // project reposition
                             if (projectCollision) {
                                 response.repositionProject.setValues(left - movingActor.offset.x - movingActor.halfWidth - EPSILON * 2, movingActor.pos1.y);
                                 response.type = Collision.ResponseType.PROJECT;
@@ -6390,19 +4328,15 @@ var Collision;
                     }
                 }
                 else if (aDiffX < 0) {
-                    // test actor moving left to hit right side
                     let t = (right - aLeft) / aDiffX - EPSILON;
                     if (-EPSILON < t && t <= 1) {
                         if (aTop + aDiffY * t <= bottom + EPSILON &&
                             aBottom + aDiffY * t >= top - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(1, 0);
                             response.point.setValues(right, (Math.max(aTop + aDiffY * t, top) + Math.min(aBottom + aDiffY * t, bottom)) / 2);
-                            // bullet reposition
                             response.reposition.setValues(movingActor.pos0.x + aDiffX * t + EPSILON * 2, movingActor.pos0.y + aDiffY * t);
-                            // project reposition
                             if (projectCollision) {
                                 response.repositionProject.setValues(right - movingActor.offset.x + movingActor.halfWidth + EPSILON * 2, movingActor.pos1.y);
                                 response.type = Collision.ResponseType.PROJECT;
@@ -6415,19 +4349,15 @@ var Collision;
                     }
                 }
                 if (aDiffY > 0) {
-                    // test actor moving down to hit top side
                     let t = (top - aBottom) / aDiffY - EPSILON;
                     if (-EPSILON < t && t <= 1) {
                         if (aLeft + aDiffX * t <= right + EPSILON &&
                             aRight + aDiffX * t >= left - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(0, -1);
                             response.point.setValues((Math.max(aLeft + aDiffX * t, left) + Math.min(aRight + aDiffX * t, right)) / 2, top);
-                            // bullet reposition
                             response.reposition.setValues(movingActor.pos0.x + aDiffX * t, movingActor.pos0.y + aDiffY * t - EPSILON * 2);
-                            // project reposition
                             if (projectCollision) {
                                 response.repositionProject.setValues(movingActor.pos1.x, top - movingActor.offset.y - movingActor.halfHeight - EPSILON * 2);
                                 response.type = Collision.ResponseType.PROJECT;
@@ -6440,19 +4370,15 @@ var Collision;
                     }
                 }
                 else if (aDiffY < 0) {
-                    // test actor moving up to hit bottom side
                     let t = (bottom - aTop) / aDiffY - EPSILON;
                     if (-EPSILON < t && t <= 1) {
                         if (aLeft + aDiffX * t <= right + EPSILON &&
                             aRight + aDiffX * t >= left - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(0, 1);
                             response.point.setValues((Math.max(aLeft + aDiffX * t, left) + Math.min(aRight + aDiffX * t, right)) / 2, bottom);
-                            // bullet reposition
                             response.reposition.setValues(movingActor.pos0.x + aDiffX * t, movingActor.pos0.y + aDiffY * t + EPSILON * 2);
-                            // project reposition
                             if (projectCollision) {
                                 response.repositionProject.setValues(movingActor.pos1.x, bottom - movingActor.offset.y + movingActor.halfHeight + EPSILON * 2);
                                 response.type = Collision.ResponseType.PROJECT;
@@ -6464,67 +4390,7 @@ var Collision;
                         }
                     }
                 }
-                //// test for actor intersecting ("discrete" collision)
-                //bool intersectCollision = false; // should be true
-                //if (intersectCollision) {
-                //    Shape.AABB actorBox = Handler.movingActorPos1BoundingBox(movingActor);
-                //    if (Shape.intersects(actorBox, currentBoundingBox)) {
-                //        // pos1 of actor intersects this platform, reposition it somewhere
-                //        colResp.type = Handler.CollisionResponse.Type.INTERSECT;
-                //        float ax = movingActor.pos1.x + movingActor.offset.x;
-                //        float ay = movingActor.pos1.y + movingActor.offset.y;
-                //        bool preferRight = ax > center.x; // prefer repositioning right if actor is more to the right
-                //        bool preferUp = ay > center.y; // prefer repositioning up if actor is more above
-                //        bool preferHoriz = (halfWidth - Mathf.Abs(ax - center.x)) < (halfHeight - Mathf.Abs(ay - center.y)); // prefer horizontal reposition or vertical reposition
-                //        if (preferHoriz) {
-                //            if (preferRight) {
-                //                // reposition to right
-                //                colResp.time = 0;
-                //                colResp.normal = new Vector2(1, 0);
-                //                colResp.point = new Vector2(right,
-                //                    (Mathf.Max(aBottom + aDiff.y, bottom) + Mathf.Min(aTop + aDiff.y, top)) / 2);
-                //                colResp.reposition = new Vector2(right - movingActor.offset.x + movingActor.halfWidth, movingActor.pos1.y);
-                //                colResp.reposition.x += EPSILON * 2;
-                //                return colResp;
-                //            } else {
-                //                // reposition to left
-                //                colResp.time = 0;
-                //                colResp.normal = new Vector2(-1, 0);
-                //                colResp.point = new Vector2(left,
-                //                    (Mathf.Max(aBottom + aDiff.y, bottom) + Mathf.Min(aTop + aDiff.y, top)) / 2);
-                //                colResp.reposition = new Vector2(left - movingActor.offset.x - movingActor.halfWidth, movingActor.pos1.y);
-                //                colResp.reposition.x -= EPSILON * 2;
-                //                return colResp;
-                //            }
-                //        } else {
-                //            if (preferUp) {
-                //                // reposition above
-                //                colResp.time = 0;
-                //                colResp.normal = new Vector2(0, 1);
-                //                colResp.point = new Vector2(
-                //                    (Mathf.Max(aLeft + aDiff.x, left) + Mathf.Min(aRight + aDiff.x, right)) / 2,
-                //                    top);
-                //                colResp.reposition = new Vector2(movingActor.pos1.x, top - movingActor.offset.y + movingActor.halfHeight);
-                //                colResp.reposition.y += EPSILON * 2;
-                //                return colResp;
-                //            } else {
-                //                // reposition below
-                //                colResp.time = 0;
-                //                colResp.normal = new Vector2(0, -1);
-                //                colResp.point = new Vector2(
-                //                    (Mathf.Max(aLeft + aDiff.x, left) + Mathf.Min(aRight + aDiff.x, right)) / 2,
-                //                    top);
-                //                colResp.reposition = new Vector2(movingActor.pos1.x, bottom - movingActor.offset.y - movingActor.halfHeight);
-                //                colResp.reposition.y -= EPSILON * 2;
-                //                return colResp;
-                //            }
-                //        }
-                //    }
-                //}
             };
-            /**
-             * Called by Handler.  Fills the given CollisionResponse, describing what happens when this platform moves towards the given actor.
-             */
             this.movingPlatformCollision = (response, stationaryActor) => {
                 if (this._platform.vx === 0 && this._platform.vy === 0)
                     return;
@@ -6546,12 +4412,10 @@ var Collision;
                 let EPSILON = .0001;
                 let t = 0;
                 if (diffX > 0) {
-                    // platform moving right to hit left of actor
                     t = (aLeft - right) / diffX;
                     if (-EPSILON < t && t <= 1) {
                         if (top + diffY * t <= aBottom + EPSILON &&
                             bottom + diffY * t >= aTop - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(1, 0);
@@ -6562,12 +4426,10 @@ var Collision;
                     }
                 }
                 else if (diffX < 0) {
-                    // platform moving left to hit right of actor
                     t = (aRight - left) / diffX;
                     if (-EPSILON < t && t <= 1) {
                         if (top + diffY * t <= aBottom + EPSILON &&
                             bottom + diffY * t >= aTop - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(-1, 0);
@@ -6578,12 +4440,10 @@ var Collision;
                     }
                 }
                 if (diffY > 0) {
-                    // platform moving down to hit top of actor
                     t = (aTop - bottom) / diffY;
                     if (-EPSILON < t && t <= 1) {
                         if (left + diffX * t <= aRight + EPSILON &&
                             right + diffX * t >= aLeft - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(0, 1);
@@ -6594,12 +4454,10 @@ var Collision;
                     }
                 }
                 else if (diffY < 0) {
-                    // platform moving up to hit bottom of actor
                     t = (aBottom - top) / diffY;
                     if (-EPSILON < t && t <= 1) {
                         if (left + diffX * t <= aRight + EPSILON &&
                             right + diffX * t >= aLeft - EPSILON) {
-                            // confirmed hit
                             response.hit = true;
                             response.time = t;
                             response.normal.setValues(0, -1);
@@ -6610,16 +4468,7 @@ var Collision;
                     }
                 }
             };
-            /**
-             * Performs a raycast.
-             * @param raycastHit put the results of the raycast here, rather than allocating a new RaycastHit.
-             * @param origin origin of the ray being cast.
-             * @param direction normalized direction of the ray being cast.
-             * @param distance distance of the ray being cast.
-             * @param collisionMask Bits representing the collision layers the ray will collide with.  Default is 0x7FFFFFFF.
-             */
             this.raycast = (raycastHit, origin, direction, distance = Number.POSITIVE_INFINITY, collisionMask = 0x7FFFFFFF) => {
-                // return immediately if collision mask won't collide with this' collision layers.
                 if (!Collision.maskCollidesWithLayers(collisionMask, this.collisionLayers)) {
                     raycastHit.hit = false;
                     return;
@@ -6629,7 +4478,6 @@ var Collision;
                 let top = this.getTop();
                 let right = this.getRight();
                 let bottom = this.getBottom();
-                // do not consider a hit if ray starts inside the actor
                 if (left < origin.x && origin.x < right &&
                     top < origin.y && origin.y < bottom) {
                     raycastHit.hit = false;
@@ -6638,24 +4486,19 @@ var Collision;
                 let vertTime = -1;
                 let horizTime = -1;
                 if (direction.y < 0) {
-                    // going up, hitting bottom side
                     vertTime = M.rayHorizontalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, bottom, left, right, distance);
                 }
                 else if (direction.y > 0) {
-                    // going down, hitting top side
                     vertTime = M.rayHorizontalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, top, left, right, distance);
                 }
                 if (direction.x < 0) {
-                    // going left, hitting right side
                     horizTime = M.rayVerticalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, right, top, bottom, distance);
                 }
                 else if (direction.x > 0) {
-                    // going right, hitting left side
                     horizTime = M.rayVerticalSegmentIntersection(origin.x, origin.y, direction.x, direction.y, left, top, bottom, distance);
                 }
                 let time = -1;
                 if (horizTime != -1 && (vertTime == -1 || horizTime <= vertTime)) {
-                    // hit horizontal wall
                     time = horizTime;
                     if (direction.x > 0) {
                         raycastHit.normal.setValues(-1, 0);
@@ -6665,7 +4508,6 @@ var Collision;
                     }
                 }
                 else if (vertTime != -1 && (horizTime == -1 || vertTime <= horizTime)) {
-                    // hit vertical wall
                     time = vertTime;
                     if (direction.y > 0) {
                         raycastHit.normal.setValues(0, -1);
@@ -6675,19 +4517,14 @@ var Collision;
                     }
                 }
                 else {
-                    // didn't hit anything
                     raycastHit.hit = false;
                     return;
                 }
-                // fill rest of raycastHit
                 raycastHit.hit = true;
                 raycastHit.platformObject = this;
                 raycastHit.t = time;
                 raycastHit.point.setValues(origin.x + direction.x * time, origin.y + direction.y * time);
             };
-            /**
-             * Returns if the given rectangle overlaps with this platform object.
-             */
             this.rectOverlaps = (rect, collisionMask = 0x7FFFFFFF) => {
                 if (!Collision.maskCollidesWithLayers(collisionMask, this.collisionLayers))
                     return false;
@@ -6698,32 +4535,18 @@ var Collision;
     }
     Collision.AABBPlatformObject = AABBPlatformObject;
 })(Collision || (Collision = {}));
-/// <reference path="_ref.ts" />
 var Collision;
 (function (Collision) {
     class TiledMapTileLayerPlatformObject extends Collision.MovingPlatformObject {
         constructor(platform) {
             super(platform);
-            /**
-             * The TileLayer data this platform object is detecting collision for.
-             */
             this.tiledMapLayer = null;
-            /**
-             * Performs a raycast.
-             * @param raycastHit put the results of the raycast here, rather than allocating a new RaycastHit.
-             * @param origin origin of the ray being cast.
-             * @param direction normalized direction of the ray being cast.
-             * @param distance distance of the ray being cast.
-             * @param collisionMask Bits representing the collision layers the ray will collide with.  Default is 0x7FFFFFFF.
-             */
             this.raycast = (raycastHit, origin, direction, distance = Number.POSITIVE_INFINITY, collisionMask = 0x7FFFFFFF) => {
                 let originX = origin.x;
                 let originY = origin.y;
-                // offset by Platform's global position
                 this.getPosition(this.tempGlobalPos);
                 originX -= this.tempGlobalPos.x;
                 originY -= this.tempGlobalPos.y;
-                // getting information about the tile layer
                 let numCols = this.tiledMapLayer.width;
                 let numRows = this.tiledMapLayer.height;
                 let tileWidth = this.tiledMapLayer.mapData.tileWidth;
@@ -6738,25 +4561,19 @@ var Collision;
                 let horizX = 0;
                 let horizY = 0;
                 if (direction.x > 0) {
-                    // test hitting vertical wall going right
                     col = Math.ceil(originX / tileWidth);
                     for (; col < numCols; col++) {
-                        // getting next tile and point of collision
                         x = col * tileWidth;
                         t = (x - originX) / direction.x;
                         y = originY + t * direction.y;
                         row = Math.floor(y / tileHeight);
-                        // break if y is going off the map
                         if (row < 0 || row >= numRows)
                             break;
-                        // break if going too far
                         if (t > distance)
                             break;
-                        // check collision mask and layers
                         tileInfo = this.tiledMapLayer.getTileInfo(col, row);
                         if (!Collision.maskCollidesWithLayers(collisionMask, tileInfo.collisionLayers))
                             continue;
-                        // collides with this tile
                         horizT = t;
                         horizX = x;
                         horizY = y;
@@ -6764,25 +4581,19 @@ var Collision;
                     }
                 }
                 else if (direction.x < 0) {
-                    // test hitting vertical wall going left
                     col = Math.floor(originX / tileWidth) - 1;
                     for (; col >= 0; col--) {
-                        // getting next tile and point of collision
                         x = (col + 1) * tileWidth;
                         t = (x - originX) / direction.x;
                         y = originY + t * direction.y;
                         row = Math.floor(y / tileHeight);
-                        // break if y is going off the map
                         if (row < 0 || row >= numRows)
                             break;
-                        // break if going too far
                         if (t > distance)
                             break;
-                        // check collision mask and layers
                         tileInfo = this.tiledMapLayer.getTileInfo(col, row);
                         if (!Collision.maskCollidesWithLayers(collisionMask, tileInfo.collisionLayers))
                             continue;
-                        // collides with this tile
                         horizT = t;
                         horizX = x;
                         horizY = y;
@@ -6793,25 +4604,19 @@ var Collision;
                 let vertX = 0;
                 let vertY = 0;
                 if (direction.y > 0) {
-                    // test hitting horizontal wall going down
                     row = Math.ceil(originY / tileHeight);
                     for (; row < numRows; row++) {
-                        // getting next tile and point of collision
                         y = row * tileHeight;
                         t = (y - originY) / direction.y;
                         x = originX + t * direction.x;
                         col = Math.floor(x / tileWidth);
-                        // break if x is going off the map
                         if (col < 0 || col >= numCols)
                             break;
-                        // break if going too far
                         if (t > distance)
                             break;
-                        // check collision mask and layers
                         tileInfo = this.tiledMapLayer.getTileInfo(col, row);
                         if (!Collision.maskCollidesWithLayers(collisionMask, tileInfo.collisionLayers))
                             continue;
-                        // collides with this tile
                         vertT = t;
                         vertX = x;
                         vertY = y;
@@ -6819,38 +4624,29 @@ var Collision;
                     }
                 }
                 else if (direction.y < 0) {
-                    // test hitting horizontal wall going up
                     row = Math.floor(originY / tileHeight) - 1;
                     for (; row >= 0; row--) {
-                        // getting next tile and point of collision
                         y = (row + 1) * tileHeight;
                         t = (y - originY) / direction.y;
                         x = originX + t * direction.x;
                         col = Math.floor(x / tileWidth);
-                        // break if x is going off the map
                         if (col < 0 || col >= numCols)
                             break;
-                        // break if going too far
                         if (t > distance)
                             break;
-                        // check collision mask and layers
                         tileInfo = this.tiledMapLayer.getTileInfo(col, row);
                         if (!Collision.maskCollidesWithLayers(collisionMask, tileInfo.collisionLayers))
                             continue;
-                        // collides with this tile
                         vertT = t;
                         vertX = x;
                         vertY = y;
                         break;
                     }
                 }
-                // resolve
                 if (horizT == -1 && vertT == -1) {
-                    // didn't hit anything
                     raycastHit.hit = false;
                 }
                 else if (horizT !== -1 && (vertT === -1 || horizT < vertT)) {
-                    // hit horizontal
                     raycastHit.hit = true;
                     raycastHit.t = horizT;
                     raycastHit.point.setValues(horizX, horizY);
@@ -6862,7 +4658,6 @@ var Collision;
                     }
                 }
                 else {
-                    // hit vertical
                     raycastHit.hit = true;
                     raycastHit.t = vertT;
                     raycastHit.point.setValues(vertX, vertY);
@@ -6875,23 +4670,16 @@ var Collision;
                 }
                 if (raycastHit.hit) {
                     raycastHit.platformObject = this;
-                    // offset by Platform's global position
                     raycastHit.point.x += this.tempGlobalPos.x;
                     raycastHit.point.y += this.tempGlobalPos.y;
                 }
             };
-            /**
-             * Called by Handler.  Fills the given CollisionResponse, describing what happens when the given actor moves toward it.
-             * This assumes platformObject's position after movement.
-             */
             this.movingActorCollision = (response, movingActor, projectCollision) => {
-                // getting information about the actor
                 let aDiffX = movingActor.pos1.x - movingActor.pos0.x;
                 let aDiffY = movingActor.pos1.y - movingActor.pos0.y;
                 let aCollisionMask = movingActor.collisionMask;
                 let aX = movingActor.pos0.x;
                 let aY = movingActor.pos0.y;
-                // offset by Platform's global position
                 this.getPosition(this.tempGlobalPos);
                 this.tempGlobalPos.x += this._platform.vx * Game.deltaTime;
                 this.tempGlobalPos.y += this._platform.vy * Game.deltaTime;
@@ -6901,7 +4689,6 @@ var Collision;
                 let aTop = aY + movingActor.offset.y - movingActor.halfHeight;
                 let aRight = aLeft + movingActor.halfWidth * 2;
                 let aBottom = aTop + movingActor.halfHeight * 2;
-                // getting information about the tile layer
                 let numCols = this.tiledMapLayer.width;
                 let numRows = this.tiledMapLayer.height;
                 let tileWidth = this.tiledMapLayer.mapData.tileWidth;
@@ -6928,154 +4715,119 @@ var Collision;
                 let vertX = 0;
                 let vertY = 0;
                 if (aDiffX > 0) {
-                    // test hitting vertical wall going right
                     col = Math.ceil((aRight - EPSILON) / tileWidth);
                     for (; col < numCols; col++) {
-                        // getting next tile and point of collision
                         x = col * tileWidth;
                         t = (x - aRight) / aDiffX;
                         yTop = aTop + t * aDiffY;
                         yBottom = aBottom + t * aDiffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        // break if y is going off the map
                         if (rowBottom < 0 || rowTop >= numRows)
                             break;
-                        // break if going past aDiffX
                         if (t > 1)
                             break;
                         for (let r = rowTop; r <= rowBottom; r++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(col, r);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             horizT = t;
-                            horizX = x; // set to col * tileWidth
+                            horizX = x;
                             horizY = (yTop + yBottom) / 2;
                             break;
                         }
-                        // break if got hit
                         if (horizT !== -1)
                             break;
                     }
                 }
                 else if (aDiffX < 0) {
-                    // test hitting vertical wall going left
                     col = Math.floor((aLeft + EPSILON) / tileWidth) - 1;
                     for (; col >= 0; col--) {
-                        // getting next tile and point of collision
                         x = (col + 1) * tileWidth;
                         t = (x - aLeft) / aDiffX;
                         yTop = aTop + t * aDiffY;
                         yBottom = aBottom + t * aDiffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        // break if y is going off the map
                         if (rowBottom < 0 || rowTop >= numRows)
                             break;
-                        // break if going past aDiffX
                         if (t > 1)
                             break;
                         for (let r = rowTop; r <= rowBottom; r++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(col, r);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             horizT = t;
-                            horizX = x; // set to (col + 1) * tileWidth
+                            horizX = x;
                             horizY = (yTop + yBottom) / 2;
                             break;
                         }
-                        // break if got hit
                         if (horizT !== -1)
                             break;
                     }
                 }
-                // work here on vertical
                 if (aDiffY > 0) {
-                    // test hitting horizontal wall going down
                     row = Math.ceil((aBottom - EPSILON) / tileHeight);
                     for (; row < numRows; row++) {
-                        // getting next tile and point of collision
                         y = row * tileHeight;
                         t = (y - aBottom) / aDiffY;
                         xLeft = aLeft + t * aDiffX;
                         xRight = aRight + t * aDiffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        // break if x is going off the map
                         if (colLeft < 0 || colRight >= numCols)
                             break;
-                        // break if going past aDiffY
                         if (t > 1)
                             break;
                         for (let c = colLeft; c <= colRight; c++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(c, row);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             vertT = t;
-                            vertY = y; // set to row * tileHeight
+                            vertY = y;
                             vertX = (xLeft + xRight) / 2;
                             break;
                         }
-                        // break if got hit
                         if (vertT !== -1)
                             break;
                     }
                 }
                 else if (aDiffY < 0) {
-                    // test hitting horizontal wall going up
                     row = Math.floor((aTop + EPSILON) / tileHeight) - 1;
                     for (; row >= 0; row--) {
-                        // getting next tile and point of collision
                         y = (row + 1) * tileHeight;
                         t = (y - aTop) / aDiffY;
                         xLeft = aLeft + t * aDiffX;
                         xRight = aRight + t * aDiffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        // break if x is going off the map
                         if (colLeft < 0 || colRight >= numCols)
                             break;
-                        // break if going past aDiffY
                         if (t > 1)
                             break;
                         for (let c = colLeft; c <= colRight; c++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(c, row);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             vertT = t;
-                            vertY = y; // set to (row + 1) * tileHeight
+                            vertY = y;
                             vertX = (xLeft + xRight) / 2;
                             break;
                         }
-                        // break if got hit
                         if (vertT !== -1)
                             break;
                     }
                 }
-                // resolve
                 if (horizT == -1 && vertT == -1) {
-                    // didn't hit anything
                     response.hit = false;
                 }
                 else if (horizT !== -1 && (vertT === -1 || horizT < vertT)) {
-                    // hit horizontal
                     response.hit = true;
                     response.time = horizT;
                     if (aDiffX > 0) {
-                        // going right, reposition to left
                         response.normal.setValues(-1, 0);
                         response.point.setValues(horizX, horizY);
-                        // bullet reposition
                         response.reposition.setValues(aX + aDiffX * horizT - EPSILON * 2, aY + aDiffY * horizT);
-                        // project reposition
                         if (projectCollision) {
                             response.repositionProject.setValues(horizX - movingActor.offset.x - movingActor.halfWidth - EPSILON * 2, aY + aDiffY);
                             response.type = Collision.ResponseType.PROJECT;
@@ -7085,12 +4837,9 @@ var Collision;
                         }
                     }
                     else {
-                        // going left, reposition to right
                         response.normal.setValues(1, 0);
                         response.point.setValues(horizX, horizY);
-                        // bullet reposition
                         response.reposition.setValues(aX + aDiffX * horizT + EPSILON * 2, aY + aDiffY * horizT);
-                        // project reposition
                         if (projectCollision) {
                             response.repositionProject.setValues(horizX - movingActor.offset.x + movingActor.halfWidth + EPSILON * 2, aY + aDiffY);
                             response.type = Collision.ResponseType.PROJECT;
@@ -7101,16 +4850,12 @@ var Collision;
                     }
                 }
                 else {
-                    // hit vertical
                     response.hit = true;
                     response.time = vertT;
                     if (aDiffY > 0) {
-                        // going down, reposition to top
                         response.normal.setValues(0, -1);
                         response.point.setValues(vertX, vertY);
-                        // bullet reposition
                         response.reposition.setValues(aX + aDiffX * vertT, aY + aDiffY * vertT - EPSILON * 2);
-                        // project reposition
                         if (projectCollision) {
                             response.repositionProject.setValues(aX + aDiffX, vertY - movingActor.offset.y - movingActor.halfHeight - EPSILON * 2);
                             response.type = Collision.ResponseType.PROJECT;
@@ -7120,12 +4865,9 @@ var Collision;
                         }
                     }
                     else {
-                        // going up, reposition to bottom
                         response.normal.setValues(0, 1);
                         response.point.setValues(vertX, vertY);
-                        // bullet reposition
                         response.reposition.setValues(aX + aDiffX * vertT, aY + aDiffY * vertT + EPSILON * 2);
-                        // project reposition
                         if (projectCollision) {
                             response.repositionProject.setValues(aX + aDiffX, vertY - movingActor.offset.y + movingActor.halfHeight + EPSILON * 2);
                             response.type = Collision.ResponseType.PROJECT;
@@ -7138,7 +4880,6 @@ var Collision;
                 if (response.hit) {
                     response.platformObject = this;
                     response.actor = movingActor.actor;
-                    // offset by Platform's global position
                     response.point.x += this.tempGlobalPos.x;
                     response.reposition.x += this.tempGlobalPos.x;
                     response.repositionProject.x += this.tempGlobalPos.x;
@@ -7147,20 +4888,14 @@ var Collision;
                     response.repositionProject.y += this.tempGlobalPos.y;
                 }
             };
-            /**
-             * Called by Handler.  Fills the given CollisionResponse, describing what happens when this platform moves towards the given actor.
-             */
             this.movingPlatformCollision = (response, stationaryActor) => {
-                // getting information about platform's movement
                 if (this._platform.vx === 0 && this._platform.vy === 0)
                     return;
                 let diffX = this._platform.vx * Game.deltaTime;
                 let diffY = this._platform.vy * Game.deltaTime;
-                // getting information about the actor
                 let aCollisionMask = stationaryActor.collisionMask;
                 let aX = stationaryActor.pos.x;
                 let aY = stationaryActor.pos.y;
-                // offset by Platform's global position
                 this.getPosition(this.tempGlobalPos);
                 aX -= this.tempGlobalPos.x;
                 aY -= this.tempGlobalPos.y;
@@ -7168,7 +4903,6 @@ var Collision;
                 let aTop = aY + stationaryActor.offset.y - stationaryActor.halfHeight;
                 let aRight = aLeft + stationaryActor.halfWidth * 2;
                 let aBottom = aTop + stationaryActor.halfHeight * 2;
-                // getting information about the tile layer
                 let numCols = this.tiledMapLayer.width;
                 let numRows = this.tiledMapLayer.height;
                 let tileWidth = this.tiledMapLayer.mapData.tileWidth;
@@ -7195,193 +4929,137 @@ var Collision;
                 let vertX = 0;
                 let vertY = 0;
                 if (diffX < 0) {
-                    // test going left, hitting actor's right side
                     col = Math.ceil((aRight - EPSILON) / tileWidth);
                     for (; col < numCols; col++) {
-                        // getting next tile and point of collision
                         x = col * tileWidth;
                         t = (x - aRight) / -diffX;
                         yTop = aTop + t * -diffY;
                         yBottom = aBottom + t * -diffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        // break if y is going off the map
                         if (rowBottom < 0 || rowTop >= numRows)
                             break;
-                        // break if going past diffX
                         if (t > 1)
                             break;
                         for (let r = rowTop; r <= rowBottom; r++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(col, r);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             horizT = t;
-                            horizX = x; // set to col * tileWidth
+                            horizX = x;
                             horizY = (yTop + yBottom) / 2;
                             break;
                         }
-                        // break if got hit
                         if (horizT !== -1)
                             break;
                     }
                 }
                 else if (diffX > 0) {
-                    // test going right, hitting actor's left side
                     col = Math.floor((aLeft + EPSILON) / tileWidth) - 1;
                     for (; col >= 0; col--) {
-                        // getting next tile and point of collision
                         x = (col + 1) * tileWidth;
                         t = (x - aLeft) / -diffX;
                         yTop = aTop + t * -diffY;
                         yBottom = aBottom + t * -diffY;
                         rowTop = Math.max(0, Math.floor(yTop / tileHeight));
                         rowBottom = Math.min(numRows - 1, Math.floor(yBottom / tileHeight));
-                        // break if y is going off the map
                         if (rowBottom < 0 || rowTop >= numRows)
                             break;
-                        // break if going past diffX
                         if (t > 1)
                             break;
                         for (let r = rowTop; r <= rowBottom; r++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(col, r);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             horizT = t;
-                            horizX = x; // set to (col + 1) * tileWidth
+                            horizX = x;
                             horizY = (yTop + yBottom) / 2;
                             break;
                         }
-                        // break if got hit
                         if (horizT !== -1)
                             break;
                     }
                 }
                 if (diffY < 0) {
-                    // test going up, hitting actor's bottom side
                     row = Math.ceil((aBottom - EPSILON) / tileHeight);
                     for (; row < numRows; row++) {
-                        // getting next tile and point of collision
                         y = row * tileHeight;
                         t = (y - aBottom) / -diffY;
                         xLeft = aLeft + t * -diffX;
                         xRight = aRight + t * -diffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        // break if x is going off the map
                         if (colRight < 0 || colLeft >= numCols)
                             break;
-                        // break if going past diffY
                         if (t > 1)
                             break;
                         for (let c = colLeft; c <= colRight; c++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(c, row);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             vertT = t;
                             vertX = (xLeft + xRight) / 2;
-                            vertY = y; // set to row * tileHeight
+                            vertY = y;
                             break;
                         }
-                        // break if got hit
                         if (vertT !== -1)
                             break;
                     }
                 }
                 else if (diffY > 0) {
-                    // test going down, hitting actor's top side
                     row = Math.floor((aTop + EPSILON) / tileHeight) - 1;
                     for (; row >= 0; row--) {
-                        // getting next tile and point of collision
                         y = (row + 1) * tileHeight;
                         t = (y - aTop) / -diffY;
                         xLeft = aLeft + t * -diffX;
                         xRight = aRight + t * -diffX;
                         colLeft = Math.max(0, Math.floor(xLeft / tileWidth));
                         colRight = Math.min(numCols - 1, Math.floor(xRight / tileWidth));
-                        // break if x is going off the map
                         if (colRight < 0 || colLeft >= numCols)
                             break;
-                        // break if going past diffY
                         if (t > 1)
                             break;
                         for (let c = colLeft; c <= colRight; c++) {
-                            // check collision mask and layers
                             tileInfo = this.tiledMapLayer.getTileInfo(c, row);
                             if (!Collision.maskCollidesWithLayers(aCollisionMask, tileInfo.collisionLayers))
                                 continue;
-                            // collides with this tile
                             vertT = t;
                             vertX = (xLeft + xRight) / 2;
-                            vertY = y; // set to (row + 1) * tileHeight
+                            vertY = y;
                             break;
                         }
-                        // break if got hit
                         if (vertT !== -1)
                             break;
                     }
                 }
-                // resolve
                 if (horizT == -1 && vertT == -1) {
-                    // didn't hit anything
                     response.hit = false;
                 }
                 else if (horizT !== -1 && (vertT === -1 || horizT < vertT)) {
-                    // hit horizontal
                     response.hit = true;
                     response.time = horizT;
                     if (diffX < 0) {
-                        // going left, reposition actor to left
                         response.normal.setValues(-1, 0);
                         response.point.setValues(horizX + diffX, horizY + diffY);
-                        // reposition
-                        //response.reposition.setValues(
-                        //    horizX + diffX - stationaryActor.offset.x - stationaryActor.halfWidth - EPSILON * 2,
-                        //    aY
-                        //);
                         response.reposition.setValues(horizX + diffX - stationaryActor.offset.x - stationaryActor.halfWidth - EPSILON * 2, aY + diffY * (1 - horizT));
                     }
                     else {
-                        // going right, reposition actor to right
                         response.normal.setValues(1, 0);
                         response.point.setValues(horizX + diffX, horizY + diffY);
-                        // reposition
-                        //response.reposition.setValues(
-                        //    horizX + diffX - stationaryActor.offset.x + stationaryActor.halfWidth + EPSILON * 2,
-                        //    aY
-                        //);
                         response.reposition.setValues(horizX + diffX - stationaryActor.offset.x + stationaryActor.halfWidth + EPSILON * 2, aY + diffY * (1 - horizT));
                     }
                 }
                 else {
-                    // hit vertical
                     response.hit = true;
                     response.time = vertT;
                     if (diffY < 0) {
-                        // going up, reposition actor to top
                         response.normal.setValues(0, -1);
                         response.point.setValues(vertX + diffX, vertY + diffY);
-                        // reposition
-                        //response.reposition.setValues(
-                        //    aX,
-                        //    vertY + diffY - stationaryActor.offset.y - stationaryActor.halfHeight - EPSILON * 2
-                        //);
                         response.reposition.setValues(aX + diffX * (1 - vertT), vertY + diffY - stationaryActor.offset.y - stationaryActor.halfHeight - EPSILON * 2);
                     }
                     else {
-                        // going down, reposition actor to bottom
                         response.normal.setValues(0, 1);
                         response.point.setValues(vertX + diffX, vertY + diffY);
-                        // reposition
-                        //response.reposition.setValues(
-                        //    aX,
-                        //    vertY + diffY - stationaryActor.offset.y + stationaryActor.halfHeight + EPSILON * 2
-                        //);
                         response.reposition.setValues(aX + diffX * (1 - vertT), vertY + diffY - stationaryActor.offset.y + stationaryActor.halfHeight + EPSILON * 2);
                     }
                 }
@@ -7389,20 +5067,15 @@ var Collision;
                     response.platformObject = this;
                     response.actor = stationaryActor.actor;
                     response.type = Collision.ResponseType.MOVING_PLATFORM;
-                    // offset by Platform's global position
                     response.point.x += this.tempGlobalPos.x;
                     response.reposition.x += this.tempGlobalPos.x;
                     response.point.y += this.tempGlobalPos.y;
                     response.reposition.y += this.tempGlobalPos.y;
                 }
             };
-            /**
-             * Returns if the given rectangle overlaps with this platform object.
-             */
             this.rectOverlaps = (rect, collisionMask = 0x7FFFFFFF) => {
                 let left = rect.x;
                 let top = rect.y;
-                // offset by Platform's global position
                 this.getPosition(this.tempGlobalPos);
                 left -= this.tempGlobalPos.x;
                 top -= this.tempGlobalPos.y;
@@ -7431,68 +5104,25 @@ var Collision;
                 this.MovingPlatformObject_destroy();
             };
             this.tempGlobalPos = new Vec2();
-            // represents all collision layers of tiles
             this.collisionLayers = 0x7FFFFFFF;
         }
     }
     Collision.TiledMapTileLayerPlatformObject = TiledMapTileLayerPlatformObject;
 })(Collision || (Collision = {}));
-/// <reference path="_ref.ts" />
-/**
- * Platform is a Component containing PlatformObjects
- */
-/**
- * - Platform is a Component containing PlatformObjects.
- * - PlatformObjects only collide with Actor.
- *
- * Messages received:
-
-    // called when an Actor first begins colliding with a PlatformObject.  Note this can be called for different PlatformObjects belonging to the same Platform.
-    onCollisionEnter = (response: Collision.Response): void => { }
-
-    // called every frame the Actor collides with a PlatformObject.
-    onCollisionStay = (response: Collision.Response): void => { }
-    
-    // called when an Actor stops colliding with a PlatformObject.
-    onCollisionExit = (response: Collision.Response): void => { }
-    
-    // called when an Actor is attached from a MovingPlatformObject belonging to this Platform.
-    onPlatformAttach = (actor: Actor): void => { }
-    
-    // called when an Actor is detached from a MovingPlatformObject belonging to this Platform.
-    onPlatformDetach = (actor: Actor): void => { }
-
- */
 class Platform extends Component {
     constructor() {
         super();
         this.onAwake = () => {
             Platform.allPlatforms.push(this);
         };
-        /**
-         * Gets position of this transform in the global space.
-         * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
-         */
         this.getGlobalPosition = (outPos = null) => {
             return this.getTransform().getGlobalPosition(outPos);
         };
-        /**
-         * Sets position of this transform in the global space.
-         */
         this.setGlobalPosition = (x, y) => {
             this.getTransform().setGlobalPosition(x, y);
         };
-        /**
-         * velocity x
-         */
         this.vx = 0;
-        /**
-         * velocity y
-         */
         this.vy = 0;
-        /**
-         * Sets velocity such that the platform will be in the given position when the frame ends.
-         */
         this.setVelocityForNextPosition = (x, y) => {
             if (Game.deltaTime < .0001) {
                 this.setGlobalPosition(x, y);
@@ -7502,21 +5132,16 @@ class Platform extends Component {
             this.vx = (x - this.tempVec2.x) / Game.deltaTime;
             this.vy = (y - this.tempVec2.y) / Game.deltaTime;
         };
-        /**
-         * Sets the collision layers for each PlatformObject belonging to this Platform.
-         */
         this.setCollisionLayers = (collisionLayers) => {
             this.platformObjects.forEach(function (platformObject) {
                 platformObject.collisionLayers = collisionLayers;
             });
         };
         this.onDestroy = () => {
-            // clear platformObjects
             this.platformObjects.forEach(function (platformObject) {
                 platformObject.destroy();
             });
             this.platformObjects.splice(0);
-            // remove from allPlatforms
             let index = Platform.allPlatforms.indexOf(this);
             if (index !== -1) {
                 Platform.allPlatforms.splice(index, 1);
@@ -7528,16 +5153,11 @@ class Platform extends Component {
         this.componentProperties.only1 = true;
         this.componentProperties.excludeComponent(Actor);
     }
-    /**
-     * Calls forEach() on all the platforms.
-     * @param callbackFn Function to call on all the platforms.
-     */
     static forEach(callbackFn) {
         Platform.allPlatforms.forEach(callbackFn);
     }
 }
 Platform.allPlatforms = [];
-/// <reference path="_ref.ts" />
 var Direction;
 (function (Direction) {
     Direction[Direction["NONE"] = 0] = "NONE";
@@ -7548,45 +5168,21 @@ var Direction;
 })(Direction || (Direction = {}));
 var Collision;
 (function (Collision) {
-    /**
-     * Gravity acceleration in the x direction.  Affects Actor movement.
-     */
     Collision.gravityX = 0;
-    /**
-     * Gravity acceleration in the y direction.  Affects Actor movement.
-     */
     Collision.gravityY = 600;
     class RaycastHit {
         constructor() {
-            /**
-             * Whether or not the ray hit something.
-             */
             this.hit = false;
             this.actor = null;
             this.platformObject = null;
-            /**
-             * Point in global space where the ray hit the object.
-             */
             this.point = new Vec2();
-            /**
-             * raycast origin + raycast direction * t = point
-             */
             this.t = 0;
-            /**
-             * The (normalized) normal vector of the surface hit by the ray.
-             */
             this.normal = new Vec2();
-            /**
-             * Clones this RaycastHit.
-             */
             this.clone = () => {
                 let ret = new RaycastHit();
                 ret.setRaycastHit(this);
                 return ret;
             };
-            /**
-             * Sets these values to match the values of the given RaycastHit.
-             */
             this.setRaycastHit = (raycastHit) => {
                 this.hit = raycastHit.hit;
                 this.actor = raycastHit.actor;
@@ -7607,7 +5203,6 @@ var Collision;
             tempRaycastHit.hit = false;
             actor.raycast(tempRaycastHit, tempOrigin, tempDirection, distance, teamMask);
             if (tempRaycastHit.hit && tempRaycastHit.t < raycastHit.t) {
-                // hit actor and before last hit actor
                 raycastHit.setRaycastHit(tempRaycastHit);
             }
         });
@@ -7623,21 +5218,12 @@ var Collision;
             if (Collision.maskCollidesWithLayers(collisionMask, platformObject.collisionLayers)) {
                 platformObject.raycast(tempRaycastHit, tempOrigin, tempDirection, distance, collisionMask);
                 if (tempRaycastHit.hit && tempRaycastHit.t < raycastHit.t) {
-                    // hit platform object and before last hit platform object
                     raycastHit.setRaycastHit(tempRaycastHit);
                 }
             }
         });
     }
     Collision.raycastAllPlatformObjectsNonAlloc = raycastAllPlatformObjectsNonAlloc;
-    /**
-     * Fills the given platformObjects array with all the platformObjects the given rect overlaps.
-     * Note that since actors are repositioned with a tiny bit of space between them and the platform they collided with,
-     * an actor's rect should not be overlapping with the platform it collided with.
-     * @param platformObjects Out parameter that will be filled with PlatformObjects.
-     * @param rect The rectangle to test.
-     * @param collisionMask Collision mask to filter collision.
-     */
     function rectOverlapAllPlatformObjectsNonAlloc(platformObjects, rect, collisionMask = 0x7FFFFFFF) {
         platformObjects.splice(0);
         Collision.PlatformObject.forEach(function (platformObject) {
@@ -7649,26 +5235,15 @@ var Collision;
         });
     }
     Collision.rectOverlapAllPlatformObjectsNonAlloc = rectOverlapAllPlatformObjectsNonAlloc;
-    /**
-     * Returns if an Actor with the given collisionMask will collide with a PlatformObject with the given collisionLayers.
-     * @param collisionMask
-     * @param collisionLayers
-     */
     function maskCollidesWithLayers(collisionMask, collisionLayers) {
         return (collisionMask & collisionLayers) !== 0;
     }
     Collision.maskCollidesWithLayers = maskCollidesWithLayers;
-    /**
-     * Returns the Direction of the normal angle.
-     * @param normalX x of the normal vector
-     * @param normalY y of the normal vector
-     * @param thresholdAngleDegrees Angle in (0, 90).  The returned direction will be RIGHT iff the normal angle is in between -threshold and threshold.
-     */
     function getNormalDirection(normalX, normalY, thresholdAngleDegrees = 45) {
         let thresholdAngle = thresholdAngleDegrees * M.degToRad;
         let normalAngle = Math.atan2(normalY, normalX);
         if (normalAngle < 0)
-            normalAngle += Math.PI * 2; // keep angle in [0, 2pi)
+            normalAngle += Math.PI * 2;
         if (normalAngle < thresholdAngle) {
             return Direction.RIGHT;
         }
@@ -7684,90 +5259,35 @@ var Collision;
         return Direction.RIGHT;
     }
     Collision.getNormalDirection = getNormalDirection;
-    /**
-     * Describes the current position of an actor.
-     */
     class StationaryActor {
         constructor() {
-            /**
-             * Position of the actor.
-             */
             this.pos = new Vec2();
-            /**
-             * Center in the actor's local space.
-             */
             this.offset = new Vec2();
         }
     }
     Collision.StationaryActor = StationaryActor;
-    /**
-     * Describes movement of an actor over 1 frame.
-     */
     class MovingActor {
         constructor() {
-            /**
-             * Position of the actor at time 0.
-             */
             this.pos0 = new Vec2();
-            /**
-             * Position of the actor at time 1.
-             */
             this.pos1 = new Vec2();
-            /**
-             * Center in the actor's local space.
-             */
             this.offset = new Vec2();
         }
     }
     Collision.MovingActor = MovingActor;
     (function (ResponseType) {
-        /**
-         * Actor hits PlatformObject at time t (time property).  Reposition Actor at that moment.
-         */
         ResponseType[ResponseType["BULLET"] = 0] = "BULLET";
-        /**
-         * Actor hits PlatformObject at time t (time property), but it should be positioned somewhere else (given by reposition property).
-         */
         ResponseType[ResponseType["PROJECT"] = 1] = "PROJECT";
-        /**
-         * Actor started intersecting the platform, reposition it outside the platform (given by the reposition property).  Time should be 0 in this case.
-         */
         ResponseType[ResponseType["INTERSECT"] = 2] = "INTERSECT";
-        /**
-         * Actor (considered stationary) is pushed by a moving platform.
-         */
         ResponseType[ResponseType["MOVING_PLATFORM"] = 3] = "MOVING_PLATFORM";
     })(Collision.ResponseType || (Collision.ResponseType = {}));
     var ResponseType = Collision.ResponseType;
-    /**
-     * Describes the calculated collision between an Actor and a PlatformObject.
-     */
     class Response {
         constructor() {
-            /**
-             * Whether or not a collision occurred.
-             */
             this.hit = false;
-            /**
-             * What the actor's position should be set to as a result of the collision.  Usually pos0+(pos1-pos0)*time with an epsilon offset.
-             */
             this.reposition = new Vec2();
-            /**
-             * Reposition as the result of a projection.  Only needed if type is PROJECT.
-             */
             this.repositionProject = new Vec2();
-            /**
-             * Point in global space where the collision occurred.
-             */
             this.point = new Vec2();
-            /**
-             * Normal of the collision, from the platform towards the actor.  Has a magnitude of 1.
-             */
             this.normal = new Vec2();
-            /**
-             * Returns the Direction of the normal angle.
-             * @param thresholdAngleDegrees Angle in (0, 90).  The returned direction will be RIGHT iff the normal angle is in between -threshold and threshold.  If not given, this value is set to 90 - actor.getDimensionRatioAngle().
-             */
             this.getNormalDirection = (thresholdAngleDegrees = undefined) => {
                 if (thresholdAngleDegrees == undefined)
                     thresholdAngleDegrees = 90 - this.actor.getDimensionRatioAngle();
@@ -7778,9 +5298,6 @@ var Collision;
             };
             this.recycled = false;
         }
-        /**
-         * Creates a new collision response, or returns a recycled response.
-         */
         static _create() {
             if (Response.recycledResponses.length > 0) {
                 let ret = Response.recycledResponses.pop();
@@ -7798,15 +5315,8 @@ var Collision;
     }
     Response.recycledResponses = [];
     Collision.Response = Response;
-    /**
-     * Contains 2 collisions the happened this frame that would crush an Actor.
-     * Like the responses, do not keep a reference to this class instance.
-     */
     class Crush {
         constructor(response0, response1) {
-            /**
-             * The angle (in degrees) between the normals of the two collision responses.
-             */
             this.getAngle = () => {
                 return M.angleBetweenVectors(this.response0.normal.x, this.response0.normal.y, this.response1.normal.x, this.response1.normal.y) * M.radToDeg;
             };
@@ -7817,32 +5327,26 @@ var Collision;
     Collision.Crush = Crush;
     class Handler {
         static _update() {
-            // set collisions that happened previous frame
             Handler.collisionsPrevFrame.splice(0);
             for (let i = 0; i < Handler.collisionsThisFrame.length; i++) {
                 Handler.collisionsPrevFrame.push(Handler.collisionsThisFrame[i]);
             }
             Handler.collisionsThisFrame.splice(0);
-            // move and resolve actors
             let actorCols = [];
             Actor.forEach(function (actor) {
                 Handler.resolveActor(actorCols, actor, Collision.PlatformObject._allPlatformObjects, Collision.MovingPlatformObject._allMovingPlatformObjects);
-                // record collision responses
                 for (let i = 0; i < actorCols.length; i++) {
                     Handler.collisionsThisFrame.push(actorCols[i]);
                 }
                 actorCols.splice(0);
             });
-            // move Platform components
             Platform.forEach(function (platform) {
                 platform.getGlobalPosition(Handler.tempVec2);
                 Handler.tempVec2.x += platform.vx * Game.deltaTime;
                 Handler.tempVec2.y += platform.vy * Game.deltaTime;
                 platform.setGlobalPosition(Handler.tempVec2.x, Handler.tempVec2.y);
             });
-            // enter and stay collision messages
             Handler.collisionsThisFrame.forEach(function (response) {
-                // if collision did not happen previous frame, send enter message
                 if (Handler.responseSearch(Handler.collisionsPrevFrame, response.actor, response.platformObject) === null) {
                     response.actor.gameObject.sendMessage("onCollisionEnter", response);
                     response.platformObject.getPlatform().gameObject.sendMessage("onCollisionEnter", response);
@@ -7850,7 +5354,6 @@ var Collision;
                 response.actor.gameObject.sendMessage("onCollisionStay", response);
                 response.platformObject.getPlatform().gameObject.sendMessage("onCollisionStay", response);
                 if (response.actor.zeroVelocityOnCollision) {
-                    // zero velocity
                     let normalDirection = response.getNormalDirection();
                     if (normalDirection === Direction.LEFT || normalDirection === Direction.RIGHT) {
                         response.actor.vx = 0;
@@ -7860,23 +5363,17 @@ var Collision;
                     }
                 }
             });
-            // exit collision messages
             Handler.collisionsPrevFrame.forEach(function (response) {
-                // if collision did not happen this frame, send enter message
                 if (Handler.responseSearch(Handler.collisionsThisFrame, response.actor, response.platformObject) === null) {
                     response.actor.gameObject.sendMessage("onCollisionExit", response);
                     response.platformObject.getPlatform().gameObject.sendMessage("onCollisionExit", response);
                 }
             });
-            // recycle collision responses
             Handler.collisionsPrevFrame.forEach(function (response) {
                 Response._recycle(response);
             });
             Handler.collisionsPrevFrame.splice(0);
         }
-        /**
-         * Searches for a Response from the given array between the given actor and platformObject.  Returns null if Response doesn't exist.
-         */
         static responseSearch(responses, actor, platformObject) {
             for (let i = 0; i < responses.length; i++) {
                 if (responses[i].actor === actor && responses[i].platformObject === platformObject)
@@ -7884,16 +5381,11 @@ var Collision;
             }
             return null;
         }
-        /**
-         * Put new responses in outResponses.
-         */
         static resolveActor(outResponses, actor, platformObjects, movingPlatformObjects) {
             outResponses.splice(0);
             let actorIsActiveAndEnabled = actor.isActiveAndEnabled();
-            // how much stationary actor was pushed by moving platforms
             let pushDistanceX = 0;
             let pushDistanceY = 0;
-            // get initial position of actor
             actor.getGlobalPosition(Handler.tempVec2);
             let actorX0 = Handler.tempVec2.x;
             let actorY0 = Handler.tempVec2.y;
@@ -7903,8 +5395,7 @@ var Collision;
             stationaryActor.halfWidth = actor.halfWidth;
             stationaryActor.halfHeight = actor.halfHeight;
             stationaryActor.collisionMask = actor.collisionMask;
-            stationaryActor.pos.setValues(actorX0, actorY0); // note this is the pre-physics position
-            // moving platforms collision
+            stationaryActor.pos.setValues(actorX0, actorY0);
             for (let i = 0; i < movingPlatformObjects.length; i++) {
                 let mpo = movingPlatformObjects[i];
                 if (!mpo.isEnabled() || !mpo.getPlatform().isActiveAndEnabled() || !actorIsActiveAndEnabled)
@@ -7918,7 +5409,6 @@ var Collision;
                 mpo.movingPlatformCollision(resp, stationaryActor);
                 if (resp.hit) {
                     if (resp.type === ResponseType.MOVING_PLATFORM) {
-                        // hit, record response.  Note can be hit by multiple moving platforms.
                         outResponses.push(resp);
                     }
                     else {
@@ -7926,27 +5416,21 @@ var Collision;
                     }
                 }
                 else {
-                    // not hit, recycle response
                     Response._recycle(resp);
                 }
             }
             if (outResponses.length > 0) {
-                // actor hit by moving platform, reposition
                 stationaryActor.pos.setValuesVec2(outResponses[0].reposition);
             }
             pushDistanceX = stationaryActor.pos.x - actorX0;
             pushDistanceY = stationaryActor.pos.y - actorY0;
-            // attached actor moving the platform.  This affects pushDistance, which only affects movingActor.pos1
             if (actor.getAttachedMovingPlatformObject() !== null) {
-                // temporarily give stationaryActor its original values
                 let sapx = stationaryActor.pos.x;
                 let sapy = stationaryActor.pos.y;
                 stationaryActor.pos.setValues(actorX0, actorY0);
-                // get push distance as a result of the platform object moving
                 actor.getAttachedMovingPlatformObject().moveAttachedActor(this.tempVec2, stationaryActor);
                 pushDistanceX = this.tempVec2.x - actorX0;
                 pushDistanceY = this.tempVec2.y - actorY0;
-                // give newset pos values back to stationaryActor
                 stationaryActor.pos.setValues(sapx, sapy);
             }
             let movingActor = Handler.movingActor;
@@ -7955,17 +5439,15 @@ var Collision;
             movingActor.halfWidth = actor.halfWidth;
             movingActor.halfHeight = actor.halfHeight;
             movingActor.collisionMask = actor.collisionMask;
-            movingActor.pos0.setValues(stationaryActor.pos.x, stationaryActor.pos.y); // is actor's pre-physics position, unless a moving platform moved the actor
-            // pos1 is what actor's position will be after the resolution
+            movingActor.pos0.setValues(stationaryActor.pos.x, stationaryActor.pos.y);
             let dt = Game.deltaTime;
             actor.vx += actor.gravityScale * Collision.gravityX * dt;
             actor.vy += actor.gravityScale * Collision.gravityY * dt;
             movingActor.pos1.x = actorX0 + actor.vx * dt + actor.windX * dt + pushDistanceX;
             movingActor.pos1.y = actorY0 + actor.vy * dt + actor.windY * dt + pushDistanceY;
-            let skipPlatformObject = null; // don't consider this platform in collision checks
-            let projectCollision = actor.projectCollision; // use projection when repositioning after collision
+            let skipPlatformObject = null;
+            let projectCollision = actor.projectCollision;
             for (let i = 0; i < this.MAX_RESOLVE_PASSES; i++) {
-                // can only collide with 1 platformObject per resolve pass
                 let response = null;
                 for (let j = 0; j < platformObjects.length; j++) {
                     let platformObject = platformObjects[j];
@@ -7977,58 +5459,32 @@ var Collision;
                         continue;
                     if (!maskCollidesWithLayers(actor.collisionMask, platformObject.collisionLayers))
                         continue;
-                    // get response for moving actor colliding with the platformObject.
                     let resp = Response._create();
                     resp.hit = false;
                     resp.actor = actor;
                     resp.platformObject = platformObject;
                     platformObject.movingActorCollision(resp, movingActor, projectCollision);
                     if (resp.hit && (response === null || resp.time < response.time)) {
-                        // moving actor hit platform earliest, use for response
                         if (response !== null)
                             Response._recycle(response);
                         response = resp;
                     }
                     else {
-                        // don't use for response
                         Response._recycle(resp);
                     }
                 }
-                // done if there's no collision
                 if (response === null)
                     break;
-                // collision happened
-                // alter movingActor position from collision
                 switch (response.type) {
                     case ResponseType.BULLET:
-                        // bullet collision.  Reposition to where collision happened, do not project.
                         movingActor.pos0.setValuesVec2(response.reposition);
                         movingActor.pos1.setValuesVec2(response.reposition);
                         break;
                     case ResponseType.PROJECT:
-                        // project collision.  Reposition to the given project position.
-                        // updating pos0 was causing problems earlier, I don't remember why.  It seems to work fine now.
-                        movingActor.pos0.setValuesVec2(response.reposition); // reposition with no projection
-                        movingActor.pos1.setValuesVec2(response.repositionProject); // reposition with projection
-                        //// check to make sure projection doesn't go behind a wall it already collided with
-                        //foreach(CollisionResponse prevCollisionResponse in movingActorCollisionResponses) {
-                        //    if (PrimitiveTest.angleBetweenVectors(prevCollisionResponse.normal, movingActor.diff) > Mathf.PI / 2) {
-                        //        // projection would move actor behind a wall it already collided with.  Cancel projection, and reposition in a way that considers both walls.
-                        //        Vector2 crossReposition = PrimitiveTest.lineLineIntersectionPoint(
-                        //            prevCollisionResponse.reposition,
-                        //            prevCollisionResponse.reposition + new Vector2(-prevCollisionResponse.normal.y, prevCollisionResponse.normal.x),
-                        //            collisionResponse.reposition,
-                        //            collisionResponse.reposition + new Vector2(-collisionResponse.normal.y, collisionResponse.normal.x));
-                        //        if (!float.IsInfinity(crossReposition.x) && !float.IsInfinity(crossReposition.y)) {
-                        //            movingActor.pos0 = crossReposition;
-                        //        }
-                        //        movingActor.diff = Vector2.zero;
-                        //        break;
-                        //    }
-                        //}
+                        movingActor.pos0.setValuesVec2(response.reposition);
+                        movingActor.pos1.setValuesVec2(response.repositionProject);
                         break;
                     case ResponseType.INTERSECT:
-                        // intersect collision.  diff between pos0 and pos1 is unchanged
                         let diffX = movingActor.pos1.x - movingActor.pos0.x;
                         let diffY = movingActor.pos1.y - movingActor.pos0.y;
                         movingActor.pos0.setValuesVec2(response.reposition);
@@ -8038,33 +5494,24 @@ var Collision;
                         console.error("Don't use collision response type " + response.type + " for moving actor collision.");
                         break;
                 }
-                // add collision response to record
                 outResponses.push(response);
                 if (movingActor.pos0.equalsVec2(movingActor.pos1)) {
-                    // no projection.  No more collisions can happen
                     break;
                 }
                 else {
-                    // actor is still moving, so need to check again
-                    // new: maybe we shouldn't do this
-                    //skipPlatformObject = response.platformObject; // don't check this platform again
                     if (i + 2 >= this.MAX_RESOLVE_PASSES) {
-                        // next pass will be the last.  So the next collision should be final (i.e. no projections)
                         projectCollision = false;
                     }
                 }
-            } // ends resolve passes for loop
-            // apply collision reposition to actor
+            }
             actor.setGlobalPosition(movingActor.pos1.x, movingActor.pos1.y);
-            // crush collision messages
             for (let i = 0; i < outResponses.length; i++) {
                 let resp1 = outResponses[i];
                 for (let j = i + 1; j < outResponses.length; j++) {
                     let resp2 = outResponses[j];
                     if (resp1.type != ResponseType.MOVING_PLATFORM && resp2.type != ResponseType.MOVING_PLATFORM)
-                        continue; // need at least one moving platform to have a crush
+                        continue;
                     if (M.angleBetweenVectors(resp1.normal.x, resp1.normal.y, resp2.normal.x, resp2.normal.y) * M.radToDeg > actor.crushAngleThreshold) {
-                        // crush detected, send message
                         let crush = new Crush(resp1, resp2);
                         actor.gameObject.sendMessage("onCollisionCrush", crush);
                     }
@@ -8083,13 +5530,9 @@ var Collision;
     let tempOrigin = new Vec2();
     let tempDirection = new Vec2();
 })(Collision || (Collision = {}));
-/// <reference path="_ref.ts" />
 class AABBPlatform extends Platform {
     constructor() {
         super();
-        /**
-         * Sets dimensions of the AABBPlatformObject.
-         */
         this.setAABB = (offsetX, offsetY, halfWidth, halfHeight) => {
             this.platformObject.offsetX = offsetX;
             this.platformObject.offsetY = offsetY;
@@ -8102,7 +5545,6 @@ class AABBPlatform extends Platform {
         this.platformObjects.push(this.platformObject);
     }
 }
-/// <reference path="_ref.ts" />
 class TiledMapTileLayerPlatform extends Platform {
     constructor() {
         super();
@@ -8112,12 +5554,7 @@ class TiledMapTileLayerPlatform extends Platform {
         this.platformObjects.push(this.platformObject);
     }
 }
-/// <reference path="_ref.ts" />
 class Game {
-    /**
-     * Initializes Game and other classes.  Starts the game loop as well, and loads the scene defined by Game.preloadScene.
-     * @param canvas Reference to the canvas defined in the html.
-     */
     static initialize(canvas) {
         if (Game.initialized) {
             console.warn("Game already initialized");
@@ -8126,26 +5563,18 @@ class Game {
         Game.initialized = true;
         Game._canvas = canvas;
         Game._context = canvas.getContext("2d");
-        // separate canvas for effects
         Game._effectsCanvas = document.createElement("canvas");
         Game._effectsCanvas.width = canvas.width;
         Game._effectsCanvas.height = canvas.height;
         Game._effectsContext = Game._effectsCanvas.getContext("2d");
-        // create camera
         Camera._initialize(Game.context);
-        // initialize Keys (input)
         Keys._initialize(document);
-        // initialize Mouse (input)
         Mouse._initialize(canvas);
-        // initialize Gamepad (input)
         Gamepads._initialize(window);
-        // start gameloop
         Game.gameLoop();
-        // user input requirements must be satisfied before the game is ready to be played
         if (!Game.userInputSatisfied) {
             Game.userInputAddEventListeners();
         }
-        // start preload scene
         if (Game.preloadScene === "BasePreloadScene") {
             Scene.addScene("BasePreloadScene", new BasePreloadScene());
         }
@@ -8154,35 +5583,18 @@ class Game {
         }
         Scene.loadScene(Game.preloadScene);
     }
-    // Canvas related
-    /**
-     * The canvas element used to display the game.
-     */
     static get canvas() {
         return Game._canvas;
     }
-    /**
-     * Object used for manipulating shapes and graphics on the canvas.
-     */
     static get context() {
         return Game._context;
     }
-    /**
-     * Hidden canvas used to help make effects.
-     */
     static get effectsCanvas() {
         return Game._effectsCanvas;
     }
-    /**
-     * Hidden context used to help make effects.
-     */
     static get effectsContext() {
         return Game._effectsContext;
     }
-    // Fullscreen
-    /**
-     * If the window is currently in fullscreen mode.
-     */
     static get isFullscreen() {
         let doc = document;
         if (doc.fullscreenElement ||
@@ -8192,9 +5604,6 @@ class Game {
             return true;
         return false;
     }
-    /**
-     * Requests the browser to go into fullscreen.  Must be called from user input.
-     */
     static requestFullscreen() {
         let canvas = Game.canvas;
         if (canvas.requestFullscreen) {
@@ -8210,9 +5619,6 @@ class Game {
             canvas.msRequestFullscreen();
         }
     }
-    /**
-     * Exits fullscreen.
-     */
     static exitFullscreen() {
         let doc = document;
         if (doc.exitFullscreen) {
@@ -8228,28 +5634,15 @@ class Game {
             doc.msExitFullscreen();
         }
     }
-    /**
-     * Time, in seconds, since the last frame.
-     */
     static get unscaledDeltaTime() {
         return Game._unscaledDeltaTime;
     }
-    /**
-     * Scaled time, in seconds, since the last frame.
-     */
     static get deltaTime() {
         return Game.unscaledDeltaTime * Game.timeScale;
     }
-    /**
-     * Time, in seconds, since window opened.  This is not affected by delta time.
-     */
     static get realtimeSinceStartup() {
         return Game.timeStamp / 1000;
     }
-    /**
-     * Gets percent of game assets loaded.  1 means fully loaded.
-     * A fully loaded game does not necessarily mean the game is ready to play.  Use Game.gameReady() for that.
-     */
     static get percentLoaded() {
         let thingsLoaded = TexPackManager.getNumTexPacksLoaded() + JSONManager.numJsonLoaded + AudioManager.getNumAudioSpritesReady();
         let things = TexPackManager.getNumTexPacks() + JSONManager.numJson + AudioManager.getNumAudioSprites();
@@ -8257,61 +5650,33 @@ class Game {
             return 1;
         return thingsLoaded / things;
     }
-    /**
-     * Gets if the user input requirement has been satisfied.  Sound won't play until user input is given, so it's best to wait until this is true for the game to start.
-     */
     static get userInputSatisfied() {
         return AudioManager.isAudioContextRunning();
     }
-    /**
-     * If game is ready to be started (i.e. advance past preloader) with no problems.
-     * Essentially this means the game is fully loaded and user input was given.
-     */
     static get ready() {
         return Game.percentLoaded >= 1 && Game.userInputSatisfied;
     }
-    // Private
-    /**
-     * gameLoop that runs the game.
-     */
     static gameLoop() {
-        // makes sure that gameLoop is called every time the game draws a new frame to the canvas
         requestAnimationFrame(Game.gameLoop);
-        // clear canvas
         Game.context.fillStyle = "black";
         Game.context.fillRect(0, 0, Game.canvas.width, Game.canvas.height);
-        // update deltaTime
         let timeStamp = Game.timeStamp;
         Game._unscaledDeltaTime = Math.min((timeStamp - Game.lastTimeStamp) / 1000, Game.MAX_UNSCALED_DELTA_TIME);
         Game.lastTimeStamp = timeStamp;
-        // poll gamepads
         Gamepads._earlyUpdate();
-        // load scenes that are marked to be loaded
         Scene._loadScenesToLoad();
-        // call update() on all GameObjects
         GameObject._updateAll();
-        // moving Actors and collision resolution
         Collision.Handler._update();
-        // (move camera here)
-        // draw all Drawers
         Drawers._drawAll();
-        // mark all GameObjects in scenes that are going to be unloaded to be destroyed
         Scene._destroyGameObjectsInScenesToUnload();
-        // destroying all GameObjects marked for destroy
         GameObject._destroyAllMarked();
-        // unload all scenes to be unloaded
         Scene._unloadMarkedScenes();
-        // clearing records of buttons pressed
         Keys._lateUpdate();
         Mouse._lateUpdate();
     }
-    /**
-     * Gets the time passed (in milliseconds) since the window opened.
-     */
     static get timeStamp() {
         return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
     }
-    // Private user input related
     static userInputAddEventListeners() {
         window.addEventListener("mousedown", Game.userInputOnMouseDown);
         document.addEventListener("keydown", Game.userInputOnKeyDown);
@@ -8328,106 +5693,31 @@ class Game {
     }
     static userInputOnInput() {
         AudioManager.userInput(Game.userInputAudioContextRunningCallback);
-        // wait for callback before confirming that user input was given
     }
     static userInputAudioContextRunningCallback() {
         Game.userInputRemoveEventListeners();
     }
 }
-// Time related
-/**
- * max value unscaledDeltaTime can be.
- */
 Game.MAX_UNSCALED_DELTA_TIME = .1;
-/**
- * value unscaledDeltaTime is multiplied by to get deltaTime.
- */
 Game.timeScale = 1;
-// Loading related
-/**
- * The first scene to run.  Should be a scene that just waits for assets to load.
- */
 Game.preloadScene = "BasePreloadScene";
-/**
- * The scene that should load after the game is finished preloading.  This should be defined before Game is initialized.
- */
 Game.startScene = "";
 Game._userInputSatisfied = false;
 Game.initialized = false;
 Game.lastTimeStamp = 0;
 Game._unscaledDeltaTime = 0;
-// references to all files in tygem.  Used to influence build order
-/// <reference path="Vec2.ts" />
-/// <reference path="M.ts" />
-/// <reference path="Rect.ts" />
-/// <reference path="Matrix2x3.ts" />
-/// <reference path="Material.ts" />
-/// <reference path="ColorParser.ts" />
-/// <reference path="Transform.ts" />
-/// <reference path="SaveBox.ts" />
-/// <reference path="Keys.ts" />
-/// <reference path="Mouse.ts" />
-/// <reference path="Gamepads.ts" />
-/// <reference path="JSONManager.ts" />
-/// <reference path="AudioManager.ts" />
-/// <reference path="TexPackManager.ts" />
-/// <reference path="Spritesheet.ts" />
-/// <reference path="Camera.ts" />
-/// <reference path="Scene.ts" />
-/// <reference path="IDrawer.ts" />
-/// <reference path="Drawers.ts" />
-/// <reference path="TiledMap.ts" />
-/// <reference path="Component.ts" />
-/// <reference path="DrawerComponent.ts" />
-/// <reference path="PackedImageRenderer.ts" />
-/// <reference path="SpriteRenderer.ts" />
-/// <reference path="TiledMapTileLayerRenderer.ts" />
-/// <reference path="TiledMapComponent.ts" />
-/// <reference path="ScreenFilter.ts" />
-/// <reference path="BasePreloader.ts" />
-/// <reference path="BasePreloadScene.ts" />
-/// <reference path="GameObject.ts" />
-/// <reference path="Actor.ts" />
-/// <reference path="PlatformObject.ts" />
-/// <reference path="MovingPlatformObject.ts" />
-/// <reference path="AABBPlatformObject.ts" />
-/// <reference path="TiledMapTileLayerPlatformObject.ts" />
-/// <reference path="Platform.ts" />
-/// <reference path="CollisionHandler.ts" />
-/// <reference path="AABBPlatform.ts" />
-/// <reference path="TiledMapTileLayerPlatform.ts" />
-/// <reference path="Game.ts" /> 
-/// <reference path="../app.ts" />
-// adding texture packs to the game
 TexPackManager.addTexturePack("Assets/Texpacks/texpack-0.json");
 TexPackManager.addTexturePack("Assets/Texpacks/texpack-1.json");
-/*
-
-Plan:
-
-Spritesheet:
-- name: "sealime"
-- filename: "sealime.png"
-    - filename as specified in the texpack json
-- frameWidth: 64
-- frameHeight: 64
-- numFrames: 10
-
-
-*/
 Spritesheet.addSpritesheet("sealime.png", 64, 64, 8, 41);
 Animation.addAnimation("sealime_idle", "sealime.png", [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
 Animation.addAnimation("sealime_leap", "sealime.png", [8, 9, 10, 11, 12, 13, 14, 15, 16, 17], 10, false);
-/// <reference path="../app.ts" />
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
-/// <reference path="../../Tygem/_ref.ts" />
 var Scenes;
 (function (Scenes) {
     class Preload extends Scene {
         constructor(...args) {
             super(...args);
             this.onLoad = () => {
-                // wait for game to finish loading
                 let go = new GameObject();
                 go.addComponent(Comps.Preloader);
             };
@@ -8436,14 +5726,12 @@ var Scenes;
     }
     Scenes.Preload = Preload;
 })(Scenes || (Scenes = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Scenes;
 (function (Scenes) {
     class TestScene extends Scene {
         constructor(...args) {
             super(...args);
             this.onLoad = () => {
-                // make GameObjects
                 let gridGO = new GameObject();
                 let gridPir = gridGO.addComponent(PackedImageRenderer);
                 gridPir.setImageByName("grid.png");
@@ -8454,11 +5742,8 @@ var Scenes;
                 thing1.transform.y = 100;
                 let thing2 = Prefabs.Thing2();
                 thing2.sendMessage("messageF", 4);
-                // creating tiled map
                 let tm = TiledMap.createTiledMapData("test2");
                 tm.createGameObject();
-                // testing SaveBox
-                //localStorage.clear();
                 let sb;
                 if (SaveBox.getSaveFileIndices().indexOf(0) == -1) {
                     sb = SaveBox.createNewSaveBox();
@@ -8485,34 +5770,19 @@ var Scenes;
                 lssb.fileIndex = sb.fileIndex;
                 lssb.loadFromLocalStorage();
                 lssb = lssb.clone(1);
-                // console logs testing SaveBox
-                //console.log(sb.saveToString());
-                //console.log(lssb.saveToString());
-                //console.log(sb.saveToString() == lssb.saveToString());
             };
             this.onUnload = () => { };
         }
     }
     Scenes.TestScene = TestScene;
 })(Scenes || (Scenes = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Scenes;
 (function (Scenes) {
     class TestScene2 extends Scene {
         constructor(...args) {
             super(...args);
             this.onLoad = () => {
-                // zoom in camera
                 Camera.scale = 2;
-                // make GameObjects
-                //let thing2: GameObject = Prefabs.Thing2();
-                //thing2.name = "thing 2";
-                //thing2.transform.x = -50;
-                //thing2.transform.y = -100;
-                //let sealime: GameObject = Prefabs.Sealime();
-                //sealime.name = "sealime";
-                //sealime.transform.x = 10;
-                //sealime.transform.y = 10;
                 let platformGO = Prefabs.TestPlatform();
                 platformGO.name = "PlatformGO";
                 platformGO.transform.x = -10;
@@ -8523,18 +5793,8 @@ var Scenes;
                 let platformGO2 = Prefabs.TestPlatform2();
                 platformGO2.transform.x = -60;
                 platformGO2.transform.y = -100;
-                // creating tiled map
                 let tm = TiledMap.createTiledMapData("test4");
-                // create tile layers and parse objects
                 let tmGO = tm.createGameObject();
-                //let tmGO: GameObject = tm.createGameObject(
-                //    function (mapObject: TiledMap.Object): void {
-                //        console.log(mapObject);
-                //        console.log("idea: map mapObject.type to a (objectProperties: TiledMap.Object) => GameObject, which are the prefab functions.");
-                //    }
-                //);
-                //tmGO.transform.setGlobalPosition(-300, -200);
-                // moving tiled map
                 let tilePlatforms = tmGO.getComponentsInChildren(TiledMapTileLayerPlatform);
                 tilePlatforms.forEach(function (tilePlatform) {
                     tilePlatform.gameObject.addComponent(Comps.MovePlatformWithIJKL);
@@ -8547,10 +5807,8 @@ var Scenes;
                 go.addComponent(Comps.ControlCameraWithWASD);
                 go = new GameObject();
                 go.addComponent(Comps.DotFollowsMouse);
-                // test sound
                 go = new GameObject();
                 go.addComponent(Comps.TestSound);
-                // test button
                 go = new GameObject();
                 let button = go.addComponent(Comps.Button);
                 go.transform.x = 300;
@@ -8561,18 +5819,10 @@ var Scenes;
     }
     Scenes.TestScene2 = TestScene2;
 })(Scenes || (Scenes = {}));
-/// <reference path="../app.ts" />
-// master list of scenes being added to the game
-/// <reference path="Scenes/Preload.ts" />
-/// <reference path="Scenes/TestScene.ts" />
-/// <reference path="Scenes/TestScene2.ts" />
 Scene.addScene("Preload", new Scenes.Preload());
 Scene.addScene("TestScene", new Scenes.TestScene());
 Scene.addScene("TestScene2", new Scenes.TestScene2());
-/// <reference path="../app.ts" />
-// setting directory to get tileset images:
 TiledMap.tilesetImageDirectory = "Tilesets/";
-// adding tilesets:
 TiledMap.addTileset("beach", { "image": "beach_1.png",
     "imageheight": 304,
     "imagewidth": 224,
@@ -8641,7 +5891,6 @@ TiledMap.addTileset("beach_bg", { "image": "beach_1_bg.png",
     "tileheight": 16,
     "tilewidth": 16
 });
-// adding maps:
 TiledMap.addMap("test4", { "height": 40,
     "layers": [
         {
@@ -8758,28 +6007,15 @@ TiledMap.addMap("test4", { "height": 40,
     "version": 1,
     "width": 60
 });
-/// <reference path="Tygem/_ref.ts" />
-// typescript handbook: http://www.typescriptlang.org/docs/handbook/basic-types.html
-// typescript game tutorial: http://www.typescriptgames.com/
-// adding assets:
-/// <reference path="Code/add_Materials.ts" />
-/// <reference path="Code/add_Textures.ts" />
-/// <reference path="Code/add_Sounds.ts" />
-/// <reference path="Code/add_Scenes.ts" />
-/// <reference path="Code/add_Tilemaps.ts" />
-Game.preloadScene = "Preload"; // this is optional, default is "BasePreloadScene" which will automatically start Game.startScene once the game is done loading.
-Game.startScene = "TestScene2"; // this must be set.
+Game.preloadScene = "Preload";
+Game.startScene = "TestScene2";
 window.onload = () => {
-    // get canvas and context (must be defined in html already)
     let canvas = document.getElementById("canvas");
-    // initialize and start game
     Game.initialize(canvas);
 };
-/// <reference path="../app.ts" />
 Material.addMaterial("SAND", {
     collisionLayers: 0x1
 });
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class ArrowTestController extends Component {
@@ -8812,20 +6048,16 @@ var Comps;
                 this.actor.vy = v.y;
             };
             this.onCollisionEnter = (response) => {
-                //console.log("collision enter: " + response.toString());
             };
             this.onCollisionStay = (response) => {
-                //console.log("collision stay: " + response.toString());
             };
             this.onCollisionExit = (response) => {
-                //console.log(Direction[response.getNormalDirection()]);
             };
             this.name = "ArrowTestController";
         }
     }
     Comps.ArrowTestController = ArrowTestController;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class ArrowTestPlatController extends Component {
@@ -8866,26 +6098,18 @@ var Comps;
                 }
             };
             this.onCollisionExit = (response) => {
-                //console.log(response.toString());
             };
             this.name = "ArrowTestPlatController";
         }
     }
     Comps.ArrowTestPlatController = ArrowTestPlatController;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class Button extends DrawerComponent {
         constructor() {
             super();
-            /**
-             * Color/style used for the fill of the rectangle.
-             */
             this.fillStyle = "#FF0000";
-            /**
-             * Color/style used for the stroke of the rectangle.
-             */
             this.borderStyle = "#00FF00";
             this.borderWidth = 1;
             this.width = 100;
@@ -8893,13 +6117,11 @@ var Comps;
             this.textFont = "12px Verdana";
             this.textColor = "#FFFFFF";
             this.draw = (context) => {
-                // draw rectangle
                 context.fillStyle = this.fillStyle;
                 context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
                 context.lineWidth = this.borderWidth;
                 context.strokeStyle = this.borderStyle;
                 context.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
-                // draw text
                 context.font = this.textFont;
                 context.textAlign = "center";
                 context.textBaseline = "middle";
@@ -8912,7 +6134,6 @@ var Comps;
     }
     Comps.Button = Button;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class ControlCameraWithWASD extends Component {
@@ -8956,7 +6177,6 @@ var Comps;
     }
     Comps.ControlCameraWithWASD = ControlCameraWithWASD;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class DotGraphic extends DrawerComponent {
@@ -8975,8 +6195,6 @@ var Comps;
     }
     Comps.DotGraphic = DotGraphic;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
-/// <reference path="DotGraphic.ts" />
 var Comps;
 (function (Comps) {
     class DotFollowsMouse extends Comps.DotGraphic {
@@ -8988,7 +6206,6 @@ var Comps;
                 }
                 else {
                     let v = Camera.canvasToGlobal(Mouse.x, Mouse.y);
-                    // extra testing
                     Camera.globalToCanvas(v.x, v.y, v);
                     Camera.canvasToGlobal(v.x, v.y, v);
                     this.getTransform().setGlobalPosition(v.x, v.y);
@@ -9001,36 +6218,30 @@ var Comps;
     }
     Comps.DotFollowsMouse = DotFollowsMouse;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class FacesMouse extends Component {
         constructor() {
             super();
-            // called once per frame, during the update step.  Is not called if the component is disabled.
             this.onUpdate = () => {
                 let pos = this.getTransform().getGlobalPosition();
                 let targetPos = Camera.canvasToGlobal(Mouse.x, Mouse.y);
                 this.getTransform().setGlobalRotation(Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x) * M.radToDeg);
             };
             this.name = "FacesMouse";
-            //this.componentProperties.requireComponent();
         }
     }
     Comps.FacesMouse = FacesMouse;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class MovePlatformWithIJKL extends Component {
         constructor() {
             super();
             this.speed = 40;
-            // Called once for a Component.  Either called when a scene finishes loading, or just before update().
             this.onStart = () => {
                 this.platform = this.getComponent(Platform);
             };
-            // called once per frame, during the update step.  Is not called if the component is disabled.
             this.onUpdate = () => {
                 if (Keys.keyHeld(Key.J)) {
                     this.platform.vx = -this.speed;
@@ -9051,7 +6262,6 @@ var Comps;
                     this.platform.vy = 0;
                 }
             };
-            // called just before the component is destroyed.
             this.onDestroy = () => { };
             this.name = "MovePlatformWithIJKL";
             this.componentProperties.requireComponent(Platform);
@@ -9059,7 +6269,6 @@ var Comps;
     }
     Comps.MovePlatformWithIJKL = MovePlatformWithIJKL;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class Preloader extends BasePreloader {
@@ -9071,43 +6280,34 @@ var Comps;
     }
     Comps.Preloader = Preloader;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class Template extends Component {
         constructor() {
             super();
-            // Called once for a Component.  Either called when a scene finishes loading, or just before update().
             this.onStart = () => { };
-            // called once per frame, during the update step.  Is not called if the component is disabled.
             this.onUpdate = () => { };
-            // called just before the component is destroyed.
             this.onDestroy = () => { };
             this.name = "";
-            //this.componentProperties.requireComponent();
         }
     }
     Comps.Template = Template;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class TestRectOverlap extends Component {
         constructor() {
             super();
-            // Called once for a Component.  Either called when a scene finishes loading, or just before update().
             this.onStart = () => {
                 this.actor = this.getComponent(Actor);
             };
             this.actor = null;
-            // called once per frame, during the update step.  Is not called if the component is disabled.
             this.onUpdate = () => {
                 let overlaps = [];
                 let rect = this.actor.getRect();
                 Collision.rectOverlapAllPlatformObjectsNonAlloc(overlaps, rect, this.actor.collisionMask);
                 console.log(overlaps.length > 0);
             };
-            // called just before the component is destroyed.
             this.onDestroy = () => { };
             this.name = "TestRectOverlap";
             this.componentProperties.requireComponent(Actor);
@@ -9115,15 +6315,12 @@ var Comps;
     }
     Comps.TestRectOverlap = TestRectOverlap;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class TestSound extends Component {
         constructor() {
             super();
-            // Called once for a Component.  Either called when a scene finishes loading, or just before update().
             this.onStart = () => { };
-            // called once per frame, during the update step.  Is not called if the component is disabled.
             this.onUpdate = () => {
                 if (Keys.keyPressed(Key.Num2)) {
                     let sn = "music/level_white";
@@ -9139,14 +6336,12 @@ var Comps;
                     AudioManager.playSFX("sfx/boop1", .8);
                 }
             };
-            // called just before the component is destroyed.
             this.onDestroy = () => { };
             this.name = "TestSound";
         }
     }
     Comps.TestSound = TestSound;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Comps;
 (function (Comps) {
     class Thing2 extends Component {
@@ -9224,7 +6419,6 @@ var Comps;
                 if (Keys.keyPressed(Key.PageDown)) {
                     Camera.scale /= 1.2;
                 }
-                // switching scenes
                 if (Keys.keyPressed(Key.M)) {
                     if (Scene.currentScene === "testScene") {
                         Scene.loadAdditionalScene("testScene2");
@@ -9250,14 +6444,12 @@ var Comps;
                     }
                     this.child.transform.x += v.x * Game.deltaTime;
                     this.child.transform.y += v.y * Game.deltaTime;
-                    // destroying things
                     if (Keys.keyPressed(Key.Dash)) {
                         let thing1 = GameObject.findObject("thing 1");
                         if (thing1 !== null) {
                             thing1.markForDestroy();
                         }
                     }
-                    // dereference child if it'll be destroyed
                     if (this.child.isMarkedForDestroy()) {
                         this.child = null;
                     }
@@ -9271,7 +6463,6 @@ var Comps;
     }
     Comps.Thing2 = Thing2;
 })(Comps || (Comps = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Prefabs;
 (function (Prefabs) {
     function Sealime(props) {
@@ -9299,7 +6490,6 @@ var Prefabs;
     Prefabs.Sealime = Sealime;
     TiledMap.addObjectParser("Sealime", Sealime);
 })(Prefabs || (Prefabs = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Prefabs;
 (function (Prefabs) {
     function TestPlatform() {
@@ -9317,7 +6507,6 @@ var Prefabs;
     }
     Prefabs.TestPlatform = TestPlatform;
 })(Prefabs || (Prefabs = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Prefabs;
 (function (Prefabs) {
     function TestPlatform2() {
@@ -9334,7 +6523,6 @@ var Prefabs;
     }
     Prefabs.TestPlatform2 = TestPlatform2;
 })(Prefabs || (Prefabs = {}));
-/// <reference path="_ref.ts" />
 class ActorGizmo extends DrawerComponent {
     constructor() {
         super();
@@ -9360,10 +6548,6 @@ class ActorGizmo extends DrawerComponent {
         this.layer = DrawLayer.GIZMO;
     }
 }
-/// <reference path="_ref.ts" />
-/**
- * Will automatically attach the bottom of the actor to the top of moving platform objects.
- */
 class AttachBottom extends Component {
     constructor() {
         super();
@@ -9377,7 +6561,6 @@ class AttachBottom extends Component {
                 return;
             if (response.platformObject instanceof Collision.MovingPlatformObject) {
                 if (response.getNormalDirection() === Direction.UP) {
-                    // attach actor
                     let mpo = response.platformObject;
                     mpo.attachActor(this.actor);
                 }
@@ -9389,7 +6572,6 @@ class AttachBottom extends Component {
             if (response.platformObject instanceof Collision.MovingPlatformObject) {
                 let mpo = response.platformObject;
                 if (mpo === this.actor.getAttachedMovingPlatformObject()) {
-                    // detach actor
                     mpo.detachActor(this.actor);
                 }
             }
@@ -9398,7 +6580,6 @@ class AttachBottom extends Component {
         this.componentProperties.requireComponent(Actor);
     }
 }
-/// <reference path="_ref.ts" />
 class RaycastTestGizmo extends DrawerComponent {
     constructor() {
         super();
@@ -9423,7 +6604,6 @@ class RaycastTestGizmo extends DrawerComponent {
             this.getTransform().localToGlobal(this.origin.x + this.direction.x, this.origin.y + this.direction.y, this.pt1);
             this.globalDirection.setValues(this.pt1.x - this.globalOrigin.x, this.pt1.y - this.globalOrigin.y);
             this.globalDirection.normalize();
-            //Collision.raycastAllActorsNonAlloc(this.raycastHit, this.globalOrigin.x, this.globalOrigin.y, this.globalDirection.x, this.globalDirection.y, this.distance);
             Collision.raycastAllPlatformObjectsNonAlloc(this.raycastHit, this.globalOrigin.x, this.globalOrigin.y, this.globalDirection.x, this.globalDirection.y, this.distance);
         };
         this.raycastHit = new Collision.RaycastHit();
@@ -9451,7 +6631,6 @@ class RaycastTestGizmo extends DrawerComponent {
         this.layer = DrawLayer.GIZMO;
     }
 }
-/// <reference path="../../Tygem/_ref.ts" />
 var Prefabs;
 (function (Prefabs) {
     function Thing1() {
@@ -9464,32 +6643,26 @@ var Prefabs;
     }
     Prefabs.Thing1 = Thing1;
 })(Prefabs || (Prefabs = {}));
-/// <reference path="../../Tygem/_ref.ts" />
 var Prefabs;
 (function (Prefabs) {
     function Thing2() {
         let go = new GameObject();
-        // adding component
         let pir = go.addComponent(PackedImageRenderer);
         pir.setImageByName("sealime.png");
         pir.setImageRect(128, 0, 128, 64);
         pir.order = 1.1;
         let dg = go.addComponent(Comps.DotGraphic);
         dg.order = 999;
-        // adding child gameObject
         let child = new GameObject();
         child.transform.setParent(go.transform);
         child.name = "pengrunt";
-        // adding component to child
         let childPir = child.addComponent(PackedImageRenderer);
         childPir.setImageByName("pengrunt.png");
         childPir.setImageRect(0, 0, 64, 64);
         childPir.order = 1.0;
-        // testing effect stuff
         childPir.imageSmoothingEnabled = false;
         childPir.tintColor = "#FF0000";
         childPir.tintAmount = .6;
-        // adding Thing2 component
         let thing2 = go.addComponent(Comps.Thing2);
         thing2.pir = pir;
         thing2.child = child;
