@@ -26,7 +26,7 @@ namespace Comps {
 
         textFont: string = "12px Verdana";
         textColor: string = "#FFFFFF";
-
+        
         draw = (context: CanvasRenderingContext2D): void => {
             
             // draw rectangle

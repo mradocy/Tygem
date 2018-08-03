@@ -72,7 +72,9 @@
     <TypeScriptCompile Include="Tygem\ScreenFilter.ts" />
     <TypeScriptCompile Include="Tygem\SpriteRenderer.ts" />
     <TypeScriptCompile Include="Tygem\Spritesheet.ts" />
+    <TypeScriptCompile Include="Tygem\StringUtils.ts" />
     <TypeScriptCompile Include="Tygem\TexPackManager.ts" />
+    <TypeScriptCompile Include="Tygem\TextArea.ts" />
     <TypeScriptCompile Include="Tygem\TiledMapComponent.ts" />
     <TypeScriptCompile Include="Tygem\TiledMapTileLayerPlatform.ts" />
     <TypeScriptCompile Include="Tygem\TiledMapTileLayerPlatformObject.ts" />

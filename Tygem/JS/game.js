@@ -644,6 +644,85 @@ ColorParser.kCSSColorTable = {
     "white": [255, 255, 255, 1], "whitesmoke": [245, 245, 245, 1],
     "yellow": [255, 255, 0, 1], "yellowgreen": [154, 205, 50, 1]
 };
+var StringUtils;
+(function (StringUtils) {
+    function isWhitespace(char) {
+        return /\s/.test(typeof char === 'number' ? String.fromCharCode(char) : char.charAt(0));
+    }
+    StringUtils.isWhitespace = isWhitespace;
+    function isAlphabetical(char) {
+        let c = typeof char === 'string' ? char.charCodeAt(0) : char;
+        return ((97 <= c && c <= 122) ||
+            (65 <= c && c <= 90));
+    }
+    StringUtils.isAlphabetical = isAlphabetical;
+    function isDigit(char) {
+        let c = typeof char === 'string' ? char.charCodeAt(0) : char;
+        return 48 <= c && c <= 57;
+    }
+    StringUtils.isDigit = isDigit;
+    function stringFromKeyCode(keyCode, shiftHeld = false) {
+        if (keyCode < 0 || keyCode >= keyCodeArr.length)
+            return "";
+        if (shiftHeld) {
+            return keyCodeShiftArr[keyCode];
+        }
+        else {
+            return keyCodeArr[keyCode];
+        }
+    }
+    StringUtils.stringFromKeyCode = stringFromKeyCode;
+    let keyCodeArr = [
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "\n", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "0", "1",
+        "2", "3", "4", "5", "6", "7", "8", "9", "", "",
+        "", "", "", "", "", "a", "b", "c", "d", "e",
+        "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+        "p", "q", "r", "s", "t", "u", "v", "w", "x", "y",
+        "z", "", "", "", "", "", "0", "1", "2", "3",
+        "4", "5", "6", "7", "8", "9", "*", "+", "", "-",
+        ".", "/", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", ";", "=", ",", "-",
+        ".", "/", "`", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "[",
+        "\\", "]", "'", "", "", "", "", "", "", "", "",
+    ];
+    let keyCodeShiftArr = [
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "\n", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", ")", "!",
+        "@", "#", "$", "%", "^", "&", "*", "(", "", "",
+        "", "", "", "", "", "A", "B", "C", "D", "E",
+        "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+        "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",
+        "Z", "", "", "", "", "", "0", "1", "2", "3",
+        "4", "5", "6", "7", "8", "9", "*", "+", "", "-",
+        ".", "/", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", ":", "+", "<", "_",
+        ">", "?", "~", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "{",
+        "|", "}", "\"", "", "", "", "", "", "", "", "",
+    ];
+})(StringUtils || (StringUtils = {}));
 class Transform {
     constructor() {
         this.getParent = () => {
@@ -1174,6 +1253,10 @@ var Keys;
                 Game.requestFullscreen();
             }
         }
+        if (event.keyCode !== Key.Shift) {
+            console.log(event.keyCode);
+            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)));
+        }
     }
     function keyUp(event) {
         if (keysReleased.indexOf(event.keyCode) == -1) {
@@ -1287,6 +1370,7 @@ var Key;
     Key[Key["ForwardSlash"] = 191] = "ForwardSlash";
     Key[Key["Tilde"] = 192] = "Tilde";
     Key[Key["OpenBracket"] = 219] = "OpenBracket";
+    Key[Key["BackSlash"] = 220] = "BackSlash";
     Key[Key["ClosedBracket"] = 221] = "ClosedBracket";
     Key[Key["Quote"] = 222] = "Quote";
 })(Key || (Key = {}));
@@ -6651,6 +6735,29 @@ class RaycastTestGizmo extends DrawerComponent {
         this.actor = null;
         this.name = "RaycastTestGizmo";
         this.layer = DrawLayer.GIZMO;
+    }
+}
+class TextArea extends DrawerComponent {
+    constructor() {
+        super();
+        this.textFont = "12px Verdana";
+        this.textColor = "#FFFFFF";
+        this.textLineSpacing = 20;
+        this.text = "";
+        this.width = 100;
+        this.height = 50;
+        this.draw = (context) => {
+            context.font = this.textFont;
+            context.textAlign = "center";
+            context.fillStyle = this.textColor;
+            let start = 0;
+            let end = 0;
+            if (context.measureText(this.text.substring(start, end)).width > this.width) {
+            }
+            context.fillText(this.text, Camera.canvasWidth / 2, Camera.canvasHeight / 2);
+        };
+        this.name = "TextArea";
+        this.anchored = true;
     }
 }
 var Prefabs;

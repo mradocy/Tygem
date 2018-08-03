@@ -112,6 +112,12 @@ namespace Keys {
             }
 
         }
+
+        if (event.keyCode !== Key.Shift) {
+            console.log(event.keyCode);
+            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)));
+        }
+        
     }
 
     function keyUp(event: KeyboardEvent): void {
@@ -243,6 +249,7 @@ enum Key {
     Tilde = 192,
 
     OpenBracket = 219,
+    BackSlash = 220,
     ClosedBracket = 221,
     Quote = 222
 }

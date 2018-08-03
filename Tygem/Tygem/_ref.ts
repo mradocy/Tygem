@@ -8,6 +8,7 @@
 /// <reference path="Matrix2x3.ts" />
 /// <reference path="Material.ts" />
 /// <reference path="ColorParser.ts" />
+/// <reference path="StringUtils.ts" />
 
 /// <reference path="Transform.ts" />
 
