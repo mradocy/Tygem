@@ -672,6 +672,35 @@ var StringUtils;
         }
     }
     StringUtils.stringFromKeyCode = stringFromKeyCode;
+    function splitToLines(str, pixelWidth, context, numChars = -1) {
+        if (numChars < 0)
+            numChars = str.length;
+        let ret = [];
+        let lineStart = 0;
+        let lineEnd = 0;
+        let i = 0;
+        for (; i < str.length; i++) {
+            let c = str.charCodeAt(i);
+            if (c === 10) {
+                lineEnd = i;
+                ret.push(str.substring(lineStart, lineEnd));
+                lineStart = lineEnd + 1;
+                lineEnd = lineStart;
+            }
+            else if (c === 13) {
+            }
+            else if (isWhitespace(c)) {
+                lineEnd = i;
+            }
+            if (context.measureText(str.substring(lineStart, i + 1)).width > pixelWidth) {
+                ret.push(str.substring(lineStart, lineEnd));
+                lineStart = lineEnd + 1;
+            }
+        }
+        ret.push(str.substring(lineStart));
+        return ret;
+    }
+    StringUtils.splitToLines = splitToLines;
     let keyCodeArr = [
         "", "", "", "", "", "", "", "", "", "",
         "", "", "", "\n", "", "", "", "", "", "",
@@ -5919,6 +5948,18 @@ var Scenes;
                 let button = go.addComponent(Comps.Button);
                 go.transform.x = 300;
                 go.transform.y = 200;
+                go = new GameObject();
+                let textArea = go.addComponent(TextArea);
+                go.transform.x = 200;
+                go.transform.y = 300;
+                textArea.text = "Here are a bunch of words making up this text.\nThis starts a new line.  What's new?    4    spaces    wow    lots    of    space.";
+                textArea.width = 100;
+                textArea.height = 300;
+                textArea.horizAlign = HorizAlign.LEFT;
+                textArea.vertAlign = VertAlign.BOTTOM;
+                textArea.borderWidth = 1;
+                textArea.layer = DrawLayer.UI;
+                textArea.order = 9999;
             };
             this.onUnload = () => { };
         }
@@ -6737,24 +6778,75 @@ class RaycastTestGizmo extends DrawerComponent {
         this.layer = DrawLayer.GIZMO;
     }
 }
+var HorizAlign;
+(function (HorizAlign) {
+    HorizAlign[HorizAlign["LEFT"] = 0] = "LEFT";
+    HorizAlign[HorizAlign["CENTER"] = 1] = "CENTER";
+    HorizAlign[HorizAlign["RIGHT"] = 2] = "RIGHT";
+})(HorizAlign || (HorizAlign = {}));
+var VertAlign;
+(function (VertAlign) {
+    VertAlign[VertAlign["TOP"] = 0] = "TOP";
+    VertAlign[VertAlign["MIDDLE"] = 1] = "MIDDLE";
+    VertAlign[VertAlign["BOTTOM"] = 2] = "BOTTOM";
+})(VertAlign || (VertAlign = {}));
 class TextArea extends DrawerComponent {
     constructor() {
         super();
-        this.textFont = "12px Verdana";
-        this.textColor = "#FFFFFF";
-        this.textLineSpacing = 20;
+        this.font = "12px Verdana";
+        this.color = "#FFFFFF";
+        this.lineSpacing = 16;
+        this.horizAlign = HorizAlign.LEFT;
+        this.vertAlign = VertAlign.TOP;
         this.text = "";
         this.width = 100;
         this.height = 50;
+        this.borderWidth = 0;
+        this.borderStyle = "#FFFFFF";
         this.draw = (context) => {
-            context.font = this.textFont;
-            context.textAlign = "center";
-            context.fillStyle = this.textColor;
-            let start = 0;
-            let end = 0;
-            if (context.measureText(this.text.substring(start, end)).width > this.width) {
+            if (this.borderWidth > 0) {
+                context.beginPath();
+                context.strokeStyle = this.borderStyle;
+                context.lineWidth = this.borderWidth;
+                context.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                context.stroke();
             }
-            context.fillText(this.text, Camera.canvasWidth / 2, Camera.canvasHeight / 2);
+            context.font = this.font;
+            let lines = StringUtils.splitToLines(this.text, this.width, context);
+            let x = 0;
+            let y0 = 0;
+            switch (this.horizAlign) {
+                case HorizAlign.LEFT:
+                    context.textAlign = "left";
+                    x = -this.width / 2;
+                    break;
+                case HorizAlign.CENTER:
+                    context.textAlign = "center";
+                    x = 0;
+                    break;
+                case HorizAlign.RIGHT:
+                    context.textAlign = "right";
+                    x = this.width / 2;
+                    break;
+            }
+            switch (this.vertAlign) {
+                case VertAlign.TOP:
+                    context.textBaseline = "top";
+                    y0 = -this.height / 2;
+                    break;
+                case VertAlign.MIDDLE:
+                    context.textBaseline = "middle";
+                    y0 = 0 - this.lineSpacing * (lines.length - 1.0) / 2;
+                    break;
+                case VertAlign.BOTTOM:
+                    context.textBaseline = "bottom";
+                    y0 = this.height / 2 - this.lineSpacing * (lines.length - 1);
+                    break;
+            }
+            context.fillStyle = this.color;
+            for (let i = 0; i < lines.length; i++) {
+                context.fillText(lines[i], x, y0 + i * this.lineSpacing);
+            }
         };
         this.name = "TextArea";
         this.anchored = true;

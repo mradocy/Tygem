@@ -87,6 +87,20 @@ namespace Scenes {
             let button: Comps.Button = go.addComponent(Comps.Button);
             go.transform.x = 300;
             go.transform.y = 200;
+            
+            // test text area
+            go = new GameObject();
+            let textArea: TextArea = go.addComponent(TextArea);
+            go.transform.x = 200;
+            go.transform.y = 300;
+            textArea.text = "Here are a bunch of words making up this text.\nThis starts a new line.  What's new?    4    spaces    wow    lots    of    space.";
+            textArea.width = 100;
+            textArea.height = 300;
+            textArea.horizAlign = HorizAlign.LEFT;
+            textArea.vertAlign = VertAlign.BOTTOM;
+            textArea.borderWidth = 1;
+            textArea.layer = DrawLayer.UI;
+            textArea.order = 9999;
 
 
         }
