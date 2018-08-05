@@ -28,6 +28,19 @@ namespace StringUtils {
         let c: number = typeof char === 'string' ? char.charCodeAt(0) : char;
         return 48 <= c && c <= 57; /* 0-9 */
     }
+
+    /**
+     * Trims left side of the string of whitespace characters.
+     */
+    export function trimLeft(str: string): string {
+        return str.replace(/^\s+/, "");
+    }
+    /**
+     * Trims right side of the string of whitespace characters.
+     */
+    export function trimRight(str: string) {
+        return str.replace(/\s+$/, "");
+    }
     
     /**
      * Gets the corresponding char string from the given input keyCode.
@@ -46,25 +59,41 @@ namespace StringUtils {
      * The font must be already set in the given context.
      * @param str
      * @param context
-     * @param numChars The number of characters to include from the string.  Set to -1 (default) to include the whole string.
+     * @param ignoreHTMLTags Set to true to ignore angle brackets and everything inside them.  Assumes tags are properly formatted.
      */
-    export function splitToLines(str: string, pixelWidth: number, context: CanvasRenderingContext2D, numChars: number = -1): Array<string> {
-
-        if (numChars < 0) numChars = str.length;
-
+    export function splitToLines(str: string, pixelWidth: number, context: CanvasRenderingContext2D, ignoreHTMLTags: boolean = false): Array<string> {
+        
         let ret: Array<string> = [];
 
         let lineStart: number = 0;
         let lineEnd: number = 0;
 
+        let insideAngleBracket: number = 0; // '<' will increment value, '>' will decrement value
+        let angleBracketStart: number = 0;
+        let angleBracketLineWidth: number = 0; // total of pixel width of tags in a line
         
-
-        let i: number = 0;
-
-        for (; i < str.length; i++) {
+        for (let i: number = 0; i < str.length; i++) {
 
             let c: number = str.charCodeAt(i);
-            if (c === 10) { // '\n'
+            if (insideAngleBracket > 0) { // inside < >, ignore chars
+                if (c === 62) { // '>'
+                    insideAngleBracket--;
+                    if (insideAngleBracket === 0) {
+                        // end of tag, record width of tag
+                        angleBracketLineWidth += context.measureText(str.substring(angleBracketStart, i + 1)).width;
+
+                        // line can end after this character
+                        lineEnd = i + 1;
+                    }
+                }
+
+            } else if (ignoreHTMLTags && c === 60) { // '<'
+                if (insideAngleBracket === 0) {
+                    angleBracketStart = i;
+                }
+                insideAngleBracket++;
+
+            } else if (c === 10) { // '\n'
 
                 // stop and make new line
                 lineEnd = i;
@@ -72,20 +101,23 @@ namespace StringUtils {
                 // start next line after this character
                 lineStart = lineEnd + 1;
                 lineEnd = lineStart;
+                angleBracketLineWidth = 0;
 
             } else if (c === 13) { // '\r' (ignore)
             } else if (isWhitespace(c)) { // whitespace that's not \n nor \r
 
-                // line can end here
-                lineEnd = i;
+                // line can end after this character
+                lineEnd = i + 1;
             }
 
-            if (context.measureText(str.substring(lineStart, i + 1)).width > pixelWidth) { // if current character was added, line would become too long
-
+            if (insideAngleBracket === 0 &&
+                context.measureText(str.substring(lineStart, i + 1)).width - angleBracketLineWidth > pixelWidth) { // if current character was added, line would become too long
+                
                 // make new line
                 ret.push(str.substring(lineStart, lineEnd));
                 // start next line after it ends
-                lineStart = lineEnd + 1;
+                lineStart = lineEnd;
+                angleBracketLineWidth = 0;
 
             }
 
@@ -93,8 +125,51 @@ namespace StringUtils {
 
         // add remaining line
         ret.push(str.substring(lineStart));
+
+        if (ignoreHTMLTags && insideAngleBracket !== 0) {
+            console.warn("HTML tags for '" + str + "' aren't properly formatted.");
+        }
         
         return ret;
+    }
+
+    /**
+     * Returns a string with angle brackets and all content inside them removed.  The content inside the tags are unchanged.
+     * Assumes the tags are properly formatted.
+     */
+    export function trimHTMLTags(str: string): string {
+        let sb: Array<string> = [];
+
+        let start: number = 0;
+        let insideAngleBracket: number = 0;
+
+        for (let i: number = 0; i < str.length; i++) {
+
+            let c: number = str.charCodeAt(i);
+            if (c === 60) { // '<'
+                if (insideAngleBracket === 0) {
+                    // add string
+                    sb.push(str.substring(start, i));
+                }
+                insideAngleBracket++;
+
+            } else if (c === 62) { // '>'
+                insideAngleBracket--;
+                if (insideAngleBracket === 0) {
+                    // angle bracket complete
+                    start = i + 1;
+                }
+            }
+        }
+
+        // add final string
+        sb.push(str.substring(start));
+
+        if (insideAngleBracket !== 0) {
+            console.warn("HTML tags for '" + str + "' aren't properly formatted.");
+        }
+
+        return sb.join("");        
     }
 
 

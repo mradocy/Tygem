@@ -93,14 +93,20 @@ namespace Scenes {
             let textArea: TextArea = go.addComponent(TextArea);
             go.transform.x = 200;
             go.transform.y = 300;
-            textArea.text = "Here are a bunch of words making up this text.\nThis starts a new line.  What's new?    4    spaces    wow    lots    of    space.";
+            textArea.text = "Here are a bunch of words <imp>making up <transparent>this</transparent> text.\nThis starts</imp> a new line.  What's new?    4    spaces    wow    lots    of    space.";
+            //textArea.text = StringUtils.trimHTMLTags(textArea.text);
             textArea.width = 100;
             textArea.height = 300;
-            textArea.horizAlign = HorizAlign.LEFT;
+            textArea.useColorTags = true;
+            textArea.horizAlign = HorizAlign.CENTER;
             textArea.vertAlign = VertAlign.BOTTOM;
             textArea.borderWidth = 1;
             textArea.layer = DrawLayer.UI;
             textArea.order = 9999;
+
+            //Game.context.font = textArea.font;
+            //console.log(StringUtils.splitToLines(textArea.text, textArea.width, Game.context, true));
+
 
 
         }

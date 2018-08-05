@@ -661,6 +661,14 @@ var StringUtils;
         return 48 <= c && c <= 57;
     }
     StringUtils.isDigit = isDigit;
+    function trimLeft(str) {
+        return str.replace(/^\s+/, "");
+    }
+    StringUtils.trimLeft = trimLeft;
+    function trimRight(str) {
+        return str.replace(/\s+$/, "");
+    }
+    StringUtils.trimRight = trimRight;
     function stringFromKeyCode(keyCode, shiftHeld = false) {
         if (keyCode < 0 || keyCode >= keyCodeArr.length)
             return "";
@@ -672,35 +680,82 @@ var StringUtils;
         }
     }
     StringUtils.stringFromKeyCode = stringFromKeyCode;
-    function splitToLines(str, pixelWidth, context, numChars = -1) {
-        if (numChars < 0)
-            numChars = str.length;
+    function splitToLines(str, pixelWidth, context, ignoreHTMLTags = false) {
         let ret = [];
         let lineStart = 0;
         let lineEnd = 0;
-        let i = 0;
-        for (; i < str.length; i++) {
+        let insideAngleBracket = 0;
+        let angleBracketStart = 0;
+        let angleBracketLineWidth = 0;
+        for (let i = 0; i < str.length; i++) {
             let c = str.charCodeAt(i);
-            if (c === 10) {
+            if (insideAngleBracket > 0) {
+                if (c === 62) {
+                    insideAngleBracket--;
+                    if (insideAngleBracket === 0) {
+                        angleBracketLineWidth += context.measureText(str.substring(angleBracketStart, i + 1)).width;
+                        lineEnd = i + 1;
+                    }
+                }
+            }
+            else if (ignoreHTMLTags && c === 60) {
+                if (insideAngleBracket === 0) {
+                    angleBracketStart = i;
+                }
+                insideAngleBracket++;
+            }
+            else if (c === 10) {
                 lineEnd = i;
                 ret.push(str.substring(lineStart, lineEnd));
                 lineStart = lineEnd + 1;
                 lineEnd = lineStart;
+                angleBracketLineWidth = 0;
             }
             else if (c === 13) {
             }
             else if (isWhitespace(c)) {
-                lineEnd = i;
+                lineEnd = i + 1;
             }
-            if (context.measureText(str.substring(lineStart, i + 1)).width > pixelWidth) {
+            if (insideAngleBracket === 0 &&
+                context.measureText(str.substring(lineStart, i + 1)).width - angleBracketLineWidth > pixelWidth) {
                 ret.push(str.substring(lineStart, lineEnd));
-                lineStart = lineEnd + 1;
+                lineStart = lineEnd;
+                angleBracketLineWidth = 0;
             }
         }
         ret.push(str.substring(lineStart));
+        if (ignoreHTMLTags && insideAngleBracket !== 0) {
+            console.warn("HTML tags for '" + str + "' aren't properly formatted.");
+        }
         return ret;
     }
     StringUtils.splitToLines = splitToLines;
+    function trimHTMLTags(str) {
+        let sb = [];
+        let start = 0;
+        let insideAngleBracket = 0;
+        for (let i = 0; i < str.length; i++) {
+            let c = str.charCodeAt(i);
+            if (c === 60) {
+                if (insideAngleBracket === 0) {
+                    sb.push(str.substring(start, i));
+                }
+                insideAngleBracket++;
+            }
+            else if (c === 62) {
+                insideAngleBracket--;
+                if (insideAngleBracket === 0) {
+                    start = i + 1;
+                }
+            }
+        }
+        sb.push(str.substring(start));
+        if (insideAngleBracket !== 0) {
+            console.warn("HTML tags for '" + str + "' aren't properly formatted.");
+        }
+        return sb.join("");
+    }
+    StringUtils.trimHTMLTags = trimHTMLTags;
     let keyCodeArr = [
         "", "", "", "", "", "", "", "", "", "",
         "", "", "", "\n", "", "", "", "", "", "",
@@ -5952,10 +6007,11 @@ var Scenes;
                 let textArea = go.addComponent(TextArea);
                 go.transform.x = 200;
                 go.transform.y = 300;
-                textArea.text = "Here are a bunch of words making up this text.\nThis starts a new line.  What's new?    4    spaces    wow    lots    of    space.";
+                textArea.text = "Here are a bunch of words <imp>making up <transparent>this</transparent> text.\nThis starts</imp> a new line.  What's new?    4    spaces    wow    lots    of    space.";
                 textArea.width = 100;
                 textArea.height = 300;
-                textArea.horizAlign = HorizAlign.LEFT;
+                textArea.useColorTags = true;
+                textArea.horizAlign = HorizAlign.CENTER;
                 textArea.vertAlign = VertAlign.BOTTOM;
                 textArea.borderWidth = 1;
                 textArea.layer = DrawLayer.UI;
@@ -6799,6 +6855,7 @@ class TextArea extends DrawerComponent {
         this.horizAlign = HorizAlign.LEFT;
         this.vertAlign = VertAlign.TOP;
         this.text = "";
+        this.useColorTags = true;
         this.width = 100;
         this.height = 50;
         this.borderWidth = 0;
@@ -6812,22 +6869,23 @@ class TextArea extends DrawerComponent {
                 context.stroke();
             }
             context.font = this.font;
-            let lines = StringUtils.splitToLines(this.text, this.width, context);
-            let x = 0;
+            let lines = StringUtils.splitToLines(this.text, this.width, context, this.useColorTags);
             let y0 = 0;
-            switch (this.horizAlign) {
-                case HorizAlign.LEFT:
-                    context.textAlign = "left";
-                    x = -this.width / 2;
-                    break;
-                case HorizAlign.CENTER:
-                    context.textAlign = "center";
-                    x = 0;
-                    break;
-                case HorizAlign.RIGHT:
-                    context.textAlign = "right";
-                    x = this.width / 2;
-                    break;
+            context.textAlign = "left";
+            let lineXs = Array(lines.length);
+            for (let i = 0; i < lines.length; i++) {
+                let lineWidth = context.measureText(this.useColorTags ? StringUtils.trimRight(StringUtils.trimHTMLTags(lines[i])) : StringUtils.trimRight(lines[i])).width;
+                switch (this.horizAlign) {
+                    case HorizAlign.LEFT:
+                        lineXs[i] = -this.width / 2;
+                        break;
+                    case HorizAlign.CENTER:
+                        lineXs[i] = -lineWidth / 2;
+                        break;
+                    case HorizAlign.RIGHT:
+                        lineXs[i] = this.width / 2 - lineWidth;
+                        break;
+                }
             }
             switch (this.vertAlign) {
                 case VertAlign.TOP:
@@ -6844,14 +6902,76 @@ class TextArea extends DrawerComponent {
                     break;
             }
             context.fillStyle = this.color;
+            let styleStack = [];
+            styleStack.push(context.fillStyle);
             for (let i = 0; i < lines.length; i++) {
-                context.fillText(lines[i], x, y0 + i * this.lineSpacing);
+                let line = lines[i];
+                let x = lineXs[i];
+                let y = y0 + i * this.lineSpacing;
+                if (this.useColorTags) {
+                    let start = 0;
+                    let tagStart = 0;
+                    let inTag = false;
+                    for (let j = 0; j < line.length; j++) {
+                        let c = line.charCodeAt(j);
+                        if (inTag) {
+                            if (c === 62) {
+                                let tag = line.substring(tagStart, j).trim();
+                                if (tag.indexOf("/") === 0) {
+                                    if (styleStack.length <= 1) {
+                                        console.error("Improperly placed tag '" + tag + "' in text '" + this.text + "'");
+                                    }
+                                    else {
+                                        styleStack.pop();
+                                    }
+                                }
+                                else {
+                                    let style = TextArea.fontFillStyleFromTag(tag);
+                                    if (style === null) {
+                                        console.error("Tag '" + tag + "' not defined.");
+                                    }
+                                    else {
+                                        styleStack.push(style);
+                                    }
+                                }
+                                context.fillStyle = styleStack[styleStack.length - 1];
+                                inTag = false;
+                                start = j + 1;
+                            }
+                        }
+                        else {
+                            if (c === 60) {
+                                let subStr = line.substring(start, j);
+                                context.fillText(subStr, x, y);
+                                x += context.measureText(subStr).width;
+                                tagStart = j + 1;
+                                inTag = true;
+                            }
+                        }
+                    }
+                    if (!inTag) {
+                        context.fillText(line.substring(start), x, y);
+                    }
+                }
+                else {
+                    context.fillText(line, x, y);
+                }
             }
         };
         this.name = "TextArea";
         this.anchored = true;
     }
+    static fontFillStyleFromTag(tag) {
+        if (tag === "imp") {
+            return TextArea.IMPORTANT_COLOR;
+        }
+        else if (tag === "transparent") {
+            return "transparent";
+        }
+        return null;
+    }
 }
+TextArea.IMPORTANT_COLOR = "#FFDE3A";
 var Prefabs;
 (function (Prefabs) {
     function Thing1() {
