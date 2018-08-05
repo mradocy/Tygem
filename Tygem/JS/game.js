@@ -718,9 +718,11 @@ var StringUtils;
             }
             if (insideAngleBracket === 0 &&
                 context.measureText(str.substring(lineStart, i + 1)).width - angleBracketLineWidth > pixelWidth) {
-                ret.push(str.substring(lineStart, lineEnd));
-                lineStart = lineEnd;
-                angleBracketLineWidth = 0;
+                if (lineStart !== lineEnd) {
+                    ret.push(str.substring(lineStart, lineEnd));
+                    lineStart = lineEnd;
+                    angleBracketLineWidth = 0;
+                }
             }
         }
         ret.push(str.substring(lineStart));
@@ -1329,7 +1331,7 @@ var Keys;
         if (keysHeld.indexOf(event.keyCode) == -1) {
             keysHeld.push(event.keyCode);
         }
-        if (event.keyCode == Key.F10) {
+        if (event.keyCode === Key.F10) {
             if (Game.isFullscreen) {
                 Game.exitFullscreen();
             }
@@ -1339,7 +1341,7 @@ var Keys;
         }
         if (event.keyCode !== Key.Shift) {
             console.log(event.keyCode);
-            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)));
+            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)) === "");
         }
     }
     function keyUp(event) {
@@ -1510,6 +1512,14 @@ var Mouse;
         }
         if (buttonsHeld.indexOf(event.button) == -1) {
             buttonsHeld.push(event.button);
+        }
+        if (event.button === 2) {
+            if (Game.isFullscreen) {
+                Game.exitFullscreen();
+            }
+            else {
+                Game.requestFullscreen();
+            }
         }
     }
     function mouseUp(event) {
@@ -5799,15 +5809,19 @@ class Game {
     static requestFullscreen() {
         let canvas = Game.canvas;
         if (canvas.requestFullscreen) {
+            console.log("requestFullscreen");
             canvas.requestFullscreen();
         }
         else if (canvas.webkitRequestFullscreen) {
+            console.log("webkitRequestFullscreen");
             canvas.webkitRequestFullscreen();
         }
         else if (canvas.mozRequestFullScreen) {
+            console.log("mozRequestFullScreen");
             canvas.mozRequestFullScreen();
         }
         else if (canvas.msRequestFullscreen) {
+            console.log("msRequestFullscreen");
             canvas.msRequestFullscreen();
         }
     }
@@ -6011,8 +6025,8 @@ var Scenes;
                 textArea.width = 100;
                 textArea.height = 300;
                 textArea.useColorTags = true;
-                textArea.horizAlign = HorizAlign.CENTER;
-                textArea.vertAlign = VertAlign.BOTTOM;
+                textArea.horizAlign = HorizAlign.LEFT;
+                textArea.vertAlign = VertAlign.MIDDLE;
                 textArea.borderWidth = 1;
                 textArea.layer = DrawLayer.UI;
                 textArea.order = 9999;
@@ -6855,6 +6869,7 @@ class TextArea extends DrawerComponent {
         this.horizAlign = HorizAlign.LEFT;
         this.vertAlign = VertAlign.TOP;
         this.text = "";
+        this.visibleChars = -1;
         this.useColorTags = true;
         this.width = 100;
         this.height = 50;
@@ -6904,11 +6919,13 @@ class TextArea extends DrawerComponent {
             context.fillStyle = this.color;
             let styleStack = [];
             styleStack.push(context.fillStyle);
+            let extraFormatting = this.useColorTags || this.visibleChars >= 0;
+            let charCount = 0;
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
                 let x = lineXs[i];
                 let y = y0 + i * this.lineSpacing;
-                if (this.useColorTags) {
+                if (extraFormatting) {
                     let start = 0;
                     let tagStart = 0;
                     let inTag = false;
@@ -6940,21 +6957,32 @@ class TextArea extends DrawerComponent {
                             }
                         }
                         else {
-                            if (c === 60) {
+                            if (this.useColorTags && c === 60) {
                                 let subStr = line.substring(start, j);
                                 context.fillText(subStr, x, y);
                                 x += context.measureText(subStr).width;
                                 tagStart = j + 1;
                                 inTag = true;
                             }
+                            else {
+                                charCount++;
+                                if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
+                                    context.fillText(line.substring(start, j), x, y);
+                                    break;
+                                }
+                            }
                         }
                     }
-                    if (!inTag) {
+                    if (!inTag &&
+                        !(this.visibleChars >= 0 && charCount >= this.visibleChars)) {
                         context.fillText(line.substring(start), x, y);
                     }
                 }
                 else {
                     context.fillText(line, x, y);
+                }
+                if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
+                    break;
                 }
             }
         };

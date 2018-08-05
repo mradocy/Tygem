@@ -95,11 +95,12 @@ namespace Scenes {
             go.transform.y = 300;
             textArea.text = "Here are a bunch of words <imp>making up <transparent>this</transparent> text.\nThis starts</imp> a new line.  What's new?    4    spaces    wow    lots    of    space.";
             //textArea.text = StringUtils.trimHTMLTags(textArea.text);
+            //textArea.visibleChars = 30;
             textArea.width = 100;
             textArea.height = 300;
             textArea.useColorTags = true;
-            textArea.horizAlign = HorizAlign.CENTER;
-            textArea.vertAlign = VertAlign.BOTTOM;
+            textArea.horizAlign = HorizAlign.LEFT;
+            textArea.vertAlign = VertAlign.MIDDLE;
             textArea.borderWidth = 1;
             textArea.layer = DrawLayer.UI;
             textArea.order = 9999;

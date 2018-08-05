@@ -112,13 +112,16 @@ namespace StringUtils {
 
             if (insideAngleBracket === 0 &&
                 context.measureText(str.substring(lineStart, i + 1)).width - angleBracketLineWidth > pixelWidth) { // if current character was added, line would become too long
-                
-                // make new line
-                ret.push(str.substring(lineStart, lineEnd));
-                // start next line after it ends
-                lineStart = lineEnd;
-                angleBracketLineWidth = 0;
 
+                if (lineStart !== lineEnd) { // don't make new line if entire word is longer than the width provided.
+
+                    // make new line
+                    ret.push(str.substring(lineStart, lineEnd));
+                    // start next line after it ends
+                    lineStart = lineEnd;
+                    angleBracketLineWidth = 0;
+                }
+                
             }
 
         }

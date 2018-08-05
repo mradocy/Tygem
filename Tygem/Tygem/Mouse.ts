@@ -84,6 +84,15 @@ namespace Mouse {
             buttonsHeld.push(event.button);
         }
         
+        // fullscreen.  Should be moved to a menu at some point
+        if (event.button === 2) {
+            if (Game.isFullscreen) {
+                Game.exitFullscreen();
+            } else {
+                Game.requestFullscreen();
+            }
+        }
+
     }
 
     function mouseUp(event: MouseEvent): void {

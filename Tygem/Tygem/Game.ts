@@ -112,15 +112,18 @@ class Game {
         
         let canvas: any = Game.canvas;
         if (canvas.requestFullscreen) {
+            console.log("requestFullscreen");
             canvas.requestFullscreen();
         } else if (canvas.webkitRequestFullscreen) {
+            console.log("webkitRequestFullscreen");
             canvas.webkitRequestFullscreen();
         } else if (canvas.mozRequestFullScreen) {
+            console.log("mozRequestFullScreen");
             canvas.mozRequestFullScreen();
         } else if (canvas.msRequestFullscreen) {
+            console.log("msRequestFullscreen");
             canvas.msRequestFullscreen();
         }
-        
     }
 
     /**

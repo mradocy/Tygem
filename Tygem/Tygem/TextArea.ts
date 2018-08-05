@@ -46,6 +46,14 @@ class TextArea extends DrawerComponent {
     
     text: string = "";
 
+
+    /**
+     * Limits the number of characters displayed.  Meant for text that appears over time character by character.  
+     * Set to -1 to display all characters.
+     */
+    visibleChars: number = -1;
+
+
     /**
      * Set to true (default) to handle color formatting tags.  If false, text will be considered as raw text.
      * Tags currently implemented:
@@ -142,13 +150,15 @@ class TextArea extends DrawerComponent {
         styleStack.push(context.fillStyle);
 
         // draw text lines
+        let extraFormatting: boolean = this.useColorTags || this.visibleChars >= 0;
+        let charCount: number = 0;
         for (let i: number = 0; i < lines.length; i++) {
 
             let line: string = lines[i];
             let x: number = lineXs[i];
             let y: number = y0 + i * this.lineSpacing;
 
-            if (this.useColorTags) {
+            if (extraFormatting) {
 
                 let start: number = 0;
                 let tagStart: number = 0;
@@ -188,7 +198,7 @@ class TextArea extends DrawerComponent {
                         }
                     } else {
                         // look for tag begin
-                        if (c === 60) { // '<'
+                        if (this.useColorTags && c === 60) { // '<'
 
                             // draw line up until this point
                             let subStr: string = line.substring(start, j);
@@ -198,26 +208,45 @@ class TextArea extends DrawerComponent {
                             // start tag
                             tagStart = j + 1;
                             inTag = true;
+                        } else {
+                            charCount++;
+                            if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
+                                // reached limit of characters
+
+                                // draw line up until this point
+                                context.fillText(line.substring(start, j), x, y);
+
+                                // don't draw anymore
+                                break;
+                            }
                         }
                     }
                     
                 }
 
                 // draw last part of text
-                if (!inTag) {
+                if (!inTag && // not currently in a tag (shouldn't happen)
+                    !(this.visibleChars >= 0 && charCount >= this.visibleChars)) // haven't reached character limit already
+                { 
                     context.fillText(line.substring(start), x, y);
                 }
                 
-            } else {
+            } else { // no formatting
 
-                // no formatting, draw full line at once
+                // draw full line at once
                 context.fillText(line, x, y);
 
             }
-            
+
+            if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
+                // don't draw anymore if reached limit of characters
+                break;
+            }
+
         }
         
     }
+
     
 }
 

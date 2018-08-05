@@ -103,7 +103,7 @@ namespace Keys {
         }
         
         // fullscreen.  Should be moved to a menu at some point
-        if (event.keyCode == Key.F10) {
+        if (event.keyCode === Key.F10) {
 
             if (Game.isFullscreen) {
                 Game.exitFullscreen();
@@ -115,7 +115,7 @@ namespace Keys {
 
         if (event.keyCode !== Key.Shift) {
             console.log(event.keyCode);
-            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)));
+            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)) === "");
         }
         
     }
