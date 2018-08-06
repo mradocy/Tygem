@@ -1310,6 +1310,10 @@ var Keys;
         return s;
     }
     Keys.keyToString = keyToString;
+    function keyCodeToString(keyCode) {
+        return keyToString(keyCode);
+    }
+    Keys.keyCodeToString = keyCodeToString;
     function getKeyCodesPressed() {
         return keysPressed.concat([]);
     }
@@ -3925,7 +3929,21 @@ class InputTextArea extends TextArea {
             let shiftHeld = Keys.keyHeld(Key.Shift);
             let keyCodesPressed = Keys.getKeyCodesPressed();
             for (let i = 0; i < keyCodesPressed.length; i++) {
-                let str = StringUtils.stringFromKeyCode(keyCodesPressed[i], shiftHeld);
+                let key = keyCodesPressed[i];
+                let tryStr = false;
+                switch (key) {
+                    case Key.LeftArrow:
+                        this.inputIndex = Math.max(0, this.inputIndex - 1);
+                        break;
+                    case Key.RightArrow:
+                        this.inputIndex = Math.min(this.text.length, this.inputIndex + 1);
+                        break;
+                    default:
+                        tryStr = true;
+                }
+                if (!tryStr)
+                    continue;
+                let str = StringUtils.stringFromKeyCode(key, shiftHeld);
                 if (str === "")
                     continue;
                 if (this.inputIndex >= this.text.length) {
@@ -6295,6 +6313,8 @@ var Scenes;
                 inputTextArea.layer = DrawLayer.UI;
                 inputTextArea.order = 9999;
                 inputTextArea.inputEnabled = true;
+                inputTextArea.horizAlign = HorizAlign.LEFT;
+                inputTextArea.vertAlign = VertAlign.BOTTOM;
             };
             this.onUnload = () => { };
         }

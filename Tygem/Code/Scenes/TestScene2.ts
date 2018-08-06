@@ -117,6 +117,8 @@ namespace Scenes {
             inputTextArea.layer = DrawLayer.UI;
             inputTextArea.order = 9999;
             inputTextArea.inputEnabled = true;
+            inputTextArea.horizAlign = HorizAlign.LEFT;
+            inputTextArea.vertAlign = VertAlign.BOTTOM;
 
 
         }

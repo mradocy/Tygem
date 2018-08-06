@@ -35,7 +35,22 @@ class InputTextArea extends TextArea {
         let keyCodesPressed: Array<number> = Keys.getKeyCodesPressed();
 
         for (let i: number = 0; i < keyCodesPressed.length; i++) {
-            let str: string = StringUtils.stringFromKeyCode(keyCodesPressed[i], shiftHeld);
+
+            let key: Key = keyCodesPressed[i];
+            let tryStr: boolean = false;
+            switch (key) {
+                case Key.LeftArrow:
+                    this.inputIndex = Math.max(0, this.inputIndex - 1);
+                    break;
+                case Key.RightArrow:
+                    this.inputIndex = Math.min(this.text.length, this.inputIndex + 1);
+                    break;
+                default:
+                    tryStr = true;
+            }
+            if (!tryStr) continue;
+
+            let str: string = StringUtils.stringFromKeyCode(key, shiftHeld);
             if (str === "") continue;
 
             if (this.inputIndex >= this.text.length) {

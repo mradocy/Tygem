@@ -64,6 +64,13 @@ namespace Keys {
         let s: string = Key[key];
         return s;
     }
+    /**
+     * Gets a string representation of the given keyCode.
+     * @param keyCode
+     */
+    export function keyCodeToString(keyCode: number): string {
+        return keyToString(keyCode);
+    }
 
     /**
      * Gets the key codes of all the keys that were pressed this frame.
@@ -111,11 +118,6 @@ namespace Keys {
                 Game.requestFullscreen();
             }
 
-        }
-
-        if (event.keyCode !== Key.Shift) {
-            console.log(event.keyCode);
-            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)) === "");
         }
         
     }
