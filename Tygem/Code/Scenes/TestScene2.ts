@@ -104,10 +104,19 @@ namespace Scenes {
             textArea.borderWidth = 1;
             textArea.layer = DrawLayer.UI;
             textArea.order = 9999;
-
-            //Game.context.font = textArea.font;
-            //console.log(StringUtils.splitToLines(textArea.text, textArea.width, Game.context, true));
-
+            
+            // test input text area
+            go = new GameObject();
+            let inputTextArea: InputTextArea = go.addComponent(InputTextArea);
+            go.transform.x = 500;
+            go.transform.y = 200;
+            inputTextArea.text = "Start text";
+            inputTextArea.width = 200;
+            inputTextArea.height = 300;
+            inputTextArea.borderWidth = 1;
+            inputTextArea.layer = DrawLayer.UI;
+            inputTextArea.order = 9999;
+            inputTextArea.inputEnabled = true;
 
 
         }

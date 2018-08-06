@@ -706,7 +706,7 @@ var StringUtils;
             }
             else if (c === 10) {
                 lineEnd = i;
-                ret.push(str.substring(lineStart, lineEnd));
+                ret.push(str.substring(lineStart, lineEnd + 1));
                 lineStart = lineEnd + 1;
                 lineEnd = lineStart;
                 angleBracketLineWidth = 0;
@@ -762,7 +762,7 @@ var StringUtils;
         "", "", "", "", "", "", "", "", "", "",
         "", "", "", "\n", "", "", "", "", "", "",
         "", "", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "",
+        "", "", " ", "", "", "", "", "", "", "",
         "", "", "", "", "", "", "", "", "0", "1",
         "2", "3", "4", "5", "6", "7", "8", "9", "", "",
         "", "", "", "", "", "a", "b", "c", "d", "e",
@@ -787,7 +787,7 @@ var StringUtils;
         "", "", "", "", "", "", "", "", "", "",
         "", "", "", "\n", "", "", "", "", "", "",
         "", "", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "",
+        "", "", " ", "", "", "", "", "", "", "",
         "", "", "", "", "", "", "", "", ")", "!",
         "@", "#", "$", "%", "^", "&", "*", "(", "", "",
         "", "", "", "", "", "A", "B", "C", "D", "E",
@@ -3699,6 +3699,260 @@ class SpriteRenderer extends PackedImageRenderer {
         this.name = "SpriteRenderer";
     }
 }
+var HorizAlign;
+(function (HorizAlign) {
+    HorizAlign[HorizAlign["LEFT"] = 0] = "LEFT";
+    HorizAlign[HorizAlign["CENTER"] = 1] = "CENTER";
+    HorizAlign[HorizAlign["RIGHT"] = 2] = "RIGHT";
+})(HorizAlign || (HorizAlign = {}));
+var VertAlign;
+(function (VertAlign) {
+    VertAlign[VertAlign["TOP"] = 0] = "TOP";
+    VertAlign[VertAlign["MIDDLE"] = 1] = "MIDDLE";
+    VertAlign[VertAlign["BOTTOM"] = 2] = "BOTTOM";
+})(VertAlign || (VertAlign = {}));
+class TextArea extends DrawerComponent {
+    constructor() {
+        super();
+        this.text = "";
+        this.visibleChars = -1;
+        this.fontName = "Verdana";
+        this.fontSize = 12;
+        this.getFont = () => {
+            return "" + this.fontSize + "px " + this.fontName;
+        };
+        this.lineSpacing = 16;
+        this.width = 100;
+        this.height = 50;
+        this.horizAlign = HorizAlign.LEFT;
+        this.vertAlign = VertAlign.TOP;
+        this.color = "#FFFFFF";
+        this.useColorTags = true;
+        this.borderWidth = 0;
+        this.borderStyle = "#FFFFFF";
+        this.draw = (context) => {
+            this.TextArea_draw(context);
+        };
+        this.getCharacterPosition = (index, context, outPos = null) => {
+            let x = 0;
+            let y = 0;
+            context.font = this.getFont();
+            let lines = StringUtils.splitToLines(this.text, this.width, context, this.useColorTags);
+            switch (this.vertAlign) {
+                case VertAlign.TOP:
+                    y = -this.height / 2;
+                    break;
+                case VertAlign.MIDDLE:
+                    y = 0 - this.lineSpacing * (lines.length - 1.0) / 2;
+                    y -= this.fontSize / 2;
+                    break;
+                case VertAlign.BOTTOM:
+                    y = this.height / 2 - this.lineSpacing * (lines.length - 1);
+                    y -= this.fontSize;
+                    break;
+            }
+            let line;
+            let indexInLine = 0;
+            let indexCount = 0;
+            for (let i = 0; i < lines.length; i++) {
+                let l = this.useColorTags ? StringUtils.trimHTMLTags(lines[i]) : lines[i];
+                if (index < indexCount + l.length || i === lines.length - 1) {
+                    line = l;
+                    indexInLine = Math.max(0, Math.min(l.length, index - indexCount));
+                    y += i * this.lineSpacing;
+                    break;
+                }
+                indexCount += l.length;
+            }
+            let lineWidth = context.measureText(line).width;
+            switch (this.horizAlign) {
+                case HorizAlign.LEFT:
+                    x = -this.width / 2;
+                    break;
+                case HorizAlign.CENTER:
+                    x = -lineWidth / 2;
+                    break;
+                case HorizAlign.RIGHT:
+                    x = this.width / 2 - lineWidth;
+                    break;
+            }
+            x += context.measureText(line.substring(0, indexInLine)).width;
+            if (outPos == null) {
+                return new Vec2(x, y);
+            }
+            outPos.setValues(x, y);
+            return null;
+        };
+        this.TextArea_draw = (context) => {
+            if (this.borderWidth > 0) {
+                context.beginPath();
+                context.strokeStyle = this.borderStyle;
+                context.lineWidth = this.borderWidth;
+                context.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                context.stroke();
+            }
+            context.font = this.getFont();
+            let lines = StringUtils.splitToLines(this.text, this.width, context, this.useColorTags);
+            let y0 = 0;
+            context.textAlign = "left";
+            let lineXs = Array(lines.length);
+            for (let i = 0; i < lines.length; i++) {
+                let lineWidth = context.measureText(this.useColorTags ? StringUtils.trimRight(StringUtils.trimHTMLTags(lines[i])) : StringUtils.trimRight(lines[i])).width;
+                switch (this.horizAlign) {
+                    case HorizAlign.LEFT:
+                        lineXs[i] = -this.width / 2;
+                        break;
+                    case HorizAlign.CENTER:
+                        lineXs[i] = -lineWidth / 2;
+                        break;
+                    case HorizAlign.RIGHT:
+                        lineXs[i] = this.width / 2 - lineWidth;
+                        break;
+                }
+            }
+            switch (this.vertAlign) {
+                case VertAlign.TOP:
+                    context.textBaseline = "top";
+                    y0 = -this.height / 2;
+                    break;
+                case VertAlign.MIDDLE:
+                    context.textBaseline = "middle";
+                    y0 = 0 - this.lineSpacing * (lines.length - 1.0) / 2;
+                    break;
+                case VertAlign.BOTTOM:
+                    context.textBaseline = "bottom";
+                    y0 = this.height / 2 - this.lineSpacing * (lines.length - 1);
+                    break;
+            }
+            context.fillStyle = this.color;
+            let styleStack = [];
+            styleStack.push(context.fillStyle);
+            let extraFormatting = this.useColorTags || this.visibleChars >= 0;
+            let charCount = 0;
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let x = lineXs[i];
+                let y = y0 + i * this.lineSpacing;
+                if (extraFormatting) {
+                    let start = 0;
+                    let tagStart = 0;
+                    let inTag = false;
+                    for (let j = 0; j < line.length; j++) {
+                        let c = line.charCodeAt(j);
+                        if (inTag) {
+                            if (c === 62) {
+                                let tag = line.substring(tagStart, j).trim();
+                                if (tag.indexOf("/") === 0) {
+                                    if (styleStack.length <= 1) {
+                                        console.error("Improperly placed tag '" + tag + "' in text '" + this.text + "'");
+                                    }
+                                    else {
+                                        styleStack.pop();
+                                    }
+                                }
+                                else {
+                                    let style = TextArea.fontFillStyleFromTag(tag);
+                                    if (style === null) {
+                                        console.error("Tag '" + tag + "' not defined.");
+                                    }
+                                    else {
+                                        styleStack.push(style);
+                                    }
+                                }
+                                context.fillStyle = styleStack[styleStack.length - 1];
+                                inTag = false;
+                                start = j + 1;
+                            }
+                        }
+                        else {
+                            if (this.useColorTags && c === 60) {
+                                let subStr = line.substring(start, j);
+                                context.fillText(subStr, x, y);
+                                x += context.measureText(subStr).width;
+                                tagStart = j + 1;
+                                inTag = true;
+                            }
+                            else {
+                                charCount++;
+                                if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
+                                    context.fillText(line.substring(start, j), x, y);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!inTag &&
+                        !(this.visibleChars >= 0 && charCount >= this.visibleChars)) {
+                        context.fillText(line.substring(start), x, y);
+                    }
+                }
+                else {
+                    context.fillText(line, x, y);
+                }
+                if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
+                    break;
+                }
+            }
+        };
+        this.name = "TextArea";
+        this.anchored = true;
+    }
+    static fontFillStyleFromTag(tag) {
+        if (tag === "imp") {
+            return TextArea.IMPORTANT_COLOR;
+        }
+        else if (tag === "transparent") {
+            return "transparent";
+        }
+        return null;
+    }
+}
+TextArea.IMPORTANT_COLOR = "#FFDE3A";
+class InputTextArea extends TextArea {
+    constructor() {
+        super();
+        this.inputEnabled = false;
+        this.inputIndex = 0;
+        this.onUpdate = () => {
+            if (this.useColorTags) {
+                console.warn("Cannot use color tags on an InputTextArea");
+                this.useColorTags = false;
+            }
+            this.inputIndex = Math.max(0, this.inputIndex);
+            this.inputIndex = Math.min(this.text.length, this.inputIndex);
+            if (!this.inputEnabled)
+                return;
+            let shiftHeld = Keys.keyHeld(Key.Shift);
+            let keyCodesPressed = Keys.getKeyCodesPressed();
+            for (let i = 0; i < keyCodesPressed.length; i++) {
+                let str = StringUtils.stringFromKeyCode(keyCodesPressed[i], shiftHeld);
+                if (str === "")
+                    continue;
+                if (this.inputIndex >= this.text.length) {
+                    this.text = this.text + str;
+                }
+                else {
+                    this.text = this.text.substring(0, this.inputIndex) + str + this.text.substring(this.inputIndex);
+                }
+                this.inputIndex++;
+            }
+        };
+        this.draw = (context) => {
+            this.TextArea_draw(context);
+            if (!this.inputEnabled)
+                return;
+            let carotPos = this.getCharacterPosition(this.inputIndex, context);
+            context.beginPath();
+            context.strokeStyle = "red";
+            context.lineWidth = 2;
+            context.moveTo(carotPos.x, carotPos.y);
+            context.lineTo(carotPos.x, carotPos.y + this.fontSize);
+            context.stroke();
+        };
+        this.name = "InputTextArea";
+        this.useColorTags = false;
+    }
+}
 class TiledMapTileLayerRenderer extends DrawerComponent {
     constructor() {
         super();
@@ -6030,6 +6284,17 @@ var Scenes;
                 textArea.borderWidth = 1;
                 textArea.layer = DrawLayer.UI;
                 textArea.order = 9999;
+                go = new GameObject();
+                let inputTextArea = go.addComponent(InputTextArea);
+                go.transform.x = 500;
+                go.transform.y = 200;
+                inputTextArea.text = "Start text";
+                inputTextArea.width = 200;
+                inputTextArea.height = 300;
+                inputTextArea.borderWidth = 1;
+                inputTextArea.layer = DrawLayer.UI;
+                inputTextArea.order = 9999;
+                inputTextArea.inputEnabled = true;
             };
             this.onUnload = () => { };
         }
@@ -6848,158 +7113,6 @@ class RaycastTestGizmo extends DrawerComponent {
         this.layer = DrawLayer.GIZMO;
     }
 }
-var HorizAlign;
-(function (HorizAlign) {
-    HorizAlign[HorizAlign["LEFT"] = 0] = "LEFT";
-    HorizAlign[HorizAlign["CENTER"] = 1] = "CENTER";
-    HorizAlign[HorizAlign["RIGHT"] = 2] = "RIGHT";
-})(HorizAlign || (HorizAlign = {}));
-var VertAlign;
-(function (VertAlign) {
-    VertAlign[VertAlign["TOP"] = 0] = "TOP";
-    VertAlign[VertAlign["MIDDLE"] = 1] = "MIDDLE";
-    VertAlign[VertAlign["BOTTOM"] = 2] = "BOTTOM";
-})(VertAlign || (VertAlign = {}));
-class TextArea extends DrawerComponent {
-    constructor() {
-        super();
-        this.font = "12px Verdana";
-        this.color = "#FFFFFF";
-        this.lineSpacing = 16;
-        this.horizAlign = HorizAlign.LEFT;
-        this.vertAlign = VertAlign.TOP;
-        this.text = "";
-        this.visibleChars = -1;
-        this.useColorTags = true;
-        this.width = 100;
-        this.height = 50;
-        this.borderWidth = 0;
-        this.borderStyle = "#FFFFFF";
-        this.draw = (context) => {
-            if (this.borderWidth > 0) {
-                context.beginPath();
-                context.strokeStyle = this.borderStyle;
-                context.lineWidth = this.borderWidth;
-                context.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
-                context.stroke();
-            }
-            context.font = this.font;
-            let lines = StringUtils.splitToLines(this.text, this.width, context, this.useColorTags);
-            let y0 = 0;
-            context.textAlign = "left";
-            let lineXs = Array(lines.length);
-            for (let i = 0; i < lines.length; i++) {
-                let lineWidth = context.measureText(this.useColorTags ? StringUtils.trimRight(StringUtils.trimHTMLTags(lines[i])) : StringUtils.trimRight(lines[i])).width;
-                switch (this.horizAlign) {
-                    case HorizAlign.LEFT:
-                        lineXs[i] = -this.width / 2;
-                        break;
-                    case HorizAlign.CENTER:
-                        lineXs[i] = -lineWidth / 2;
-                        break;
-                    case HorizAlign.RIGHT:
-                        lineXs[i] = this.width / 2 - lineWidth;
-                        break;
-                }
-            }
-            switch (this.vertAlign) {
-                case VertAlign.TOP:
-                    context.textBaseline = "top";
-                    y0 = -this.height / 2;
-                    break;
-                case VertAlign.MIDDLE:
-                    context.textBaseline = "middle";
-                    y0 = 0 - this.lineSpacing * (lines.length - 1.0) / 2;
-                    break;
-                case VertAlign.BOTTOM:
-                    context.textBaseline = "bottom";
-                    y0 = this.height / 2 - this.lineSpacing * (lines.length - 1);
-                    break;
-            }
-            context.fillStyle = this.color;
-            let styleStack = [];
-            styleStack.push(context.fillStyle);
-            let extraFormatting = this.useColorTags || this.visibleChars >= 0;
-            let charCount = 0;
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                let x = lineXs[i];
-                let y = y0 + i * this.lineSpacing;
-                if (extraFormatting) {
-                    let start = 0;
-                    let tagStart = 0;
-                    let inTag = false;
-                    for (let j = 0; j < line.length; j++) {
-                        let c = line.charCodeAt(j);
-                        if (inTag) {
-                            if (c === 62) {
-                                let tag = line.substring(tagStart, j).trim();
-                                if (tag.indexOf("/") === 0) {
-                                    if (styleStack.length <= 1) {
-                                        console.error("Improperly placed tag '" + tag + "' in text '" + this.text + "'");
-                                    }
-                                    else {
-                                        styleStack.pop();
-                                    }
-                                }
-                                else {
-                                    let style = TextArea.fontFillStyleFromTag(tag);
-                                    if (style === null) {
-                                        console.error("Tag '" + tag + "' not defined.");
-                                    }
-                                    else {
-                                        styleStack.push(style);
-                                    }
-                                }
-                                context.fillStyle = styleStack[styleStack.length - 1];
-                                inTag = false;
-                                start = j + 1;
-                            }
-                        }
-                        else {
-                            if (this.useColorTags && c === 60) {
-                                let subStr = line.substring(start, j);
-                                context.fillText(subStr, x, y);
-                                x += context.measureText(subStr).width;
-                                tagStart = j + 1;
-                                inTag = true;
-                            }
-                            else {
-                                charCount++;
-                                if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
-                                    context.fillText(line.substring(start, j), x, y);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (!inTag &&
-                        !(this.visibleChars >= 0 && charCount >= this.visibleChars)) {
-                        context.fillText(line.substring(start), x, y);
-                    }
-                }
-                else {
-                    context.fillText(line, x, y);
-                }
-                if (this.visibleChars >= 0 && charCount >= this.visibleChars) {
-                    break;
-                }
-            }
-        };
-        this.name = "TextArea";
-        this.anchored = true;
-    }
-    static fontFillStyleFromTag(tag) {
-        if (tag === "imp") {
-            return TextArea.IMPORTANT_COLOR;
-        }
-        else if (tag === "transparent") {
-            return "transparent";
-        }
-        return null;
-    }
-}
-TextArea.IMPORTANT_COLOR = "#FFDE3A";
 var Prefabs;
 (function (Prefabs) {
     function Thing1() {

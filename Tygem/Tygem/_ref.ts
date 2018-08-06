@@ -41,6 +41,8 @@
 /// <reference path="DrawerComponent.ts" />
 /// <reference path="PackedImageRenderer.ts" />
 /// <reference path="SpriteRenderer.ts" />
+/// <reference path="TextArea.ts" />
+/// <reference path="InputTextArea.ts" />
 
 /// <reference path="TiledMapTileLayerRenderer.ts" />
 /// <reference path="TiledMapComponent.ts" />
