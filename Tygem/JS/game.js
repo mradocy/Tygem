@@ -1343,10 +1343,6 @@ var Keys;
                 Game.requestFullscreen();
             }
         }
-        if (event.keyCode !== Key.Shift) {
-            console.log(event.keyCode);
-            console.log(StringUtils.stringFromKeyCode(event.keyCode, keyHeld(Key.Shift)) === "");
-        }
     }
     function keyUp(event) {
         if (keysReleased.indexOf(event.keyCode) == -1) {
@@ -3938,6 +3934,17 @@ class InputTextArea extends TextArea {
                     case Key.RightArrow:
                         this.inputIndex = Math.min(this.text.length, this.inputIndex + 1);
                         break;
+                    case Key.Backspace:
+                        if (this.inputIndex > 0) {
+                            this.text = this.text.substring(0, this.inputIndex - 1) + this.text.substring(this.inputIndex);
+                            this.inputIndex--;
+                        }
+                        break;
+                    case Key.Delete:
+                        if (this.inputIndex < this.text.length) {
+                            this.text = this.text.substring(0, this.inputIndex) + this.text.substring(this.inputIndex + 1);
+                        }
+                        break;
                     default:
                         tryStr = true;
                 }
@@ -6286,10 +6293,6 @@ var Scenes;
                 go = new GameObject();
                 go.addComponent(Comps.DotFollowsMouse);
                 go = new GameObject();
-                let button = go.addComponent(Comps.Button);
-                go.transform.x = 300;
-                go.transform.y = 200;
-                go = new GameObject();
                 let textArea = go.addComponent(TextArea);
                 go.transform.x = 200;
                 go.transform.y = 300;
@@ -6605,36 +6608,6 @@ var Comps;
         }
     }
     Comps.ArrowTestPlatController = ArrowTestPlatController;
-})(Comps || (Comps = {}));
-var Comps;
-(function (Comps) {
-    class Button extends DrawerComponent {
-        constructor() {
-            super();
-            this.fillStyle = "#FF0000";
-            this.borderStyle = "#00FF00";
-            this.borderWidth = 1;
-            this.width = 100;
-            this.height = 50;
-            this.textFont = "12px Verdana";
-            this.textColor = "#FFFFFF";
-            this.draw = (context) => {
-                context.fillStyle = this.fillStyle;
-                context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-                context.lineWidth = this.borderWidth;
-                context.strokeStyle = this.borderStyle;
-                context.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
-                context.font = this.textFont;
-                context.textAlign = "center";
-                context.textBaseline = "middle";
-                context.fillStyle = this.textColor;
-                context.fillText("test text", 0, 0);
-            };
-            this.name = "Button";
-            this.anchored = true;
-        }
-    }
-    Comps.Button = Button;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {

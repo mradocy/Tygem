@@ -81,13 +81,7 @@ namespace Scenes {
             // test sound
             //go = new GameObject();
             //go.addComponent(Comps.TestSound);
-
-            // test button
-            go = new GameObject();
-            let button: Comps.Button = go.addComponent(Comps.Button);
-            go.transform.x = 300;
-            go.transform.y = 200;
-            
+                        
             // test text area
             go = new GameObject();
             let textArea: TextArea = go.addComponent(TextArea);

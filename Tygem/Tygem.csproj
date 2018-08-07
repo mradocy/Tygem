@@ -35,7 +35,6 @@
     <TypeScriptCompile Include="Code\add_Tilemaps.ts" />
     <TypeScriptCompile Include="Code\Components\ArrowTestController.ts" />
     <TypeScriptCompile Include="Code\Components\ArrowTestPlatController.ts" />
-    <TypeScriptCompile Include="Code\Components\Button.ts" />
     <TypeScriptCompile Include="Code\Components\ControlCameraWithWASD.ts" />
     <TypeScriptCompile Include="Code\Components\DotFollowsMouse.ts" />
     <TypeScriptCompile Include="Code\Components\DotGraphic.ts" />

@@ -45,6 +45,17 @@ class InputTextArea extends TextArea {
                 case Key.RightArrow:
                     this.inputIndex = Math.min(this.text.length, this.inputIndex + 1);
                     break;
+                case Key.Backspace:
+                    if (this.inputIndex > 0) {
+                        this.text = this.text.substring(0, this.inputIndex - 1) + this.text.substring(this.inputIndex);
+                        this.inputIndex--;
+                    }
+                    break;
+                case Key.Delete:
+                    if (this.inputIndex < this.text.length) {
+                        this.text = this.text.substring(0, this.inputIndex) + this.text.substring(this.inputIndex + 1);
+                    }
+                    break;
                 default:
                     tryStr = true;
             }
