@@ -2924,7 +2924,10 @@ var TiledMap;
                 this.width = jsonObj.width;
                 this.height = jsonObj.height;
                 this.visible = jsonObj.visible;
-                this.customProperties = jsonObj.properties;
+                if (jsonObj.properties == undefined)
+                    this.customProperties = undefined;
+                else
+                    this.customProperties = JSON.parse(JSON.stringify(jsonObj.properties));
                 if (this.customProperties == undefined)
                     this.customProperties = {};
             };
@@ -2934,7 +2937,6 @@ var TiledMap;
             this.Layer_dispose = () => {
                 this.mapData = null;
                 this.customProperties = null;
-                console.log("layer disposed");
             };
             this.type = LayerType.NONE;
         }
@@ -2943,6 +2945,7 @@ var TiledMap;
     class TileLayer extends Layer {
         constructor() {
             super();
+            this.tileData = null;
             this.getTileData = (x, y) => {
                 if (!this.coordinatesAreValid(x, y)) {
                     return 0;
@@ -2989,7 +2992,13 @@ var TiledMap;
             };
             this.parse = (jsonObj) => {
                 this.Layer_parse(jsonObj);
-                this.tileData = jsonObj.data;
+                if (this.tileData != null) {
+                    this.tileData.splice(0);
+                }
+                this.tileData = new Array(jsonObj.data.length);
+                for (let i = 0; i < jsonObj.data.length; i++) {
+                    this.tileData[i] = jsonObj.data[i];
+                }
             };
             this.dispose = () => {
                 this.tileData.splice(0);
@@ -3061,6 +3070,7 @@ var TiledMap;
             this.getNumColumns = () => {
                 return Math.floor(this.imageWidth / this.tileWidth);
             };
+            this.external = false;
             this.parse = (tilesetJSON) => {
                 if (TiledMap.tilesetImageDirectory == null || TiledMap.tilesetImageDirectory == "") {
                     console.error("TiledMap.tilesetImageDirectory must be defined before creating tilesets.");
@@ -3125,6 +3135,9 @@ var TiledMap;
                 }
             };
             this.dispose = () => {
+                if (this.external) {
+                    console.warn("external tilesets should not be disposed");
+                }
                 if (this.tileInfos == null)
                     return;
                 for (let i = 0; i < this.tileInfos.length; i++) {
@@ -3168,10 +3181,12 @@ var TiledMap;
                 }
                 else if (jsonObject.polygon != undefined) {
                     this.objectType = ObjectType.POLYGON;
+                    console.log("Problem with setting properties to reference of jsonObj");
                     objPoints = jsonObject.polygon;
                 }
                 else if (jsonObject.polyline != undefined) {
                     this.objectType = ObjectType.POLYLINE;
+                    console.log("Problem with setting properties to reference of jsonObj");
                     objPoints = jsonObject.polyline;
                 }
                 else {
@@ -3230,7 +3245,10 @@ var TiledMap;
                 this.width = jsonObj.width;
                 this.tileWidth = jsonObj.tilewidth;
                 this.tileHeight = jsonObj.tileheight;
-                this.customProperties = jsonObj.properties;
+                if (jsonObj.properties == undefined)
+                    this.customProperties = undefined;
+                else
+                    this.customProperties = JSON.parse(JSON.stringify(jsonObj.properties));
                 if (this.customProperties == undefined)
                     this.customProperties = {};
                 for (let i = 0; i < jsonObj.layers.length; i++) {
@@ -3376,11 +3394,12 @@ var TiledMap;
                 });
                 this.layers = null;
                 this._tilesets.forEach(function (tilesetElement) {
-                    tilesetElement.tileset.dispose();
+                    if (!tilesetElement.tileset.external) {
+                        tilesetElement.tileset.dispose();
+                    }
                 });
                 this._tilesets = null;
                 this.customProperties = null;
-                console.log("map data disposed");
             };
             this._tilesets = [];
             this._parsed = false;
@@ -3390,10 +3409,11 @@ var TiledMap;
                 console.warn("Tileset with name \"" + tilesetName + "\" already exists.");
                 return;
             }
+            tileset.external = true;
             MapData.externalTilesets[tilesetName] = tileset;
         }
         static getExternalTileset(tilesetSource) {
-            if (MapData.externalTilesetExists(tilesetSource)) {
+            if (!MapData.externalTilesetExists(tilesetSource)) {
                 console.error("Tileset \"" + tilesetSource + "\" does not exist.");
                 return null;
             }
@@ -6120,6 +6140,10 @@ var Debug;
         return Scene.getAllScenes(searchPrefix);
     }
     Debug.listScenes = listScenes;
+    function loadScene(sceneName) {
+        Scene.loadScene(sceneName);
+    }
+    Debug.loadScene = loadScene;
 })(Debug || (Debug = {}));
 class Game {
     static initialize(canvas) {
@@ -6228,6 +6252,7 @@ class Game {
         return Game.percentLoaded >= 1 && Game.userInputSatisfied;
     }
     static gameLoop() {
+        Game.inGameLoop = true;
         requestAnimationFrame(Game.gameLoop);
         Game.context.fillStyle = "black";
         Game.context.fillRect(0, 0, Game.canvas.width, Game.canvas.height);
@@ -6244,6 +6269,7 @@ class Game {
         Scene._unloadMarkedScenes();
         Keys._lateUpdate();
         Mouse._lateUpdate();
+        Game.inGameLoop = false;
     }
     static get timeStamp() {
         return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -6273,6 +6299,7 @@ Game.MAX_UNSCALED_DELTA_TIME = .1;
 Game.timeScale = 1;
 Game.preloadScene = "BasePreloadScene";
 Game.startScene = "";
+Game.inGameLoop = false;
 Game._userInputSatisfied = false;
 Game.initialized = false;
 Game.lastTimeStamp = 0;
@@ -6429,7 +6456,8 @@ var Scenes;
                 let tmGO = tm.createGameObject();
                 let go = new GameObject();
                 go.addComponent(Comps.ControlCameraWithWASD);
-                Camera.setCenter(GameObject.findObject("Hero").transform.getGlobalPosition());
+                go = GameObject.findObject("Hero");
+                Camera.setCenter(go.transform.getGlobalPosition());
             };
         }
     }
@@ -6537,18 +6565,6 @@ TiledMap.addMap("test4", { "height": 40,
                     "width": 0,
                     "x": 44.5,
                     "y": 55
-                },
-                {
-                    "height": 0,
-                    "id": 3,
-                    "name": "",
-                    "properties": {},
-                    "rotation": 0,
-                    "type": "Hero",
-                    "visible": true,
-                    "width": 0,
-                    "x": 15,
-                    "y": 83
                 }],
             "opacity": 1,
             "type": "objectgroup",
@@ -6686,7 +6702,9 @@ TiledMap.addMap("test5", { "height": 20,
         }],
     "nextobjectid": 2,
     "orientation": "orthogonal",
-    "properties": {},
+    "properties": {
+        "prop1": "prop val"
+    },
     "renderorder": "right-down",
     "tileheight": 16,
     "tilesets": [

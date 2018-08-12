@@ -49,6 +49,7 @@ namespace Comps {
 
             this.updateAnimation();
 
+            
         }
 
         idle = (): void => {

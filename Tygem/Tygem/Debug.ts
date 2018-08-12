@@ -10,7 +10,6 @@ namespace Debug {
      * @param searchPrefix If given, limits results to names that start with this string.
      */
     export function listSprites(searchPrefix: string = ""): Array<string> {
-
         return TexPackManager.getAllPackedImages(searchPrefix);
     }
 
@@ -19,7 +18,6 @@ namespace Debug {
      * @param searchPrefix If given, limits results to names that start with this string.
      */
     export function listSounds(searchPrefix: string = ""): Array<string> {
-
         return AudioManager.getAllSounds(searchPrefix);
     }
 
@@ -28,7 +26,6 @@ namespace Debug {
      * @param searchPrefix If given, limits results to names that start with this string.
      */
     export function listAnimations(searchPrefix: string = ""): Array<string> {
-
         return Animation.getAllAnimations(searchPrefix);
     }
 
@@ -37,8 +34,14 @@ namespace Debug {
      * @param searchPrefix If given, limits results to names that start with this string.
      */
     export function listScenes(searchPrefix: string = ""): Array<string> {
-
         return Scene.getAllScenes(searchPrefix);
     }
 
+    /**
+     * Load the given scene at the end of the next frame.
+     */
+    export function loadScene(sceneName: string): void {
+        Scene.loadScene(sceneName);
+    }
+    
 }

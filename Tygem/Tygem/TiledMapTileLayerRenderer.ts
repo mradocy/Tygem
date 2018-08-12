@@ -110,7 +110,7 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
                 tileInfo = this.tiledMapLayer.mapData.getTileInfo(gid);
                 tileset = tileInfo.tileset;
                 id = tileInfo.id;
-
+                
                 numColumns = tileset.getNumColumns();
                 tilesetX = id % numColumns;
                 tilesetY = Math.floor(id / numColumns);

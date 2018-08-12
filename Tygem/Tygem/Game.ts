@@ -225,11 +225,15 @@ class Game {
     // Private
 
 
+    public static inGameLoop: boolean = false;
+
     /**
      * gameLoop that runs the game.
      */
     private static gameLoop(): void {
-        
+
+        Game.inGameLoop = true;
+
         // makes sure that gameLoop is called every time the game draws a new frame to the canvas
         requestAnimationFrame(Game.gameLoop);
 
@@ -278,6 +282,7 @@ class Game {
         Keys._lateUpdate();
         Mouse._lateUpdate();
 
+        Game.inGameLoop = false;
     }
 
     /**

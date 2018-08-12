@@ -194,7 +194,10 @@ namespace TiledMap {
             this.width = jsonObj.width;
             this.height = jsonObj.height;
             this.visible = jsonObj.visible;
-            this.customProperties = jsonObj.properties;
+            if (jsonObj.properties == undefined)
+                this.customProperties = undefined;
+            else
+                this.customProperties = JSON.parse(JSON.stringify(jsonObj.properties)); // making copy instead of reference
             if (this.customProperties == undefined)
                 this.customProperties = {};
         }
@@ -206,8 +209,6 @@ namespace TiledMap {
         protected Layer_dispose = (): void => {
             this.mapData = null;
             this.customProperties = null;
-
-            console.log("layer disposed");
         }
 
     }
@@ -222,7 +223,7 @@ namespace TiledMap {
         /**
          * Direct access to the tile data.
          */
-        tileData: Array<number>;
+        tileData: Array<number> = null;
 
         /**
          * Gets the number at the given coordinates, or 0 if coordinates are invalid. 
@@ -300,7 +301,14 @@ namespace TiledMap {
         parse = (jsonObj: any): void => {
             this.Layer_parse(jsonObj);
 
-            this.tileData = jsonObj.data;
+            // setting tileData to a copy of the data in jsonObj
+            if (this.tileData != null) {
+                this.tileData.splice(0);
+            }
+            this.tileData = new Array<number>(jsonObj.data.length);
+            for (let i: number = 0; i < jsonObj.data.length; i++) {
+                this.tileData[i] = jsonObj.data[i];
+            }
         }
 
         
@@ -464,6 +472,11 @@ namespace TiledMap {
          * Guaranteed to contain an entry for every tile id in this tileset.
          */
         tileInfos: Array<TileInfo>;
+
+        /**
+         * If is an externally loaded tileset.
+         */
+        external: boolean = false;
         
     
         /**
@@ -549,6 +562,10 @@ namespace TiledMap {
          */
         dispose = (): void => {
 
+            if (this.external) {
+                console.warn("external tilesets should not be disposed");
+            }
+
             if (this.tileInfos == null) return;
             for (let i: number = 0; i < this.tileInfos.length; i++) {
                 TileInfo.recycle(this.tileInfos[i]);
@@ -632,9 +649,11 @@ namespace TiledMap {
                 this.objectType = ObjectType.ELLIPSE;
             } else if (jsonObject.polygon != undefined) {
                 this.objectType = ObjectType.POLYGON;
+                console.log("Problem with setting properties to reference of jsonObj");
                 objPoints = jsonObject.polygon;
             } else if (jsonObject.polyline != undefined) {
                 this.objectType = ObjectType.POLYLINE;
+                console.log("Problem with setting properties to reference of jsonObj");
                 objPoints = jsonObject.polyline;
             } else {
                 this.objectType = ObjectType.RECTANGLE;
@@ -725,7 +744,10 @@ namespace TiledMap {
             this.width = jsonObj.width;
             this.tileWidth = jsonObj.tilewidth;
             this.tileHeight = jsonObj.tileheight;
-            this.customProperties = jsonObj.properties;
+            if (jsonObj.properties == undefined)
+                this.customProperties = undefined;
+            else
+                this.customProperties = JSON.parse(JSON.stringify(jsonObj.properties)); // making copy, not reference
             if (this.customProperties == undefined)
                 this.customProperties = {};
 
@@ -971,14 +993,14 @@ namespace TiledMap {
 
             this._tilesets.forEach(
                 function (tilesetElement: TilesetElement): void {
-                    tilesetElement.tileset.dispose();
+                    if (!tilesetElement.tileset.external) { // external tilesets will be reused, do not dispose
+                        tilesetElement.tileset.dispose();
+                    }
                 }
             );
             this._tilesets = null;
 
             this.customProperties = null;
-
-            console.log("map data disposed");
 
         }
 
@@ -994,11 +1016,12 @@ namespace TiledMap {
                 return;
             }
 
+            tileset.external = true;
             MapData.externalTilesets[tilesetName] = tileset;
         }
 
         private static getExternalTileset(tilesetSource: string): Tileset {
-            if (MapData.externalTilesetExists(tilesetSource)) {
+            if (!MapData.externalTilesetExists(tilesetSource)) {
                 console.error("Tileset \"" + tilesetSource + "\" does not exist.");
                 return null;
             }

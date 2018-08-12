@@ -24,7 +24,12 @@ namespace Scenes {
             
 
             // center camera on hero
-            Camera.setCenter(GameObject.findObject("Hero").transform.getGlobalPosition());
+            go = GameObject.findObject("Hero");
+            Camera.setCenter(go.transform.getGlobalPosition());
+            
+
+
+
 
 
         }

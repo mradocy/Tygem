@@ -127,21 +127,6 @@ TiledMap.addMap("test4",
                  "width":0,
                  "x":44.5,
                  "y":55
-                }, 
-                {
-                 "height":0,
-                 "id":3,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"Hero",
-                 "visible":true,
-                 "width":0,
-                 "x":15,
-                 "y":83
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -305,7 +290,7 @@ TiledMap.addMap("test5",
  "orientation":"orthogonal",
  "properties":
     {
-
+     "prop1":"prop val"
     },
  "renderorder":"right-down",
  "tileheight":16,

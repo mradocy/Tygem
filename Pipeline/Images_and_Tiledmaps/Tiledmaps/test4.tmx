@@ -2431,6 +2431,5 @@
  </layer>
  <objectgroup name="Object Layer 1">
   <object id="2" name="seebee" type="Sealime" x="44.5" y="55"/>
-  <object id="3" type="Hero" x="15" y="83"/>
  </objectgroup>
 </map>

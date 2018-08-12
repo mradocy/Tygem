@@ -53,7 +53,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-
+     "prop1":"prop val"
     },
  "renderorder":"right-down",
  "tileheight":16,
