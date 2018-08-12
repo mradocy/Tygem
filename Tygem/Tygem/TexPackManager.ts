@@ -126,12 +126,21 @@ namespace TexPackManager {
     export function getNumTexPacksLoaded(): number {
         return _numTexPacksLoaded;
     }
-
+    
     /**
-     * Writes all packed image filenames to the console.
+     * Returns a list of all the packed images by filename.
+     * @param searchPrefix If given, limits results to names that start with this string.
      */
-    export function consoleLogAllPackedImages(): void {
-        console.log(packedImageDictionary);
+    export function getAllPackedImages(searchPrefix: string = ""): Array<string> {
+        
+        let ret: Array<string> = [];
+        for (let tag in packedImageDictionary) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
     }
 
 

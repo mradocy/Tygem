@@ -161,6 +161,22 @@ namespace AudioManager {
             node.stop();
         });
     }
+
+    /**
+     * Returns a list of all sounds by filename.
+     * @param searchPrefix If given, limits results to names that start with this string.
+     */
+    export function getAllSounds(searchPrefix: string = ""): Array<string> {
+
+        let ret: Array<string> = [];
+        for (let tag in soundDictionary) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
+    }
     
     /**
      * Gets the volume of the gain node that all sound effects pass through.  This is a setting that'd be in an options menu.

@@ -10,6 +10,24 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
+	"filename": "platform.png",
+	"frame": {"x":1,"y":548,"w":98,"h":34},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
+	"sourceSize": {"w":128,"h":64},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "platform_2.png",
+	"frame": {"x":101,"y":548,"w":98,"h":34},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
+	"sourceSize": {"w":128,"h":64},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "sealime.png",
 	"frame": {"x":1,"y":1,"w":507,"h":360},
 	"rotated": false,
@@ -23,8 +41,8 @@
 	"version": "1.0",
 	"image": "texpack-0.png",
 	"format": "RGBA8888",
-	"size": {"w":509,"h":547},
+	"size": {"w":509,"h":583},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:7bbf61fa1a66d6c8ba733be1b36fd702:1ec87ae4c4de76e27479c468a06a271b:3fb75b380d0c159e20eb954cb0f232eb$"
+	"smartupdate": "$TexturePacker:SmartUpdate:0dff737157c1e19fa5e4f87e00280d54:90df36d6855158b372171dcf1d8e1973:3fb75b380d0c159e20eb954cb0f232eb$"
 }
 }

@@ -58,6 +58,7 @@
     <TypeScriptCompile Include="Tygem\BasePreloadScene.ts" />
     <TypeScriptCompile Include="Tygem\CollisionHandler.ts" />
     <TypeScriptCompile Include="Tygem\ColorParser.ts" />
+    <TypeScriptCompile Include="Tygem\Debug.ts" />
     <TypeScriptCompile Include="Tygem\InputTextArea.ts" />
     <TypeScriptCompile Include="Tygem\M.ts" />
     <TypeScriptCompile Include="Tygem\Material.ts" />

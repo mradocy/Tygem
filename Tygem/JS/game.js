@@ -1914,6 +1914,17 @@ var AudioManager;
         });
     }
     AudioManager.stopAllSounds = stopAllSounds;
+    function getAllSounds(searchPrefix = "") {
+        let ret = [];
+        for (let tag in soundDictionary) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
+    }
+    AudioManager.getAllSounds = getAllSounds;
     function getMasterSFXVolume() {
         return masterSFXGain.gain.value;
     }
@@ -2269,10 +2280,17 @@ var TexPackManager;
         return _numTexPacksLoaded;
     }
     TexPackManager.getNumTexPacksLoaded = getNumTexPacksLoaded;
-    function consoleLogAllPackedImages() {
-        console.log(packedImageDictionary);
+    function getAllPackedImages(searchPrefix = "") {
+        let ret = [];
+        for (let tag in packedImageDictionary) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
     }
-    TexPackManager.consoleLogAllPackedImages = consoleLogAllPackedImages;
+    TexPackManager.getAllPackedImages = getAllPackedImages;
     function jsonNameFromURL(jsonURL) {
         let index = Math.max(jsonURL.lastIndexOf("/"), jsonURL.lastIndexOf("\\"));
         let trimmedStr;
@@ -6035,6 +6053,17 @@ class TiledMapTileLayerPlatform extends Platform {
         this.platformObjects.push(this.platformObject);
     }
 }
+var Debug;
+(function (Debug) {
+    function listSprites(searchPrefix = "") {
+        return TexPackManager.getAllPackedImages(searchPrefix);
+    }
+    Debug.listSprites = listSprites;
+    function listSounds(searchPrefix = "") {
+        return AudioManager.getAllSounds(searchPrefix);
+    }
+    Debug.listSounds = listSounds;
+})(Debug || (Debug = {}));
 class Game {
     static initialize(canvas) {
         if (Game.initialized) {

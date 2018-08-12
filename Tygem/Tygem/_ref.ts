@@ -79,4 +79,6 @@
 
 
 
+/// <reference path="Debug.ts" />
+
 /// <reference path="Game.ts" />
