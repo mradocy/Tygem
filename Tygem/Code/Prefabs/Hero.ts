@@ -16,7 +16,8 @@ namespace Prefabs {
 
         let sr: SpriteRenderer = go.addComponent(SpriteRenderer);
         sr.imageSmoothingEnabled = false;
-        sr.playAnimationByName("hero_idle");
+
+        let hero: Comps.Hero = go.addComponent(Comps.Hero);
         
         return go;
     }

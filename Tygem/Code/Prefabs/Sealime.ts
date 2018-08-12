@@ -20,7 +20,7 @@ namespace Prefabs {
         
         let sr: SpriteRenderer = go.addComponent(SpriteRenderer);
         sr.imageSmoothingEnabled = false;
-        sr.playAnimationByName("sealime_leap", "sealime_idle");
+        sr.playAnimation("sealime_leap", "sealime_idle");
         sr.order = 1.0;
         sr.tintColor = "blue";
         sr.tintAmount = .5;

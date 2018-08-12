@@ -61,17 +61,36 @@ class SpriteRenderer extends PackedImageRenderer {
     }
 
     /**
-     * Plays the given animation.
-     * @param animation The animation to play.  Can be null to stop the animation.
+     * Plays the given animation.  
+     * @param animation The animation to play.  Can be the Animation object or a string being the name of the animation.  Can be null to stop the animation.
      * @param nextAnimation (default is null) The animation to play after the other animation finishes (doesn't apply when playing backwards).  This won't happen when set to null.
      */
-    playAnimation = (animation: Animation, nextAnimation: Animation = null): void => {
-        if (animation !== null && (animation.frames == null || animation.frames.length === 0)) {
-            console.error("Cannot play animation " + animation.name + " because it has no frames");
+    playAnimation = (animation: Animation | string, nextAnimation: Animation | string = null): void => {
+        if ((animation != null && (typeof animation === "string")) ||
+            (nextAnimation != null && (typeof nextAnimation === "string"))) {
+            if (nextAnimation == null) {
+                this.playAnimationByName(animation as string);
+            } else if (typeof nextAnimation === "string") {
+                this.playAnimationByName(animation as string, nextAnimation as string);
+            } else {
+                this.playAnimationByName(animation as string, (nextAnimation as Animation).name);
+            }
+            return;
+        }
+
+        let anim: Animation = null;
+        if (animation != null)
+            anim = animation as Animation;
+        let nextAnim: Animation = null;
+        if (nextAnimation != null)
+            nextAnim = nextAnimation as Animation;
+
+        if (anim !== null && (anim.frames == null || anim.frames.length === 0)) {
+            console.error("Cannot play animation " + anim.name + " because it has no frames");
             animation = null;
         }
-        this.animation = animation;
-        this.nextAnimation = nextAnimation;
+        this.animation = anim;
+        this.nextAnimation = nextAnim;
         if (this.animSpeed < 0 && this.animation !== null) {
             // playing backwards.  Start animation at the end
             this.animTime = this.animation.getDuration() - .0001;
@@ -84,7 +103,7 @@ class SpriteRenderer extends PackedImageRenderer {
      * @param animation The animation to play.  Can be "" to stop the animation.
      * @param nextAnimation (default is "") The animation to play after the other animation finishes (doesn't apply when playing backwards).  This won't happen when set to "".
      */
-    playAnimationByName = (animation: string, nextAnimation: string = ""): void => {
+    private playAnimationByName = (animation: string, nextAnimation: string = ""): void => {
         let anim: Animation = null;
         if (animation != null && animation !== "") {
             anim = Animation.getAnimation(animation);

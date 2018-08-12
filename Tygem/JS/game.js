@@ -3633,12 +3633,31 @@ class SpriteRenderer extends PackedImageRenderer {
             this.spriteFrame = null;
         };
         this.playAnimation = (animation, nextAnimation = null) => {
-            if (animation !== null && (animation.frames == null || animation.frames.length === 0)) {
-                console.error("Cannot play animation " + animation.name + " because it has no frames");
+            if ((animation != null && (typeof animation === "string")) ||
+                (nextAnimation != null && (typeof nextAnimation === "string"))) {
+                if (nextAnimation == null) {
+                    this.playAnimationByName(animation);
+                }
+                else if (typeof nextAnimation === "string") {
+                    this.playAnimationByName(animation, nextAnimation);
+                }
+                else {
+                    this.playAnimationByName(animation, nextAnimation.name);
+                }
+                return;
+            }
+            let anim = null;
+            if (animation != null)
+                anim = animation;
+            let nextAnim = null;
+            if (nextAnimation != null)
+                nextAnim = nextAnimation;
+            if (anim !== null && (anim.frames == null || anim.frames.length === 0)) {
+                console.error("Cannot play animation " + anim.name + " because it has no frames");
                 animation = null;
             }
-            this.animation = animation;
-            this.nextAnimation = nextAnimation;
+            this.animation = anim;
+            this.nextAnimation = nextAnim;
             if (this.animSpeed < 0 && this.animation !== null) {
                 this.animTime = this.animation.getDuration() - .0001;
             }
@@ -6263,7 +6282,9 @@ Spritesheet.addSpritesheet("sealime.png", 64, 64, 8, 41);
 Animation.addAnimation("sealime_idle", "sealime.png", [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
 Animation.addAnimation("sealime_leap", "sealime.png", [8, 9, 10, 11, 12, 13, 14, 15, 16, 17], 10, false);
 Spritesheet.addSpritesheet("hero/walk.png", 16, 32, 13, 52);
-Animation.addAnimation("hero_idle", "hero/walk.png", [0], 10, true);
+Animation.addAnimation("hero_idle_down", "hero/walk.png", [0], 10, true);
+Animation.addAnimation("hero_idle_right", "hero/walk.png", [13], 10, true);
+Animation.addAnimation("hero_idle_up", "hero/walk.png", [26], 10, true);
 Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 10, true);
 Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 10, true);
 Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 10, true);
@@ -6884,6 +6905,99 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
+    var Hero_State;
+    (function (Hero_State) {
+        Hero_State[Hero_State["NONE"] = 0] = "NONE";
+        Hero_State[Hero_State["IDLE"] = 1] = "IDLE";
+        Hero_State[Hero_State["WALK"] = 2] = "WALK";
+    })(Hero_State || (Hero_State = {}));
+    class Hero extends Component {
+        constructor() {
+            super();
+            this.onStart = () => {
+                this.actor = this.getComponent(Actor);
+                this.spriteRenderer = this.getComponent(SpriteRenderer);
+                this.faceDirection = Direction.DOWN;
+                this.idle();
+            };
+            this.onUpdate = () => {
+                this.leftHeld = Keys.keyHeld(Key.LeftArrow);
+                this.rightHeld = Keys.keyHeld(Key.RightArrow);
+                this.upHeld = Keys.keyHeld(Key.UpArrow);
+                this.downHeld = Keys.keyHeld(Key.DownArrow);
+                if (this.leftHeld !== this.rightHeld) {
+                    this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
+                    this.walk();
+                }
+                else if (this.upHeld !== this.downHeld) {
+                    this.faceDirection = this.upHeld ? Direction.UP : Direction.DOWN;
+                    this.walk();
+                }
+                else {
+                    this.idle();
+                }
+                this.updateAnimation();
+            };
+            this.idle = () => {
+                if (this.state === Hero_State.IDLE)
+                    return;
+                this.state = Hero_State.IDLE;
+            };
+            this.walk = () => {
+                if (this.state === Hero_State.WALK)
+                    return;
+                this.state = Hero_State.WALK;
+            };
+            this.updateAnimation = () => {
+                let anim = "hero";
+                let flipped = false;
+                switch (this.state) {
+                    case Hero_State.NONE:
+                        return;
+                    case Hero_State.IDLE:
+                        anim += "_idle";
+                        break;
+                    case Hero_State.WALK:
+                        anim += "_walk";
+                        break;
+                }
+                switch (this.faceDirection) {
+                    case Direction.NONE:
+                        return;
+                    case Direction.LEFT:
+                        flipped = true;
+                    case Direction.RIGHT:
+                        anim += "_right";
+                        break;
+                    case Direction.UP:
+                        anim += "_up";
+                        break;
+                    case Direction.DOWN:
+                        anim += "_down";
+                        break;
+                }
+                if (flipped === this.getTransform().scaleX > 0) {
+                    this.getTransform().scaleX *= -1;
+                }
+                if (this.spriteRenderer.getAnimation() === null ||
+                    this.spriteRenderer.getAnimation().name !== anim) {
+                    this.spriteRenderer.playAnimation(anim);
+                }
+            };
+            this.onDestroy = () => { };
+            this.leftHeld = false;
+            this.rightHeld = false;
+            this.upHeld = false;
+            this.downHeld = false;
+            this.state = Hero_State.NONE;
+            this.faceDirection = Direction.NONE;
+            this.name = "Hero";
+        }
+    }
+    Comps.Hero = Hero;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
     class MovePlatformWithIJKL extends Component {
         constructor() {
             super();
@@ -7124,7 +7238,7 @@ var Prefabs;
         go.addComponent(ActorGizmo);
         let sr = go.addComponent(SpriteRenderer);
         sr.imageSmoothingEnabled = false;
-        sr.playAnimationByName("hero_idle");
+        let hero = go.addComponent(Comps.Hero);
         return go;
     }
     Prefabs.Hero = Hero;
@@ -7144,7 +7258,7 @@ var Prefabs;
         let actorTestController = go.addComponent(Comps.ArrowTestController);
         let sr = go.addComponent(SpriteRenderer);
         sr.imageSmoothingEnabled = false;
-        sr.playAnimationByName("sealime_leap", "sealime_idle");
+        sr.playAnimation("sealime_leap", "sealime_idle");
         sr.order = 1.0;
         sr.tintColor = "blue";
         sr.tintAmount = .5;

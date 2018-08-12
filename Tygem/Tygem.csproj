@@ -39,6 +39,7 @@
     <TypeScriptCompile Include="Code\Components\DotFollowsMouse.ts" />
     <TypeScriptCompile Include="Code\Components\DotGraphic.ts" />
     <TypeScriptCompile Include="Code\Components\FacesMouse.ts" />
+    <TypeScriptCompile Include="Code\Components\Hero.ts" />
     <TypeScriptCompile Include="Code\Components\MovePlatformWithIJKL.ts" />
     <TypeScriptCompile Include="Code\Components\Preloader.ts" />
     <TypeScriptCompile Include="Code\Components\Template.ts" />
