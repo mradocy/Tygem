@@ -8,7 +8,7 @@ namespace Scenes {
 
             // zoom in camera
             Camera.scale = 2;
-
+            
 
             // make GameObjects
             

@@ -23,4 +23,22 @@ namespace Debug {
         return AudioManager.getAllSounds(searchPrefix);
     }
 
+    /**
+     * List all animations by name.
+     * @param searchPrefix If given, limits results to names that start with this string.
+     */
+    export function listAnimations(searchPrefix: string = ""): Array<string> {
+
+        return Animation.getAllAnimations(searchPrefix);
+    }
+
+    /**
+     * List all scenes by name.
+     * @param searchPrefix If given, limits results to names that start with this string.
+     */
+    export function listScenes(searchPrefix: string = ""): Array<string> {
+
+        return Scene.getAllScenes(searchPrefix);
+    }
+
 }

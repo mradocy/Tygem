@@ -2502,6 +2502,16 @@ class Animation {
             return null;
         return Animation.animationsDic[name];
     }
+    static getAllAnimations(searchPrefix = "") {
+        let ret = [];
+        for (let tag in Animation.animationsDic) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
+    }
 }
 Animation.animationsDic = {};
 class Camera {
@@ -2513,6 +2523,10 @@ class Camera {
     }
     static get context() {
         return Camera._context;
+    }
+    static setCenter(center) {
+        Camera.centerX = center.x;
+        Camera.centerY = center.y;
     }
     static get canvasWidth() {
         return Camera.context.canvas.width;
@@ -2693,6 +2707,16 @@ class Scene {
     static get numScenes() {
         return Scene._numScenes;
     }
+    static getAllScenes(searchPrefix = "") {
+        let ret = [];
+        for (let tag in Scene.dictionary) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
+    }
     static _loadScenesToLoad() {
         let scene;
         for (let i = 0; i < Scene.scenesToLoad.length; i++) {
@@ -2867,10 +2891,16 @@ var TiledMap;
             return null;
         if (mapObject.type === "") {
             console.warn("Map objects with type \"\" cannot be parsed.");
-            return;
+            return null;
         }
         if (objectParserDictionary.hasOwnProperty(mapObject.type)) {
-            return objectParserDictionary[mapObject.type](mapObject);
+            let go = objectParserDictionary[mapObject.type](mapObject);
+            if (go == null)
+                return go;
+            go.name = mapObject.name;
+            go.transform.x = mapObject.x;
+            go.transform.y = mapObject.y;
+            return go;
         }
         console.warn("No object parser found mapped to the type \"" + mapObject.type + "\".  Add a parse function in addObjectParser().");
         return null;
@@ -6063,6 +6093,14 @@ var Debug;
         return AudioManager.getAllSounds(searchPrefix);
     }
     Debug.listSounds = listSounds;
+    function listAnimations(searchPrefix = "") {
+        return Animation.getAllAnimations(searchPrefix);
+    }
+    Debug.listAnimations = listAnimations;
+    function listScenes(searchPrefix = "") {
+        return Scene.getAllScenes(searchPrefix);
+    }
+    Debug.listScenes = listScenes;
 })(Debug || (Debug = {}));
 class Game {
     static initialize(canvas) {
@@ -6221,10 +6259,14 @@ Game.initialized = false;
 Game.lastTimeStamp = 0;
 Game._unscaledDeltaTime = 0;
 TexPackManager.addTexturePack("Assets/Texpacks/texpack-0.json");
-TexPackManager.addTexturePack("Assets/Texpacks/texpack-1.json");
 Spritesheet.addSpritesheet("sealime.png", 64, 64, 8, 41);
 Animation.addAnimation("sealime_idle", "sealime.png", [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
 Animation.addAnimation("sealime_leap", "sealime.png", [8, 9, 10, 11, 12, 13, 14, 15, 16, 17], 10, false);
+Spritesheet.addSpritesheet("hero/walk.png", 16, 32, 13, 52);
+Animation.addAnimation("hero_idle", "hero/walk.png", [0], 10, true);
+Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 10, true);
+Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 10, true);
+Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 10, true);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -6353,9 +6395,29 @@ var Scenes;
     }
     Scenes.TestScene2 = TestScene2;
 })(Scenes || (Scenes = {}));
+var Scenes;
+(function (Scenes) {
+    class TestScene3 extends Scene {
+        constructor(...args) {
+            super(...args);
+            this.onLoad = () => {
+                Camera.scale = 2;
+                Collision.gravityX = 0;
+                Collision.gravityY = 0;
+                let tm = TiledMap.createTiledMapData("test5");
+                let tmGO = tm.createGameObject();
+                let go = new GameObject();
+                go.addComponent(Comps.ControlCameraWithWASD);
+                Camera.setCenter(GameObject.findObject("Hero").transform.getGlobalPosition());
+            };
+        }
+    }
+    Scenes.TestScene3 = TestScene3;
+})(Scenes || (Scenes = {}));
 Scene.addScene("Preload", new Scenes.Preload());
 Scene.addScene("TestScene", new Scenes.TestScene());
 Scene.addScene("TestScene2", new Scenes.TestScene2());
+Scene.addScene("TestScene3", new Scenes.TestScene3());
 TiledMap.tilesetImageDirectory = "Tilesets/";
 TiledMap.addTileset("beach", { "image": "beach_1.png",
     "imageheight": 304,
@@ -6454,6 +6516,18 @@ TiledMap.addMap("test4", { "height": 40,
                     "width": 0,
                     "x": 44.5,
                     "y": 55
+                },
+                {
+                    "height": 0,
+                    "id": 3,
+                    "name": "",
+                    "properties": {},
+                    "rotation": 0,
+                    "type": "Hero",
+                    "visible": true,
+                    "width": 0,
+                    "x": 15,
+                    "y": 83
                 }],
             "opacity": 1,
             "type": "objectgroup",
@@ -6462,7 +6536,7 @@ TiledMap.addMap("test4", { "height": 40,
             "x": 0,
             "y": 0
         }],
-    "nextobjectid": 3,
+    "nextobjectid": 4,
     "orientation": "orthogonal",
     "properties": {},
     "renderorder": "right-down",
@@ -6541,8 +6615,79 @@ TiledMap.addMap("test4", { "height": 40,
     "version": 1,
     "width": 60
 });
+TiledMap.addMap("test5", { "height": 20,
+    "layers": [
+        {
+            "data": [406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 243, 244, 244, 244, 245, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 403, 244, 244, 244, 245, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 323, 324, 324, 324, 364, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 323, 324, 324, 324, 325, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 409, 406, 406, 406, 406, 406, 406, 406, 406, 406, 446, 446, 446, 446, 446, 446, 1, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 486, 486, 486, 486, 486, 486, 405, 406, 406, 406, 406, 406, 1, 1, 1, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 526, 445, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 526, 526, 526, 526, 526, 526, 526, 526, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526],
+            "height": 20,
+            "name": "ground",
+            "opacity": 1,
+            "type": "tilelayer",
+            "visible": true,
+            "width": 24,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 561, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 646, 647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 686, 687, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 522, 523, 603, 603, 603, 603, 604, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 562, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 602, 603, 603, 603, 642, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "height": 20,
+            "name": "tile objects",
+            "opacity": 1,
+            "type": "tilelayer",
+            "visible": true,
+            "width": 24,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "draworder": "topdown",
+            "height": 20,
+            "name": "objects",
+            "objects": [
+                {
+                    "height": 0,
+                    "id": 1,
+                    "name": "Hero",
+                    "properties": {},
+                    "rotation": 0,
+                    "type": "Hero",
+                    "visible": true,
+                    "width": 0,
+                    "x": 175,
+                    "y": 173
+                }],
+            "opacity": 1,
+            "type": "objectgroup",
+            "visible": true,
+            "width": 24,
+            "x": 0,
+            "y": 0
+        }],
+    "nextobjectid": 2,
+    "orientation": "orthogonal",
+    "properties": {},
+    "renderorder": "right-down",
+    "tileheight": 16,
+    "tilesets": [
+        {
+            "firstgid": 1,
+            "image": "..\/..\/..\/Workbench\/oga top down\/Overworld.png",
+            "imageheight": 576,
+            "imagewidth": 640,
+            "margin": 0,
+            "name": "Overworld",
+            "properties": {},
+            "spacing": 0,
+            "tilecount": 1440,
+            "tileheight": 16,
+            "tilewidth": 16
+        }],
+    "tilewidth": 16,
+    "version": 1,
+    "width": 24
+});
 Game.preloadScene = "Preload";
-Game.startScene = "TestScene2";
+Game.startScene = "TestScene3";
 window.onload = () => {
     let canvas = document.getElementById("canvas");
     Game.initialize(canvas);
@@ -6969,6 +7114,24 @@ var Comps;
 })(Comps || (Comps = {}));
 var Prefabs;
 (function (Prefabs) {
+    function Hero(props) {
+        let go = new GameObject();
+        let actor = go.addComponent(Actor);
+        actor.offsetX = 0;
+        actor.offsetY = 8;
+        actor.halfWidth = 7.5;
+        actor.halfHeight = 7.5;
+        go.addComponent(ActorGizmo);
+        let sr = go.addComponent(SpriteRenderer);
+        sr.imageSmoothingEnabled = false;
+        sr.playAnimationByName("hero_idle");
+        return go;
+    }
+    Prefabs.Hero = Hero;
+    TiledMap.addObjectParser("Hero", Hero);
+})(Prefabs || (Prefabs = {}));
+var Prefabs;
+(function (Prefabs) {
     function Sealime(props) {
         let go = new GameObject();
         let actor = go.addComponent(Actor);
@@ -6985,10 +7148,6 @@ var Prefabs;
         sr.order = 1.0;
         sr.tintColor = "blue";
         sr.tintAmount = .5;
-        go.name = props.name;
-        go.transform.x = props.x;
-        go.transform.y = props.y;
-        console.log(go.transform);
         return go;
     }
     Prefabs.Sealime = Sealime;

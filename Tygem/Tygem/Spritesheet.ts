@@ -196,6 +196,22 @@ class Animation {
         return Animation.animationsDic[name];
     }
 
+    /**
+     * Returns a list of all the animations by name.
+     * @param searchPrefix If given, limits results to names that start with this string.
+     */
+    static getAllAnimations(searchPrefix: string = ""): Array<string> {
+
+        let ret: Array<string> = [];
+        for (let tag in Animation.animationsDic) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
+    }
+
     private static animationsDic: { [name: string]: Animation; } = {};
     
 }

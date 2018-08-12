@@ -45,9 +45,11 @@
     <TypeScriptCompile Include="Code\Components\TestRectOverlap.ts" />
     <TypeScriptCompile Include="Code\Components\TestSound.ts" />
     <TypeScriptCompile Include="Code\Components\Thing2.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\Hero.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Sealime.ts" />
     <TypeScriptCompile Include="Code\Prefabs\TestPlatform.ts" />
     <TypeScriptCompile Include="Code\Prefabs\TestPlatform2.ts" />
+    <TypeScriptCompile Include="Code\Scenes\TestScene3.ts" />
     <TypeScriptCompile Include="Tygem\AABBPlatform.ts" />
     <TypeScriptCompile Include="Tygem\AABBPlatformObject.ts" />
     <TypeScriptCompile Include="Tygem\Actor.ts" />

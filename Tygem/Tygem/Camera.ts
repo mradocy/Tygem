@@ -37,6 +37,14 @@ class Camera {
     static scale: number = 1;
 
     /**
+     * Sets the center to match the given Vec2.
+     */
+    static setCenter(center: Vec2): void {
+        Camera.centerX = center.x;
+        Camera.centerY = center.y;
+    }
+
+    /**
      * Gets width of the canvas of the context.
      */
     static get canvasWidth(): number {

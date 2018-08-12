@@ -17,7 +17,7 @@
 
 
 Game.preloadScene = "Preload"; // this is optional, default is "BasePreloadScene" which will automatically start Game.startScene once the game is done loading.
-Game.startScene = "TestScene2"; // this must be set.
+Game.startScene = "TestScene3"; // this must be set.
 
 
 

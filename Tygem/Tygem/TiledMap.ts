@@ -110,10 +110,20 @@ namespace TiledMap {
             return null;
         if (mapObject.type === "") {
             console.warn("Map objects with type \"\" cannot be parsed.");
-            return;
+            return null;
         }
+        
         if (objectParserDictionary.hasOwnProperty(mapObject.type)) {
-            return objectParserDictionary[mapObject.type](mapObject);
+            // run parse function
+            let go: GameObject = objectParserDictionary[mapObject.type](mapObject);
+            if (go == null) return go;
+
+            // parse default properties
+            go.name = mapObject.name;
+            go.transform.x = mapObject.x;
+            go.transform.y = mapObject.y;
+
+            return go;
         }
 
         console.warn("No object parser found mapped to the type \"" + mapObject.type + "\".  Add a parse function in addObjectParser().");

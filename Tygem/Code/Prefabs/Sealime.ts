@@ -24,13 +24,7 @@ namespace Prefabs {
         sr.order = 1.0;
         sr.tintColor = "blue";
         sr.tintAmount = .5;
-
-
-        go.name = props.name;
-        go.transform.x = props.x;
-        go.transform.y = props.y;
-        console.log(go.transform);
-
+        
         return go;
     }
     TiledMap.addObjectParser("Sealime", Sealime);

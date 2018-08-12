@@ -149,6 +149,21 @@ class Scene {
         return Scene._numScenes;
     }
 
+    /**
+     * Returns a list of all scenes by name.
+     * @param searchPrefix If given, limits results to names that start with this string.
+     */
+    static getAllScenes(searchPrefix: string = ""): Array<string> {
+
+        let ret: Array<string> = [];
+        for (let tag in Scene.dictionary) {
+            if (searchPrefix == null || searchPrefix === "" ||
+                tag.indexOf(searchPrefix) === 0)
+                ret.push(tag);
+        }
+        ret.sort();
+        return ret;
+    }
 
     // Scene Properties
 

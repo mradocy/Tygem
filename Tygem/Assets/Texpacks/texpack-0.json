@@ -1,48 +1,100 @@
 {"frames": [
 
 {
+	"filename": "grid.png",
+	"frame": {"x":857,"y":123,"w":109,"h":108},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":90,"y":89,"w":109,"h":108},
+	"sourceSize": {"w":200,"h":200}
+},
+{
+	"filename": "Hero/attack.png",
+	"frame": {"x":857,"y":1,"w":115,"h":120},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":6,"y":5,"w":115,"h":120},
+	"sourceSize": {"w":128,"h":128}
+},
+{
+	"filename": "Hero/walk.png",
+	"frame": {"x":717,"y":764,"w":208,"h":120},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":5,"w":208,"h":120},
+	"sourceSize": {"w":208,"h":128}
+},
+{
 	"filename": "pengrunt.png",
-	"frame": {"x":1,"y":363,"w":500,"h":183},
+	"frame": {"x":510,"y":579,"w":500,"h":183},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":3,"y":7,"w":500,"h":183},
-	"sourceSize": {"w":512,"h":192},
-	"pivot": {"x":0.5,"y":0.5}
+	"sourceSize": {"w":512,"h":192}
 },
 {
 	"filename": "platform.png",
-	"frame": {"x":1,"y":548,"w":98,"h":34},
+	"frame": {"x":717,"y":886,"w":98,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
-	"sourceSize": {"w":128,"h":64},
-	"pivot": {"x":0.5,"y":0.5}
+	"sourceSize": {"w":128,"h":64}
 },
 {
 	"filename": "platform_2.png",
-	"frame": {"x":101,"y":548,"w":98,"h":34},
+	"frame": {"x":817,"y":886,"w":98,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
-	"sourceSize": {"w":128,"h":64},
-	"pivot": {"x":0.5,"y":0.5}
+	"sourceSize": {"w":128,"h":64}
 },
 {
 	"filename": "sealime.png",
-	"frame": {"x":1,"y":1,"w":507,"h":360},
+	"frame": {"x":1,"y":579,"w":507,"h":360},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":14,"w":507,"h":360},
-	"sourceSize": {"w":512,"h":384},
-	"pivot": {"x":0.5,"y":0.5}
+	"sourceSize": {"w":512,"h":384}
+},
+{
+	"filename": "Tilesets/beach_1.png",
+	"frame": {"x":643,"y":1,"w":212,"h":214},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":12,"y":11,"w":212,"h":214},
+	"sourceSize": {"w":224,"h":304}
+},
+{
+	"filename": "Tilesets/beach_1_bg.png",
+	"frame": {"x":510,"y":764,"w":205,"h":171},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":9,"y":10,"w":205,"h":171},
+	"sourceSize": {"w":224,"h":192}
+},
+{
+	"filename": "Tilesets/Overworld.png",
+	"frame": {"x":1,"y":1,"w":640,"h":576},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":576},
+	"sourceSize": {"w":640,"h":576}
+},
+{
+	"filename": "Tilesets/stone_1.png",
+	"frame": {"x":643,"y":217,"w":211,"h":212},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":13,"y":13,"w":211,"h":212},
+	"sourceSize": {"w":224,"h":304}
 }],
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "texpack-0.png",
 	"format": "RGBA8888",
-	"size": {"w":509,"h":583},
+	"size": {"w":1011,"h":940},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:0dff737157c1e19fa5e4f87e00280d54:90df36d6855158b372171dcf1d8e1973:3fb75b380d0c159e20eb954cb0f232eb$"
+	"smartupdate": "$TexturePacker:SmartUpdate:82845feca9b209699d934aede0cd6bfd:c4836bf3992a5979fd95b9084348a96b:eeaea9f1bcd474833b26acc93b6f2e89$"
 }
 }
