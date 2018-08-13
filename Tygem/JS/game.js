@@ -6720,6 +6720,9 @@ TiledMap.addMap("test5", { "height": 20,
             "tilecount": 1440,
             "tileheight": 16,
             "tileproperties": {
+                "283": {
+                    "material": "WATER"
+                },
                 "521": {
                     "col": "true"
                 },
@@ -6786,6 +6789,9 @@ window.onload = () => {
 };
 Material.addMaterial("SAND", {
     collisionLayers: 0x1
+});
+Material.addMaterial("WATER", {
+    collisionLayers: 0x2
 });
 var Comps;
 (function (Comps) {

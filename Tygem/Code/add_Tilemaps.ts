@@ -311,6 +311,10 @@ TiledMap.addMap("test5",
          "tileheight":16,
          "tileproperties":
             {
+             "283":
+                {
+                 "material":"WATER"
+                },
              "521":
                 {
                  "col":"true"

@@ -5,6 +5,11 @@
  </properties>
  <tileset firstgid="1" name="Overworld" tilewidth="16" tileheight="16" tilecount="1440">
   <image source="../../../Workbench/oga top down/Overworld.png" width="640" height="576"/>
+  <tile id="283">
+   <properties>
+    <property name="material" value="WATER"/>
+   </properties>
+  </tile>
   <tile id="521">
    <properties>
     <property name="col" value="true"/>

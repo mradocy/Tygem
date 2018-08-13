@@ -7,3 +7,8 @@ Material.addMaterial("SAND",
     }
 );
 
+Material.addMaterial("WATER",
+    {
+        collisionLayers: 0x2
+    }
+);
