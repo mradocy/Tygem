@@ -94,6 +94,9 @@ class SpriteRenderer extends PackedImageRenderer {
         if (this.animSpeed < 0 && this.animation !== null) {
             // playing backwards.  Start animation at the end
             this.animTime = this.animation.getDuration() - .0001;
+        } else {
+            // start from the beginning
+            this.animTime = 0;
         }
         this.animPlaying = (animation !== null);
 

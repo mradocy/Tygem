@@ -3681,6 +3681,9 @@ class SpriteRenderer extends PackedImageRenderer {
             if (this.animSpeed < 0 && this.animation !== null) {
                 this.animTime = this.animation.getDuration() - .0001;
             }
+            else {
+                this.animTime = 0;
+            }
             this.animPlaying = (animation !== null);
             this.updateSpriteFrameFromAnimation();
         };
@@ -6310,12 +6313,16 @@ Spritesheet.addSpritesheet("sealime.png", 64, 64, 8, 41);
 Animation.addAnimation("sealime_idle", "sealime.png", [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
 Animation.addAnimation("sealime_leap", "sealime.png", [8, 9, 10, 11, 12, 13, 14, 15, 16, 17], 10, false);
 Spritesheet.addSpritesheet("hero/walk.png", 16, 32, 13, 52);
+Spritesheet.addSpritesheet("hero/attack.png", 32, 32, 4, 16);
 Animation.addAnimation("hero_idle_down", "hero/walk.png", [0], 10, true);
 Animation.addAnimation("hero_idle_right", "hero/walk.png", [13], 10, true);
 Animation.addAnimation("hero_idle_up", "hero/walk.png", [26], 10, true);
 Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true);
 Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
 Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
+Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 15, false);
+Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 15, false);
+Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 15, false);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -6987,6 +6994,7 @@ var Comps;
         Hero_State[Hero_State["NONE"] = 0] = "NONE";
         Hero_State[Hero_State["IDLE"] = 1] = "IDLE";
         Hero_State[Hero_State["WALK"] = 2] = "WALK";
+        Hero_State[Hero_State["SLASH"] = 3] = "SLASH";
     })(Hero_State || (Hero_State = {}));
     class Hero extends Component {
         constructor() {
@@ -6994,6 +7002,7 @@ var Comps;
             this.speed = 70;
             this.accel = 500;
             this.friction = 700;
+            this.slashDuration = .3;
             this.onStart = () => {
                 this.actor = this.getComponent(Actor);
                 this.spriteRenderer = this.getComponent(SpriteRenderer);
@@ -7005,24 +7014,13 @@ var Comps;
                 this.rightHeld = Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
                 this.upHeld = Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
                 this.downHeld = Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
-                if (this.leftHeld !== this.rightHeld) {
-                    if (this.upHeld === this.downHeld) {
-                        this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
-                    }
-                    this.walk();
-                }
-                else if (this.upHeld !== this.downHeld) {
-                    this.faceDirection = this.upHeld ? Direction.UP : Direction.DOWN;
-                    this.walk();
-                }
-                else {
-                    this.idle();
-                }
+                let attackPressed = Keys.keyPressed(Key.X) || Keys.keyPressed(Key.ForwardSlash);
                 let vx = this.actor.vx;
                 let vy = this.actor.vy;
                 let speed = this.speed;
                 let accel = this.accel;
                 let friction = this.friction;
+                this.time += Game.deltaTime;
                 switch (this.state) {
                     case Hero_State.IDLE:
                     case Hero_State.WALK:
@@ -7066,12 +7064,46 @@ var Comps;
                             }
                             vy += accel * Game.deltaTime;
                         }
-                        let mag = M.magnitude(vx, vy);
-                        if (mag > speed) {
-                            vx *= speed / mag;
-                            vy *= speed / mag;
+                        if (this.leftHeld !== this.rightHeld) {
+                            if (!(this.upHeld && this.faceDirection === Direction.UP) &&
+                                !(this.downHeld && this.faceDirection === Direction.DOWN)) {
+                                this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
+                            }
+                            this.walk();
+                        }
+                        else if (this.upHeld !== this.downHeld) {
+                            this.faceDirection = this.upHeld ? Direction.UP : Direction.DOWN;
+                            this.walk();
+                        }
+                        else {
+                            this.idle();
+                        }
+                        if (attackPressed) {
+                            this.slash();
                         }
                         break;
+                    case Hero_State.SLASH:
+                        if (vx < 0) {
+                            vx = Math.min(0, vx + friction * Game.deltaTime);
+                        }
+                        else {
+                            vx = Math.max(0, vx - friction * Game.deltaTime);
+                        }
+                        if (vy < 0) {
+                            vy = Math.min(0, vy + friction * Game.deltaTime);
+                        }
+                        else {
+                            vy = Math.max(0, vy - friction * Game.deltaTime);
+                        }
+                        if (this.time >= this.slashDuration) {
+                            this.idle();
+                        }
+                        break;
+                }
+                let mag = M.magnitude(vx, vy);
+                if (mag > speed) {
+                    vx *= speed / mag;
+                    vy *= speed / mag;
                 }
                 this.actor.vx = vx;
                 this.actor.vy = vy;
@@ -7081,17 +7113,40 @@ var Comps;
                 if (this.state === Hero_State.IDLE)
                     return;
                 this.state = Hero_State.IDLE;
+                this.time = 0;
             };
             this.walk = () => {
                 if (this.state === Hero_State.WALK)
                     return;
                 this.state = Hero_State.WALK;
+                this.time = 0;
+            };
+            this.slash = () => {
+                if (this.state === Hero_State.SLASH)
+                    return;
+                this.state = Hero_State.SLASH;
+                this.time = 0;
+                let anim = "";
+                switch (this.faceDirection) {
+                    case Direction.LEFT:
+                    case Direction.RIGHT:
+                        anim = "hero_slash_right";
+                        break;
+                    case Direction.UP:
+                        anim = "hero_slash_up";
+                        break;
+                    case Direction.DOWN:
+                        anim = "hero_slash_down";
+                        break;
+                }
+                this.spriteRenderer.playAnimation(anim);
             };
             this.updateAnimation = () => {
                 let anim = "hero";
                 let flipped = false;
                 switch (this.state) {
                     case Hero_State.NONE:
+                    case Hero_State.SLASH:
                         return;
                     case Hero_State.IDLE:
                         anim += "_idle";
@@ -7130,6 +7185,7 @@ var Comps;
             this.downHeld = false;
             this.state = Hero_State.NONE;
             this.faceDirection = Direction.NONE;
+            this.time = 0;
             this.name = "Hero";
         }
     }
