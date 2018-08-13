@@ -9,6 +9,11 @@ namespace Comps {
     }
 
     export class Hero extends Component {
+
+        speed: number = 70;
+        accel: number = 500;
+        friction: number = 700;
+
         
         constructor() {
             super();
@@ -31,21 +36,89 @@ namespace Comps {
         onUpdate = (): void => {
 
             // getting input
-            this.leftHeld = Keys.keyHeld(Key.LeftArrow);
-            this.rightHeld = Keys.keyHeld(Key.RightArrow);
-            this.upHeld = Keys.keyHeld(Key.UpArrow);
-            this.downHeld = Keys.keyHeld(Key.DownArrow);
+            this.leftHeld = Keys.keyHeld(Key.LeftArrow) || Keys.keyHeld(Key.A);
+            this.rightHeld = Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
+            this.upHeld = Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
+            this.downHeld = Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
 
             
             if (this.leftHeld !== this.rightHeld) {
-                this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
+                if (this.upHeld === this.downHeld) {
+                    this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
+                }
                 this.walk();
             } else if (this.upHeld !== this.downHeld) {
                 this.faceDirection = this.upHeld ? Direction.UP : Direction.DOWN;
+                
                 this.walk();
             } else {
                 this.idle();
             }
+
+            let vx: number = this.actor.vx;
+            let vy: number = this.actor.vy;
+            let speed: number = this.speed;
+            let accel: number = this.accel;
+            let friction: number = this.friction;
+
+            switch (this.state) {
+                case Hero_State.IDLE:
+                case Hero_State.WALK:
+
+                    if (this.leftHeld == this.rightHeld) {
+                        // apply friction
+                        if (vx < 0) {
+                            vx = Math.min(0, vx + friction * Game.deltaTime);
+                        } else {
+                            vx = Math.max(0, vx - friction * Game.deltaTime);
+                        }
+                    } else if (this.leftHeld) {
+                        // left held
+                        if (vx > 0) {
+                            vx = Math.max(0, vx - friction * Game.deltaTime); // apply friction if currently going other way
+                        }
+                        vx -= accel * Game.deltaTime;
+                    } else {
+                        // right held
+                        if (vx < 0) {
+                            vx = Math.min(0, vx + friction * Game.deltaTime); // apply friction if currently going other way
+                        }
+                        vx += accel * Game.deltaTime;
+                    }
+
+                    if (this.upHeld == this.downHeld) {
+                        // apply friction
+                        if (vy < 0) {
+                            vy = Math.min(0, vy + friction * Game.deltaTime);
+                        } else {
+                            vy = Math.max(0, vy - friction * Game.deltaTime);
+                        }
+                    } else if (this.upHeld) {
+                        // up held
+                        if (vy > 0) {
+                            vy = Math.max(0, vy - friction * Game.deltaTime); // apply friction if currently going other way
+                        }
+                        vy -= accel * Game.deltaTime;
+                    } else {
+                        // down held
+                        if (vy < 0) {
+                            vy = Math.min(0, vy + friction * Game.deltaTime); // apply friction if currently going other way
+                        }
+                        vy += accel * Game.deltaTime;
+                    }
+                    
+                    // normalize
+                    let mag: number = M.magnitude(vx, vy);
+                    if (mag > speed) {
+                        vx *= speed / mag;
+                        vy *= speed / mag;
+                    }
+                    
+                    break;
+            }
+
+            this.actor.vx = vx;
+            this.actor.vy = vy;
 
             this.updateAnimation();
 

@@ -8,9 +8,9 @@ namespace Prefabs {
 
         let actor: Actor = go.addComponent(Actor);
         actor.offsetX = 0;
-        actor.offsetY = 8;
-        actor.halfWidth = 7.5;
-        actor.halfHeight = 7.5;
+        actor.offsetY = 6;
+        actor.halfWidth = 6;
+        actor.halfHeight = 6;
 
         go.addComponent(ActorGizmo);
 

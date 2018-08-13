@@ -19,8 +19,10 @@ namespace Scenes {
             // create tile layers and parse objects
             let tmGO: GameObject = tm.createGameObject();
 
-            let go: GameObject = new GameObject();
-            go.addComponent(Comps.ControlCameraWithWASD);
+            let go: GameObject;
+
+            //go = new GameObject();
+            //go.addComponent(Comps.ControlCameraWithWASD);
             
 
             // center camera on hero

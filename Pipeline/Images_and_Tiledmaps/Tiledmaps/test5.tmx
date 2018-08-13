@@ -5,6 +5,91 @@
  </properties>
  <tileset firstgid="1" name="Overworld" tilewidth="16" tileheight="16" tilecount="1440">
   <image source="../../../Workbench/oga top down/Overworld.png" width="640" height="576"/>
+  <tile id="521">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="522">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="523">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="560">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="561">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="562">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="563">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="600">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="601">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="602">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="603">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="640">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="641">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="645">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="646">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="685">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="686">
+   <properties>
+    <property name="col" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="ground" width="24" height="20">
   <data>

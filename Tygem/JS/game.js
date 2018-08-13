@@ -3682,6 +3682,7 @@ class SpriteRenderer extends PackedImageRenderer {
                 this.animTime = this.animation.getDuration() - .0001;
             }
             this.animPlaying = (animation !== null);
+            this.updateSpriteFrameFromAnimation();
         };
         this.playAnimationByName = (animation, nextAnimation = "") => {
             let anim = null;
@@ -3768,11 +3769,11 @@ class SpriteRenderer extends PackedImageRenderer {
             }
         };
         this.updateSpriteFrameFromAnimation = () => {
+            if (this.animation === null)
+                return;
             let sf = null;
-            if (this.animation !== null) {
-                let t = M.fmod(this.animTime, this.animation.frames.length / this.animation.fps);
-                sf = this.animation.frames[Math.floor(t * this.animation.fps)];
-            }
+            let t = M.fmod(this.animTime, this.animation.frames.length / this.animation.fps);
+            sf = this.animation.frames[Math.floor(t * this.animation.fps)];
             if (sf !== this.spriteFrame) {
                 this.setSpriteFrame(sf);
             }
@@ -6312,9 +6313,9 @@ Spritesheet.addSpritesheet("hero/walk.png", 16, 32, 13, 52);
 Animation.addAnimation("hero_idle_down", "hero/walk.png", [0], 10, true);
 Animation.addAnimation("hero_idle_right", "hero/walk.png", [13], 10, true);
 Animation.addAnimation("hero_idle_up", "hero/walk.png", [26], 10, true);
-Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 10, true);
-Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 10, true);
-Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 10, true);
+Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true);
+Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
+Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -6454,8 +6455,7 @@ var Scenes;
                 Collision.gravityY = 0;
                 let tm = TiledMap.createTiledMapData("test5");
                 let tmGO = tm.createGameObject();
-                let go = new GameObject();
-                go.addComponent(Comps.ControlCameraWithWASD);
+                let go;
                 go = GameObject.findObject("Hero");
                 Camera.setCenter(go.transform.getGlobalPosition());
             };
@@ -6719,6 +6719,59 @@ TiledMap.addMap("test5", { "height": 20,
             "spacing": 0,
             "tilecount": 1440,
             "tileheight": 16,
+            "tileproperties": {
+                "521": {
+                    "col": "true"
+                },
+                "522": {
+                    "col": "true"
+                },
+                "523": {
+                    "col": "true"
+                },
+                "560": {
+                    "col": "true"
+                },
+                "561": {
+                    "col": "true"
+                },
+                "562": {
+                    "col": "true"
+                },
+                "563": {
+                    "col": "true"
+                },
+                "600": {
+                    "col": "true"
+                },
+                "601": {
+                    "col": "true"
+                },
+                "602": {
+                    "col": "true"
+                },
+                "603": {
+                    "col": "true"
+                },
+                "640": {
+                    "col": "true"
+                },
+                "641": {
+                    "col": "true"
+                },
+                "645": {
+                    "col": "true"
+                },
+                "646": {
+                    "col": "true"
+                },
+                "685": {
+                    "col": "true"
+                },
+                "686": {
+                    "col": "true"
+                }
+            },
             "tilewidth": 16
         }],
     "tilewidth": 16,
@@ -6932,6 +6985,9 @@ var Comps;
     class Hero extends Component {
         constructor() {
             super();
+            this.speed = 70;
+            this.accel = 500;
+            this.friction = 700;
             this.onStart = () => {
                 this.actor = this.getComponent(Actor);
                 this.spriteRenderer = this.getComponent(SpriteRenderer);
@@ -6939,12 +6995,14 @@ var Comps;
                 this.idle();
             };
             this.onUpdate = () => {
-                this.leftHeld = Keys.keyHeld(Key.LeftArrow);
-                this.rightHeld = Keys.keyHeld(Key.RightArrow);
-                this.upHeld = Keys.keyHeld(Key.UpArrow);
-                this.downHeld = Keys.keyHeld(Key.DownArrow);
+                this.leftHeld = Keys.keyHeld(Key.LeftArrow) || Keys.keyHeld(Key.A);
+                this.rightHeld = Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
+                this.upHeld = Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
+                this.downHeld = Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
                 if (this.leftHeld !== this.rightHeld) {
-                    this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
+                    if (this.upHeld === this.downHeld) {
+                        this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
+                    }
                     this.walk();
                 }
                 else if (this.upHeld !== this.downHeld) {
@@ -6954,6 +7012,63 @@ var Comps;
                 else {
                     this.idle();
                 }
+                let vx = this.actor.vx;
+                let vy = this.actor.vy;
+                let speed = this.speed;
+                let accel = this.accel;
+                let friction = this.friction;
+                switch (this.state) {
+                    case Hero_State.IDLE:
+                    case Hero_State.WALK:
+                        if (this.leftHeld == this.rightHeld) {
+                            if (vx < 0) {
+                                vx = Math.min(0, vx + friction * Game.deltaTime);
+                            }
+                            else {
+                                vx = Math.max(0, vx - friction * Game.deltaTime);
+                            }
+                        }
+                        else if (this.leftHeld) {
+                            if (vx > 0) {
+                                vx = Math.max(0, vx - friction * Game.deltaTime);
+                            }
+                            vx -= accel * Game.deltaTime;
+                        }
+                        else {
+                            if (vx < 0) {
+                                vx = Math.min(0, vx + friction * Game.deltaTime);
+                            }
+                            vx += accel * Game.deltaTime;
+                        }
+                        if (this.upHeld == this.downHeld) {
+                            if (vy < 0) {
+                                vy = Math.min(0, vy + friction * Game.deltaTime);
+                            }
+                            else {
+                                vy = Math.max(0, vy - friction * Game.deltaTime);
+                            }
+                        }
+                        else if (this.upHeld) {
+                            if (vy > 0) {
+                                vy = Math.max(0, vy - friction * Game.deltaTime);
+                            }
+                            vy -= accel * Game.deltaTime;
+                        }
+                        else {
+                            if (vy < 0) {
+                                vy = Math.min(0, vy + friction * Game.deltaTime);
+                            }
+                            vy += accel * Game.deltaTime;
+                        }
+                        let mag = M.magnitude(vx, vy);
+                        if (mag > speed) {
+                            vx *= speed / mag;
+                            vy *= speed / mag;
+                        }
+                        break;
+                }
+                this.actor.vx = vx;
+                this.actor.vy = vy;
                 this.updateAnimation();
             };
             this.idle = () => {
@@ -7250,9 +7365,9 @@ var Prefabs;
         let go = new GameObject();
         let actor = go.addComponent(Actor);
         actor.offsetX = 0;
-        actor.offsetY = 8;
-        actor.halfWidth = 7.5;
-        actor.halfHeight = 7.5;
+        actor.offsetY = 6;
+        actor.halfWidth = 6;
+        actor.halfHeight = 6;
         go.addComponent(ActorGizmo);
         let sr = go.addComponent(SpriteRenderer);
         sr.imageSmoothingEnabled = false;

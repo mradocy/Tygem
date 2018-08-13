@@ -309,6 +309,77 @@ TiledMap.addMap("test5",
          "spacing":0,
          "tilecount":1440,
          "tileheight":16,
+         "tileproperties":
+            {
+             "521":
+                {
+                 "col":"true"
+                },
+             "522":
+                {
+                 "col":"true"
+                },
+             "523":
+                {
+                 "col":"true"
+                },
+             "560":
+                {
+                 "col":"true"
+                },
+             "561":
+                {
+                 "col":"true"
+                },
+             "562":
+                {
+                 "col":"true"
+                },
+             "563":
+                {
+                 "col":"true"
+                },
+             "600":
+                {
+                 "col":"true"
+                },
+             "601":
+                {
+                 "col":"true"
+                },
+             "602":
+                {
+                 "col":"true"
+                },
+             "603":
+                {
+                 "col":"true"
+                },
+             "640":
+                {
+                 "col":"true"
+                },
+             "641":
+                {
+                 "col":"true"
+                },
+             "645":
+                {
+                 "col":"true"
+                },
+             "646":
+                {
+                 "col":"true"
+                },
+             "685":
+                {
+                 "col":"true"
+                },
+             "686":
+                {
+                 "col":"true"
+                }
+            },
          "tilewidth":16
         }],
  "tilewidth":16,

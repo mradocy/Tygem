@@ -35,8 +35,8 @@ Spritesheet.addSpritesheet("hero/walk.png", 16, 32, 13, 52);
 Animation.addAnimation("hero_idle_down", "hero/walk.png", [0], 10, true);
 Animation.addAnimation("hero_idle_right", "hero/walk.png", [13], 10, true);
 Animation.addAnimation("hero_idle_up", "hero/walk.png", [26], 10, true);
-Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 10, true);
-Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 10, true);
-Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 10, true);
+Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true);
+Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
+Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
 
 

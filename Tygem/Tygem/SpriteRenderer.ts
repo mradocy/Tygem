@@ -96,6 +96,8 @@ class SpriteRenderer extends PackedImageRenderer {
             this.animTime = this.animation.getDuration() - .0001;
         }
         this.animPlaying = (animation !== null);
+
+        this.updateSpriteFrameFromAnimation();
     }
 
     /**
@@ -230,11 +232,11 @@ class SpriteRenderer extends PackedImageRenderer {
 
     protected updateSpriteFrameFromAnimation = (): void => {
 
+        if (this.animation === null) return;
+
         let sf: SpriteFrame = null;
-        if (this.animation !== null) {
-            let t: number = M.fmod(this.animTime, this.animation.frames.length / this.animation.fps);
-            sf = this.animation.frames[Math.floor(t * this.animation.fps)];
-        }
+        let t: number = M.fmod(this.animTime, this.animation.frames.length / this.animation.fps);
+        sf = this.animation.frames[Math.floor(t * this.animation.fps)];        
         if (sf !== this.spriteFrame) {
             this.setSpriteFrame(sf);
         }
