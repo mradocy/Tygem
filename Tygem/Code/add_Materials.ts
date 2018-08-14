@@ -12,3 +12,9 @@ Material.addMaterial("WATER",
         collisionLayers: 0x2
     }
 );
+
+Material.addMaterial("CLIFF",
+    {
+        collisionLayers: 0x4
+    }
+);

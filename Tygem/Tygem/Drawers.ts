@@ -47,21 +47,21 @@ namespace Drawers {
             context.save();
 
             if (dispObj.anchored) {
-                if (dispObj.getTransform() == null) {
+                if (dispObj.transform == null) {
                     // identity transform
                     context.setTransform(1, 0, 0, 1, 0, 0);
                 } else {
                     // transform of drawer without the camera
-                    dispObj.getTransform().multiplyByGlobalMatrix(m);
+                    dispObj.transform.multiplyByGlobalMatrix(m);
                     context.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
                 }
             } else {
-                if (dispObj.getTransform() == null) {
+                if (dispObj.transform == null) {
                     // transform of just the camera
                     Camera.setContextTransformFromMatrix(m);
                 } else {
                     // transform of the camera and the drawer
-                    Camera.setContextTransform(dispObj.getTransform());
+                    Camera.setContextTransform(dispObj.transform);
                 }
             }
 

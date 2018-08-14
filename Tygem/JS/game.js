@@ -2809,20 +2809,20 @@ var Drawers;
             m.setIdentity();
             context.save();
             if (dispObj.anchored) {
-                if (dispObj.getTransform() == null) {
+                if (dispObj.transform == null) {
                     context.setTransform(1, 0, 0, 1, 0, 0);
                 }
                 else {
-                    dispObj.getTransform().multiplyByGlobalMatrix(m);
+                    dispObj.transform.multiplyByGlobalMatrix(m);
                     context.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
                 }
             }
             else {
-                if (dispObj.getTransform() == null) {
+                if (dispObj.transform == null) {
                     Camera.setContextTransformFromMatrix(m);
                 }
                 else {
-                    Camera.setContextTransform(dispObj.getTransform());
+                    Camera.setContextTransform(dispObj.transform);
                 }
             }
             dispObj.draw(context);
@@ -3467,9 +3467,7 @@ class Component {
     constructor() {
         this.name = "";
         this.gameObject = null;
-        this.getTransform = () => {
-            return this.gameObject.transform;
-        };
+        this.transform = null;
         this.isEnabled = () => {
             return this._enabled;
         };
@@ -4077,11 +4075,11 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
             return this.tiledMapLayer.mapData;
         };
         this.getTiledMapComponent = () => {
-            return this.getTransform().getParent().gameObject.getComponent(TiledMapComponent);
+            return this.transform.getParent().gameObject.getComponent(TiledMapComponent);
         };
         this.cameraCulling = true;
         this.onAwake = () => {
-            this._transform = this.getTransform();
+            this._transform = this.transform;
         };
         this.draw = (context) => {
             if (this.tiledMapLayer == null) {
@@ -4307,6 +4305,7 @@ class GameObject {
                 }
             }
             component.gameObject = this;
+            component.transform = this.transform;
             this.components.push(component);
             if (component instanceof DrawerComponent) {
                 Drawers._add(component);
@@ -4417,6 +4416,8 @@ class GameObject {
                 if (component.onDestroy != undefined) {
                     component.onDestroy();
                 }
+                component.gameObject = null;
+                component.transform = null;
             }
             this.components.splice(0);
             let index = GameObject.allGameObjects.indexOf(this);
@@ -4543,10 +4544,10 @@ class Actor extends Component {
     constructor() {
         super();
         this.getGlobalPosition = (outPos = null) => {
-            return this.getTransform().getGlobalPosition(outPos);
+            return this.transform.getGlobalPosition(outPos);
         };
         this.setGlobalPosition = (x, y) => {
-            this.getTransform().setGlobalPosition(x, y);
+            this.transform.setGlobalPosition(x, y);
         };
         this.vx = 0;
         this.vy = 0;
@@ -4687,7 +4688,7 @@ var Collision;
                 return this._platform;
             };
             this.getPosition = (outPos = null) => {
-                return this._platform.getTransform().getGlobalPosition(outPos);
+                return this._platform.transform.getGlobalPosition(outPos);
             };
             this.isEnabled = () => {
                 return this._enabled;
@@ -5688,10 +5689,10 @@ class Platform extends Component {
             Platform.allPlatforms.push(this);
         };
         this.getGlobalPosition = (outPos = null) => {
-            return this.getTransform().getGlobalPosition(outPos);
+            return this.transform.getGlobalPosition(outPos);
         };
         this.setGlobalPosition = (x, y) => {
-            this.getTransform().setGlobalPosition(x, y);
+            this.transform.setGlobalPosition(x, y);
         };
         this.vx = 0;
         this.vy = 0;
@@ -6323,6 +6324,9 @@ Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, tru
 Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 15, false);
 Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 15, false);
 Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 15, false);
+Spritesheet.addSpritesheet("log/log.png", 32, 32, 6, 23);
+Animation.addAnimation("log_idle_down", "log/log.png", [0], 10, true);
+Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -6697,8 +6701,8 @@ TiledMap.addMap("test5", { "height": 20,
                     "type": "Hero",
                     "visible": true,
                     "width": 0,
-                    "x": 175,
-                    "y": 173
+                    "x": 159.5,
+                    "y": 109
                 }],
             "opacity": 1,
             "type": "objectgroup",
@@ -6730,6 +6734,15 @@ TiledMap.addMap("test5", { "height": 20,
                 "283": {
                     "material": "WATER"
                 },
+                "484": {
+                    "material": "CLIFF"
+                },
+                "485": {
+                    "material": "CLIFF"
+                },
+                "486": {
+                    "material": "CLIFF"
+                },
                 "521": {
                     "col": "true"
                 },
@@ -6738,6 +6751,15 @@ TiledMap.addMap("test5", { "height": 20,
                 },
                 "523": {
                     "col": "true"
+                },
+                "524": {
+                    "material": "CLIFF"
+                },
+                "525": {
+                    "material": "CLIFF"
+                },
+                "526": {
+                    "material": "CLIFF"
                 },
                 "560": {
                     "col": "true"
@@ -6750,6 +6772,15 @@ TiledMap.addMap("test5", { "height": 20,
                 },
                 "563": {
                     "col": "true"
+                },
+                "564": {
+                    "material": "CLIFF"
+                },
+                "565": {
+                    "material": "CLIFF"
+                },
+                "566": {
+                    "material": "CLIFF"
                 },
                 "600": {
                     "col": "true"
@@ -6799,6 +6830,9 @@ Material.addMaterial("SAND", {
 });
 Material.addMaterial("WATER", {
     collisionLayers: 0x2
+});
+Material.addMaterial("CLIFF", {
+    collisionLayers: 0x4
 });
 var Comps;
 (function (Comps) {
@@ -6956,13 +6990,13 @@ var Comps;
             super();
             this.onUpdate = () => {
                 if (this.anchored) {
-                    this.getTransform().setGlobalPosition(Mouse.x, Mouse.y);
+                    this.transform.setGlobalPosition(Mouse.x, Mouse.y);
                 }
                 else {
                     let v = Camera.canvasToGlobal(Mouse.x, Mouse.y);
                     Camera.globalToCanvas(v.x, v.y, v);
                     Camera.canvasToGlobal(v.x, v.y, v);
-                    this.getTransform().setGlobalPosition(v.x, v.y);
+                    this.transform.setGlobalPosition(v.x, v.y);
                 }
             };
             this.name = "DotFollowsMouse";
@@ -6978,9 +7012,9 @@ var Comps;
         constructor() {
             super();
             this.onUpdate = () => {
-                let pos = this.getTransform().getGlobalPosition();
+                let pos = this.transform.getGlobalPosition();
                 let targetPos = Camera.canvasToGlobal(Mouse.x, Mouse.y);
-                this.getTransform().setGlobalRotation(Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x) * M.radToDeg);
+                this.transform.setGlobalRotation(Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x) * M.radToDeg);
             };
             this.name = "FacesMouse";
         }
@@ -7170,8 +7204,8 @@ var Comps;
                         anim += "_down";
                         break;
                 }
-                if (flipped === this.getTransform().scaleX > 0) {
-                    this.getTransform().scaleX *= -1;
+                if (flipped === this.transform.scaleX > 0) {
+                    this.transform.scaleX *= -1;
                 }
                 if (this.spriteRenderer.getAnimation() === null ||
                     this.spriteRenderer.getAnimation().name !== anim) {
@@ -7327,8 +7361,8 @@ var Comps;
                 else {
                     v.y = 0;
                 }
-                this.getTransform().x += v.x * Game.deltaTime;
-                this.getTransform().y += v.y * Game.deltaTime;
+                this.transform.x += v.x * Game.deltaTime;
+                this.transform.y += v.y * Game.deltaTime;
                 let rv = 0;
                 if (Keys.keyHeld(Key.Q)) {
                     rv = -100;
@@ -7339,15 +7373,15 @@ var Comps;
                 else {
                     rv = 0;
                 }
-                this.getTransform().rotation += rv * Game.deltaTime;
+                this.transform.rotation += rv * Game.deltaTime;
                 if (Keys.keyPressed(Key.Num1)) {
-                    this.getTransform().scaleX *= 1.2;
+                    this.transform.scaleX *= 1.2;
                 }
                 if (Keys.keyPressed(Key.Num2)) {
-                    this.getTransform().scaleX *= -1;
+                    this.transform.scaleX *= -1;
                 }
                 if (Keys.keyPressed(Key.Num3)) {
-                    this.getTransform().scaleY *= .8;
+                    this.transform.scaleY *= .8;
                 }
                 v.x = 0;
                 v.y = 0;
@@ -7572,8 +7606,8 @@ class RaycastTestGizmo extends DrawerComponent {
         this.globalDirection = new Vec2();
         this.identityMatrix = new Matrix2x3();
         this.onUpdate = () => {
-            this.getTransform().localToGlobal(this.origin.x, this.origin.y, this.globalOrigin);
-            this.getTransform().localToGlobal(this.origin.x + this.direction.x, this.origin.y + this.direction.y, this.pt1);
+            this.transform.localToGlobal(this.origin.x, this.origin.y, this.globalOrigin);
+            this.transform.localToGlobal(this.origin.x + this.direction.x, this.origin.y + this.direction.y, this.pt1);
             this.globalDirection.setValues(this.pt1.x - this.globalOrigin.x, this.pt1.y - this.globalOrigin.y);
             this.globalDirection.normalize();
             Collision.raycastAllPlatformObjectsNonAlloc(this.raycastHit, this.globalOrigin.x, this.globalOrigin.y, this.globalDirection.x, this.globalDirection.y, this.distance);

@@ -18,11 +18,19 @@
 },
 {
 	"filename": "Hero/walk.png",
-	"frame": {"x":717,"y":764,"w":208,"h":120},
+	"frame": {"x":643,"y":431,"w":208,"h":120},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":5,"w":208,"h":120},
 	"sourceSize": {"w":208,"h":128}
+},
+{
+	"filename": "Log/log.png",
+	"frame": {"x":717,"y":764,"w":183,"h":123},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":5,"w":183,"h":123},
+	"sourceSize": {"w":192,"h":128}
 },
 {
 	"filename": "pengrunt.png",
@@ -34,7 +42,7 @@
 },
 {
 	"filename": "platform.png",
-	"frame": {"x":717,"y":886,"w":98,"h":34},
+	"frame": {"x":902,"y":764,"w":98,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
@@ -42,7 +50,7 @@
 },
 {
 	"filename": "platform_2.png",
-	"frame": {"x":817,"y":886,"w":98,"h":34},
+	"frame": {"x":902,"y":800,"w":98,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
@@ -95,6 +103,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1011,"h":940},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:82845feca9b209699d934aede0cd6bfd:c4836bf3992a5979fd95b9084348a96b:eeaea9f1bcd474833b26acc93b6f2e89$"
+	"smartupdate": "$TexturePacker:SmartUpdate:885ec83824dce4d397e9f4dc596b1b9e:eac72c58a6fa62b2e95c533c3814cbe6:eeaea9f1bcd474833b26acc93b6f2e89$"
 }
 }

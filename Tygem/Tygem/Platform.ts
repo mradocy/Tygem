@@ -43,14 +43,14 @@ class Platform extends Component {
      * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
      */
     getGlobalPosition = (outPos: Vec2 = null): Vec2 => {
-        return this.getTransform().getGlobalPosition(outPos);
+        return this.transform.getGlobalPosition(outPos);
     }
 
     /**
      * Sets position of this transform in the global space.
      */
     setGlobalPosition = (x: number, y: number): void => {
-        this.getTransform().setGlobalPosition(x, y);
+        this.transform.setGlobalPosition(x, y);
     }
     
     /**

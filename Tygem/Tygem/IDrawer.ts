@@ -26,7 +26,7 @@ interface IDrawer {
      * When defined, the transform of the context will be automatically set to this before drawing the object.
      * This can be set to reference another transform.
      */
-    getTransform(): Transform;
+    transform: Transform;
 
     /**
      * Draws the IDrawer on the given context.

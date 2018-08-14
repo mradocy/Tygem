@@ -222,8 +222,8 @@ namespace Comps {
                     break;
             }
 
-            if (flipped === this.getTransform().scaleX > 0) {
-                this.getTransform().scaleX *= -1;
+            if (flipped === this.transform.scaleX > 0) {
+                this.transform.scaleX *= -1;
             }
 
             if (this.spriteRenderer.getAnimation() === null ||

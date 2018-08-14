@@ -276,8 +276,8 @@ TiledMap.addMap("test5",
                  "type":"Hero",
                  "visible":true,
                  "width":0,
-                 "x":175,
-                 "y":173
+                 "x":159.5,
+                 "y":109
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -315,6 +315,18 @@ TiledMap.addMap("test5",
                 {
                  "material":"WATER"
                 },
+             "484":
+                {
+                 "material":"CLIFF"
+                },
+             "485":
+                {
+                 "material":"CLIFF"
+                },
+             "486":
+                {
+                 "material":"CLIFF"
+                },
              "521":
                 {
                  "col":"true"
@@ -326,6 +338,18 @@ TiledMap.addMap("test5",
              "523":
                 {
                  "col":"true"
+                },
+             "524":
+                {
+                 "material":"CLIFF"
+                },
+             "525":
+                {
+                 "material":"CLIFF"
+                },
+             "526":
+                {
+                 "material":"CLIFF"
                 },
              "560":
                 {
@@ -342,6 +366,18 @@ TiledMap.addMap("test5",
              "563":
                 {
                  "col":"true"
+                },
+             "564":
+                {
+                 "material":"CLIFF"
+                },
+             "565":
+                {
+                 "material":"CLIFF"
+                },
+             "566":
+                {
+                 "material":"CLIFF"
                 },
              "600":
                 {

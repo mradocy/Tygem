@@ -17,7 +17,7 @@ namespace Comps {
         onUpdate = (): void => {
 
             if (this.anchored) {
-                this.getTransform().setGlobalPosition(Mouse.x, Mouse.y);
+                this.transform.setGlobalPosition(Mouse.x, Mouse.y);
             } else {
                 let v: Vec2 = Camera.canvasToGlobal(Mouse.x, Mouse.y);
 
@@ -25,7 +25,7 @@ namespace Comps {
                 Camera.globalToCanvas(v.x, v.y, v);
                 Camera.canvasToGlobal(v.x, v.y, v);
 
-                this.getTransform().setGlobalPosition(v.x, v.y);
+                this.transform.setGlobalPosition(v.x, v.y);
             }
 
         }

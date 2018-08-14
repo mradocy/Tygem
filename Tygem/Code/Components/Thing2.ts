@@ -36,8 +36,8 @@ namespace Comps {
                 v.y = 0;
             }
 
-            this.getTransform().x += v.x * Game.deltaTime;
-            this.getTransform().y += v.y * Game.deltaTime;
+            this.transform.x += v.x * Game.deltaTime;
+            this.transform.y += v.y * Game.deltaTime;
 
 
             let rv: number = 0;
@@ -49,16 +49,16 @@ namespace Comps {
                 rv = 0;
             }
 
-            this.getTransform().rotation += rv * Game.deltaTime;
+            this.transform.rotation += rv * Game.deltaTime;
 
             if (Keys.keyPressed(Key.Num1)) {
-                this.getTransform().scaleX *= 1.2;
+                this.transform.scaleX *= 1.2;
             }
             if (Keys.keyPressed(Key.Num2)) {
-                this.getTransform().scaleX *= -1;
+                this.transform.scaleX *= -1;
             }
             if (Keys.keyPressed(Key.Num3)) {
-                this.getTransform().scaleY *= .8;
+                this.transform.scaleY *= .8;
             }
 
 

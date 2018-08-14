@@ -21,7 +21,7 @@ namespace Collision {
          * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
          */
         getPosition = (outPos: Vec2 = null): Vec2 => {
-            return this._platform.getTransform().getGlobalPosition(outPos);
+            return this._platform.transform.getGlobalPosition(outPos);
         }
 
         /**

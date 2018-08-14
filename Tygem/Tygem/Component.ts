@@ -60,9 +60,10 @@ class Component {
      */
     gameObject: GameObject = null;
 
-    getTransform = (): Transform => {
-        return this.gameObject.transform;
-    }
+    /**
+     * Transform for the GameObject this Component is attached to.  Please don't change.
+     */
+    transform: Transform = null;
 
     /**
      * Gets if this component is enabled.  Only active and enabled components receive calls to update() every frame.

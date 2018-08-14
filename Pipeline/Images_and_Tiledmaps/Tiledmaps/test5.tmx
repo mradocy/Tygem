@@ -10,6 +10,21 @@
     <property name="material" value="WATER"/>
    </properties>
   </tile>
+  <tile id="484">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
+  <tile id="485">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
+  <tile id="486">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
   <tile id="521">
    <properties>
     <property name="col" value="true"/>
@@ -23,6 +38,21 @@
   <tile id="523">
    <properties>
     <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="524">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
+  <tile id="525">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
+  <tile id="526">
+   <properties>
+    <property name="material" value="CLIFF"/>
    </properties>
   </tile>
   <tile id="560">
@@ -43,6 +73,21 @@
   <tile id="563">
    <properties>
     <property name="col" value="true"/>
+   </properties>
+  </tile>
+  <tile id="564">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
+  <tile id="565">
+   <properties>
+    <property name="material" value="CLIFF"/>
+   </properties>
+  </tile>
+  <tile id="566">
+   <properties>
+    <property name="material" value="CLIFF"/>
    </properties>
   </tile>
   <tile id="600">
@@ -1065,6 +1110,6 @@
   </data>
  </layer>
  <objectgroup name="objects">
-  <object id="1" name="Hero" type="Hero" x="175" y="173"/>
+  <object id="1" name="Hero" type="Hero" x="159.5" y="109"/>
  </objectgroup>
 </map>

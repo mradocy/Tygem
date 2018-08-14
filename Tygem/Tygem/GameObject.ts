@@ -141,6 +141,7 @@ class GameObject {
         
         // make component part of this gameObject
         component.gameObject = this;
+        component.transform = this.transform;
         this.components.push(component);
         
         // add DrawerComponent to Drawers
@@ -443,6 +444,8 @@ class GameObject {
             if ((component as any).onDestroy != undefined) {
                 (component as any).onDestroy();
             }
+            component.gameObject = null;
+            component.transform = null;
         }
         this.components.splice(0);
         

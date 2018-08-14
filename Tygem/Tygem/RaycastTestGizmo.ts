@@ -31,8 +31,8 @@ class RaycastTestGizmo extends DrawerComponent {
 
     onUpdate = (): void => {
 
-        this.getTransform().localToGlobal(this.origin.x, this.origin.y, this.globalOrigin);
-        this.getTransform().localToGlobal(this.origin.x + this.direction.x, this.origin.y + this.direction.y, this.pt1);
+        this.transform.localToGlobal(this.origin.x, this.origin.y, this.globalOrigin);
+        this.transform.localToGlobal(this.origin.x + this.direction.x, this.origin.y + this.direction.y, this.pt1);
 
         this.globalDirection.setValues(this.pt1.x - this.globalOrigin.x, this.pt1.y - this.globalOrigin.y);
         this.globalDirection.normalize();

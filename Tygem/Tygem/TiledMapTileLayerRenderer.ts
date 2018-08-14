@@ -24,7 +24,7 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
      * TiledMapComponent should be in the parent transform.
      */
     getTiledMapComponent = (): TiledMapComponent => {
-        return this.getTransform().getParent().gameObject.getComponent(TiledMapComponent);
+        return this.transform.getParent().gameObject.getComponent(TiledMapComponent);
     }
     
 
@@ -35,7 +35,7 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
 
     
     onAwake = (): void => {
-        this._transform = this.getTransform();
+        this._transform = this.transform;
     }
 
     draw = (context: CanvasRenderingContext2D): void => {

@@ -45,3 +45,11 @@ Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 15, fal
 Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 15, false);
 
 
+Spritesheet.addSpritesheet("log/log.png", 32, 32, 6, 23);
+Animation.addAnimation("log_idle_down", "log/log.png", [0], 10, true);
+Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
+
+
+
+
+
