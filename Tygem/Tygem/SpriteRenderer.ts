@@ -189,8 +189,16 @@ class SpriteRenderer extends PackedImageRenderer {
     }
 
     onUpdate = (): void => {
-        
-        // play animation
+
+        this.onUpdateAnimation();
+
+    }
+
+    /**
+     * Plays the animation
+     */
+    protected onUpdateAnimation = (): void => {
+
         if (this.animPlaying && this.animation !== null) {
             this.animTime += this.animSpeed * Game.deltaTime;
             let animDuration = this.animation.getDuration();
@@ -230,7 +238,7 @@ class SpriteRenderer extends PackedImageRenderer {
             }
             this.updateSpriteFrameFromAnimation();
         }
-        
+
     }
 
     protected updateSpriteFrameFromAnimation = (): void => {

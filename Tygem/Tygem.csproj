@@ -42,6 +42,8 @@
     <TypeScriptCompile Include="Code\Components\Hero.ts" />
     <TypeScriptCompile Include="Code\Components\MovePlatformWithIJKL.ts" />
     <TypeScriptCompile Include="Code\Components\Preloader.ts" />
+    <TypeScriptCompile Include="Code\Components\TDActor.ts" />
+    <TypeScriptCompile Include="Code\Components\TDSpriteRenderer.ts" />
     <TypeScriptCompile Include="Code\Components\Template.ts" />
     <TypeScriptCompile Include="Code\Components\TestRectOverlap.ts" />
     <TypeScriptCompile Include="Code\Components\TestSound.ts" />

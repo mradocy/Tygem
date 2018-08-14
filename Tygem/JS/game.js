@@ -3734,6 +3734,9 @@ class SpriteRenderer extends PackedImageRenderer {
             this.animSpeed = speed;
         };
         this.onUpdate = () => {
+            this.onUpdateAnimation();
+        };
+        this.onUpdateAnimation = () => {
             if (this.animPlaying && this.animation !== null) {
                 this.animTime += this.animSpeed * Game.deltaTime;
                 let animDuration = this.animation.getDuration();
@@ -4558,6 +4561,15 @@ class Actor extends Component {
         this.offsetY = 0;
         this.halfWidth = 0;
         this.halfHeight = 0;
+        this.setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
+            this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
+        };
+        this.Actor_setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+            this.halfWidth;
+            this.halfHeight = halfHeight;
+        };
         this.team = Team.PLAYER_1;
         this.isInTeam = (team) => {
             return (team & this.team) != 0;
@@ -7274,6 +7286,56 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
+    class TDActor extends Actor {
+        constructor() {
+            super();
+            this.getFoot = () => {
+                this.getGlobalPosition(this.tempVec2);
+                return this.tempVec2.y + this.offsetY;
+            };
+            this.setFoot = (foot) => {
+                this.getGlobalPosition(this.tempVec2);
+                this.setGlobalPosition(this.tempVec2.x, foot - this.offsetY);
+            };
+            this.getAir = () => {
+                return this.offsetY - this.baseOffsetY;
+            };
+            this.setAir = (air) => {
+                let foot = this.getFoot();
+                this.offsetY = air + this.baseOffsetY;
+                this.setFoot(foot);
+            };
+            this.baseOffsetY = 0;
+            this.setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
+                this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
+                this.baseOffsetY = offsetY;
+            };
+            this.name = "TDActor";
+        }
+    }
+    Comps.TDActor = TDActor;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
+    class TDSpriteRenderer extends SpriteRenderer {
+        constructor() {
+            super();
+            this.onStart = () => {
+                this.tdActor = this.getComponent(Comps.TDActor);
+            };
+            this.onUpdate = () => {
+                this.onUpdateAnimation();
+                this.order = this.tdActor.getFoot();
+            };
+            this.tdActor = null;
+            this.name = "TDSpriteRenderer";
+            this.componentProperties.requireComponent(Comps.TDActor);
+        }
+    }
+    Comps.TDSpriteRenderer = TDSpriteRenderer;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
     class Template extends Component {
         constructor() {
             super();
@@ -7459,15 +7521,12 @@ var Prefabs;
 (function (Prefabs) {
     function Hero(props) {
         let go = new GameObject();
-        let actor = go.addComponent(Actor);
-        actor.offsetX = 0;
-        actor.offsetY = 6;
-        actor.halfWidth = 6;
-        actor.halfHeight = 6;
+        let tdActor = go.addComponent(Comps.TDActor);
+        tdActor.setBounds(0, 6, 6, 6);
         go.addComponent(ActorGizmo);
-        let sr = go.addComponent(SpriteRenderer);
-        sr.imageSmoothingEnabled = false;
         let hero = go.addComponent(Comps.Hero);
+        let tdsr = go.addComponent(Comps.TDSpriteRenderer);
+        tdsr.imageSmoothingEnabled = false;
         return go;
     }
     Prefabs.Hero = Hero;

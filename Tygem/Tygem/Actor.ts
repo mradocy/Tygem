@@ -112,6 +112,20 @@ class Actor extends Component {
 
     halfHeight: number = 0;
 
+    /**
+     * Quickly sets the offsetX, offsetY, halfWidth, halfHeight properties of this Actor.
+     * Meant for initialization.
+     */
+    setBounds = (offsetX: number, offsetY: number, halfWidth: number, halfHeight: number): void => {
+        this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
+    }
+    protected Actor_setBounds = (offsetX: number, offsetY: number, halfWidth: number, halfHeight: number): void => {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.halfWidth;
+        this.halfHeight = halfHeight;
+    }
+    
     getRect(outRect: Rect = null): Rect {
 
         this.getGlobalPosition(this.tempVec2);
@@ -314,9 +328,12 @@ class Actor extends Component {
         Actor.allActors.forEach(callbackFn);
     }
 
+
+
+
     private attachedMovingPlatformObject: Collision.MovingPlatformObject = null;
 
-    private tempVec2: Vec2 = new Vec2();
+    protected tempVec2: Vec2 = new Vec2();
     private static allActors: Array<Actor> = [];
 
 
