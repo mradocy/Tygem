@@ -4167,6 +4167,7 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
             this.tiledMapLayer = null;
         };
         this.name = "TiledMapTileLayerRenderer";
+        this.layer = DrawLayer.PLATFORMS;
     }
 }
 class TiledMapComponent extends Component {
@@ -4393,7 +4394,7 @@ class GameObject {
                 for (let i = 0; i < this.components.length; i++) {
                     let component = this.components[i];
                     if (!component.isEnabled())
-                        return;
+                        continue;
                     if (component.onUpdate != undefined) {
                         component.onUpdate();
                     }
@@ -4567,7 +4568,7 @@ class Actor extends Component {
         this.Actor_setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
-            this.halfWidth;
+            this.halfWidth = halfWidth;
             this.halfHeight = halfHeight;
         };
         this.team = Team.PLAYER_1;
@@ -7317,6 +7318,47 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
+    class TDActorShadow extends DrawerComponent {
+        constructor() {
+            super();
+            this.color = "#2A2A2A66";
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.radiusX = 10;
+            this.radiusY = 5;
+            this.setSize = (offsetX, offsetY, radiusX, radiusY) => {
+                this.offsetX = offsetX;
+                this.offsetY = offsetY;
+                this.radiusX = radiusX;
+                this.radiusY = radiusY;
+            };
+            this.onStart = () => {
+                this.tdActor = this.getComponent(Comps.TDActor);
+            };
+            this.onUpdate = () => { };
+            this.draw = (context) => {
+                let x = this.offsetX;
+                let y = this.tdActor.offsetY + this.offsetY;
+                let radiusX = this.radiusX;
+                let radiusY = this.radiusY;
+                context.fillStyle = this.color;
+                context.beginPath();
+                context.ellipse(x, y, radiusX, radiusY, 0, 0, Math.PI * 2);
+                context.fill();
+            };
+            this.onDestroy = () => {
+                this.tdActor = null;
+            };
+            this.tdActor = null;
+            this.name = "TDActorShadow";
+            this.componentProperties.requireComponent(Comps.TDActor);
+            this.order = -9999;
+        }
+    }
+    Comps.TDActorShadow = TDActorShadow;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
     class TDSpriteRenderer extends SpriteRenderer {
         constructor() {
             super();
@@ -7326,6 +7368,9 @@ var Comps;
             this.onUpdate = () => {
                 this.onUpdateAnimation();
                 this.order = this.tdActor.getFoot();
+            };
+            this.onDestroy = () => {
+                this.tdActor = null;
             };
             this.tdActor = null;
             this.name = "TDSpriteRenderer";
@@ -7523,10 +7568,13 @@ var Prefabs;
         let go = new GameObject();
         let tdActor = go.addComponent(Comps.TDActor);
         tdActor.setBounds(0, 6, 6, 6);
-        go.addComponent(ActorGizmo);
+        let actorGizmo = go.addComponent(ActorGizmo);
+        actorGizmo.disable();
         let hero = go.addComponent(Comps.Hero);
         let tdsr = go.addComponent(Comps.TDSpriteRenderer);
         tdsr.imageSmoothingEnabled = false;
+        let tdas = go.addComponent(Comps.TDActorShadow);
+        tdas.setSize(0, 4, 5, 2);
         return go;
     }
     Prefabs.Hero = Hero;

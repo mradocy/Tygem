@@ -402,7 +402,7 @@ class GameObject {
         if (this.isActive()) {
             for (let i: number = 0; i < this.components.length; i++) {
                 let component: Component = this.components[i];
-                if (!component.isEnabled()) return;
+                if (!component.isEnabled()) continue;
                 if ((component as any).onUpdate != undefined) {
                     (component as any).onUpdate();
                 }

@@ -23,6 +23,10 @@ namespace Comps {
             this.order = this.tdActor.getFoot();
         }
 
+        onDestroy = (): void => {
+            this.tdActor = null;
+        }
+
         private tdActor: TDActor = null;
         
     }

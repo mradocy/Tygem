@@ -122,7 +122,7 @@ class Actor extends Component {
     protected Actor_setBounds = (offsetX: number, offsetY: number, halfWidth: number, halfHeight: number): void => {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
-        this.halfWidth;
+        this.halfWidth = halfWidth;
         this.halfHeight = halfHeight;
     }
     

@@ -5,6 +5,8 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
     constructor() {
         super();
         this.name = "TiledMapTileLayerRenderer";
+
+        this.layer = DrawLayer.PLATFORMS;
     }
 
     /**

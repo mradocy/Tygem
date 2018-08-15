@@ -9,12 +9,16 @@ namespace Prefabs {
         let tdActor: Comps.TDActor = go.addComponent(Comps.TDActor);
         tdActor.setBounds(0, 6, 6, 6);
 
-        go.addComponent(ActorGizmo);
+        let actorGizmo: ActorGizmo = go.addComponent(ActorGizmo);
+        actorGizmo.disable();
         
         let hero: Comps.Hero = go.addComponent(Comps.Hero);
 
         let tdsr: Comps.TDSpriteRenderer = go.addComponent(Comps.TDSpriteRenderer);
         tdsr.imageSmoothingEnabled = false;
+
+        let tdas: Comps.TDActorShadow = go.addComponent(Comps.TDActorShadow);
+        tdas.setSize(0, 4, 5, 2);
 
         return go;
     }
