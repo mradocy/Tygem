@@ -6358,6 +6358,9 @@ Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 15, fal
 Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 15, false);
 Spritesheet.addSpritesheet("log/log.png", 32, 32, 6, 23);
 Animation.addAnimation("log_idle_down", "log/log.png", [0], 10, true);
+Animation.addAnimation("log_idle_up", "log/log.png", [6], 10, true);
+Animation.addAnimation("log_idle_right", "log/log.png", [12], 10, true);
+Animation.addAnimation("log_idle_left", "log/log.png", [18], 10, true);
 Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
@@ -6735,6 +6738,18 @@ TiledMap.addMap("test5", { "height": 20,
                     "width": 0,
                     "x": 159.5,
                     "y": 109
+                },
+                {
+                    "height": 0,
+                    "id": 2,
+                    "name": "Log",
+                    "properties": {},
+                    "rotation": 0,
+                    "type": "Log",
+                    "visible": true,
+                    "width": 0,
+                    "x": 227.5,
+                    "y": 194
                 }],
             "opacity": 1,
             "type": "objectgroup",
@@ -6743,7 +6758,7 @@ TiledMap.addMap("test5", { "height": 20,
             "x": 0,
             "y": 0
         }],
-    "nextobjectid": 2,
+    "nextobjectid": 3,
     "orientation": "orthogonal",
     "properties": {
         "prop1": "prop val"
@@ -6954,6 +6969,130 @@ var Comps;
         }
     }
     Comps.ArrowTestPlatController = ArrowTestPlatController;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
+    class TDActor extends Actor {
+        constructor() {
+            super();
+            this.getFoot = () => {
+                this.getGlobalPosition(this.tempVec2);
+                return this.tempVec2.y + this.offsetY;
+            };
+            this.setFoot = (foot) => {
+                this.getGlobalPosition(this.tempVec2);
+                this.setGlobalPosition(this.tempVec2.x, foot - this.offsetY);
+            };
+            this.getAir = () => {
+                return this.offsetY - this.baseOffsetY;
+            };
+            this.setAir = (air) => {
+                let foot = this.getFoot();
+                this.offsetY = air + this.baseOffsetY;
+                this.setFoot(foot);
+            };
+            this.baseOffsetY = 0;
+            this.setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
+                this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
+                this.baseOffsetY = offsetY;
+            };
+            this.name = "TDActor";
+        }
+    }
+    Comps.TDActor = TDActor;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
+    (function (Character_State) {
+        Character_State[Character_State["NONE"] = 0] = "NONE";
+        Character_State[Character_State["IDLE"] = 1] = "IDLE";
+        Character_State[Character_State["WALK"] = 2] = "WALK";
+    })(Comps.Character_State || (Comps.Character_State = {}));
+    var Character_State = Comps.Character_State;
+    class Character extends Comps.TDActor {
+        constructor() {
+            super();
+            this.animPrefix = "[define animPrefix here]";
+            this.symmetrical = true;
+            this.canWalk = true;
+            this.walkSpeed = 70;
+            this.walkAccel = 500;
+            this.walkFriction = 700;
+            this.idle = () => {
+                this._state = Character_State.IDLE;
+                this._time = 0;
+                this.updateAnimation();
+            };
+            this.faceDirection = (direction) => {
+                this._direction = direction;
+                this.idle();
+            };
+            this.getState = () => {
+                return this._state;
+            };
+            this.getDirection = () => {
+                return this._direction;
+            };
+            this.onStart = () => {
+                this.tdSpriteRenderer = this.getComponent(Comps.TDSpriteRenderer);
+                this.idle();
+            };
+            this.onUpdate = () => {
+                this.updateAnimation();
+            };
+            this.onDestroy = () => {
+                this.tdSpriteRenderer = null;
+            };
+            this.updateAnimation = () => {
+                let anim = this.animPrefix;
+                let flipped = false;
+                switch (this._state) {
+                    case Character_State.IDLE:
+                        anim += "_idle";
+                        break;
+                    case Character_State.WALK:
+                        anim += "_walk";
+                        break;
+                }
+                switch (this._direction) {
+                    case Direction.NONE:
+                        return;
+                    case Direction.LEFT:
+                        if (this.symmetrical) {
+                            flipped = true;
+                            anim += "_right";
+                        }
+                        else {
+                            anim += "_left";
+                        }
+                        break;
+                    case Direction.RIGHT:
+                        anim += "_right";
+                        break;
+                    case Direction.UP:
+                        anim += "_up";
+                        break;
+                    case Direction.DOWN:
+                        anim += "_down";
+                        break;
+                }
+                if (flipped === this.transform.scaleX > 0) {
+                    this.transform.scaleX *= -1;
+                }
+                if (this.tdSpriteRenderer.getAnimation() === null ||
+                    this.tdSpriteRenderer.getAnimation().name !== anim) {
+                    this.tdSpriteRenderer.playAnimation(anim);
+                }
+            };
+            this.tdSpriteRenderer = null;
+            this._state = Character_State.NONE;
+            this._time = 0;
+            this._direction = Direction.DOWN;
+            this.name = "Character";
+            this.componentProperties.requireComponent(Comps.TDSpriteRenderer);
+        }
+    }
+    Comps.Character = Character;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
@@ -7310,37 +7449,6 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
-    class TDActor extends Actor {
-        constructor() {
-            super();
-            this.getFoot = () => {
-                this.getGlobalPosition(this.tempVec2);
-                return this.tempVec2.y + this.offsetY;
-            };
-            this.setFoot = (foot) => {
-                this.getGlobalPosition(this.tempVec2);
-                this.setGlobalPosition(this.tempVec2.x, foot - this.offsetY);
-            };
-            this.getAir = () => {
-                return this.offsetY - this.baseOffsetY;
-            };
-            this.setAir = (air) => {
-                let foot = this.getFoot();
-                this.offsetY = air + this.baseOffsetY;
-                this.setFoot(foot);
-            };
-            this.baseOffsetY = 0;
-            this.setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
-                this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
-                this.baseOffsetY = offsetY;
-            };
-            this.name = "TDActor";
-        }
-    }
-    Comps.TDActor = TDActor;
-})(Comps || (Comps = {}));
-var Comps;
-(function (Comps) {
     class TDActorShadow extends DrawerComponent {
         constructor() {
             super();
@@ -7386,10 +7494,14 @@ var Comps;
         constructor() {
             super();
             this.onStart = () => {
-                this.tdActor = this.getComponent(Comps.TDActor);
             };
             this.onUpdate = () => {
                 this.onUpdateAnimation();
+                if (this.tdActor === null) {
+                    this.tdActor = this.getComponent(Comps.TDActor);
+                }
+                if (this.tdActor === null)
+                    return;
                 this.order = this.tdActor.getFoot();
             };
             this.onDestroy = () => {
@@ -7397,7 +7509,6 @@ var Comps;
             };
             this.tdActor = null;
             this.name = "TDSpriteRenderer";
-            this.componentProperties.requireComponent(Comps.TDActor);
         }
     }
     Comps.TDSpriteRenderer = TDSpriteRenderer;
@@ -7602,6 +7713,22 @@ var Prefabs;
     }
     Prefabs.Hero = Hero;
     TiledMap.addObjectParser("Hero", Hero);
+})(Prefabs || (Prefabs = {}));
+var Prefabs;
+(function (Prefabs) {
+    function Log(props) {
+        let go = new GameObject();
+        let tdsr = go.addComponent(Comps.TDSpriteRenderer);
+        tdsr.imageSmoothingEnabled = false;
+        let character = go.addComponent(Comps.Character);
+        character.animPrefix = "log";
+        character.setBounds(0, 10, 6, 6);
+        let tdas = go.addComponent(Comps.TDActorShadow);
+        tdas.setSize(0, 4, 5, 2);
+        return go;
+    }
+    Prefabs.Log = Log;
+    TiledMap.addObjectParser("Log", Log);
 })(Prefabs || (Prefabs = {}));
 var Prefabs;
 (function (Prefabs) {

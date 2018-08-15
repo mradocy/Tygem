@@ -35,6 +35,7 @@
     <TypeScriptCompile Include="Code\add_Tilemaps.ts" />
     <TypeScriptCompile Include="Code\Components\ArrowTestController.ts" />
     <TypeScriptCompile Include="Code\Components\ArrowTestPlatController.ts" />
+    <TypeScriptCompile Include="Code\Components\Character.ts" />
     <TypeScriptCompile Include="Code\Components\ControlCameraWithWASD.ts" />
     <TypeScriptCompile Include="Code\Components\DotFollowsMouse.ts" />
     <TypeScriptCompile Include="Code\Components\DotGraphic.ts" />
@@ -50,6 +51,7 @@
     <TypeScriptCompile Include="Code\Components\TestSound.ts" />
     <TypeScriptCompile Include="Code\Components\Thing2.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Hero.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\Log.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Sealime.ts" />
     <TypeScriptCompile Include="Code\Prefabs\TestPlatform.ts" />
     <TypeScriptCompile Include="Code\Prefabs\TestPlatform2.ts" />

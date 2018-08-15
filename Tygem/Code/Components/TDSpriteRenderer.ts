@@ -11,15 +11,21 @@ namespace Comps {
             super();
             this.name = "TDSpriteRenderer";
 
-            this.componentProperties.requireComponent(TDActor);
         }
 
         onStart = (): void => {
-            this.tdActor = this.getComponent(TDActor);
+
         }
         
         onUpdate = (): void => {
             this.onUpdateAnimation();
+
+            if (this.tdActor === null) {
+                this.tdActor = this.getComponent(TDActor);
+            }
+            if (this.tdActor === null)
+                return;
+
             this.order = this.tdActor.getFoot();
         }
 

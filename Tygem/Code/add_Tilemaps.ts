@@ -278,6 +278,21 @@ TiledMap.addMap("test5",
                  "width":0,
                  "x":159.5,
                  "y":109
+                }, 
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"Log",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"Log",
+                 "visible":true,
+                 "width":0,
+                 "x":227.5,
+                 "y":194
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -286,7 +301,7 @@ TiledMap.addMap("test5",
          "x":0,
          "y":0
         }],
- "nextobjectid":2,
+ "nextobjectid":3,
  "orientation":"orthogonal",
  "properties":
     {
