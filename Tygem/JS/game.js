@@ -6837,7 +6837,22 @@ Game.startScene = "TestScene3";
 window.onload = () => {
     let canvas = document.getElementById("canvas");
     Game.initialize(canvas);
+    setUpSaveButtons();
 };
+function setUpSaveButtons() {
+    document.getElementById("the_button").onclick = thisFunc;
+}
+function thisFunc() {
+    if (saveDownloadURL != "") {
+        window.URL.revokeObjectURL(saveDownloadURL);
+    }
+    let data = { "a": 1, "b": "1 \n 2 \n \"3\"" };
+    let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    saveDownloadURL = window.URL.createObjectURL(blob);
+    console.log(saveDownloadURL);
+    window.open(saveDownloadURL);
+}
+let saveDownloadURL = "";
 Material.addMaterial("SAND", {
     collisionLayers: 0x1
 });
