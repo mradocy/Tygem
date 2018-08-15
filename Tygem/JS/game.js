@@ -1269,6 +1269,25 @@ SaveBox.saveboxPrefix = "savebox";
 SaveBox.newLine = "|";
 SaveBox.separator1 = "<";
 SaveBox.separator2 = ">";
+var SaveManager;
+(function (SaveManager) {
+    SaveManager.data = {};
+    function downloadSaveData() {
+        if (saveDownloadURL != "") {
+            window.URL.revokeObjectURL(saveDownloadURL);
+        }
+        let blob = new Blob([JSON.stringify(SaveManager.data)], { type: 'application/json' });
+        saveDownloadURL = window.URL.createObjectURL(blob);
+        var elem = window.document.createElement('a');
+        elem.href = saveDownloadURL;
+        elem.download = "data.sav";
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
+    SaveManager.downloadSaveData = downloadSaveData;
+    let saveDownloadURL = "";
+})(SaveManager || (SaveManager = {}));
 var Keys;
 (function (Keys) {
     function _initialize(document) {
@@ -6837,22 +6856,8 @@ Game.startScene = "TestScene3";
 window.onload = () => {
     let canvas = document.getElementById("canvas");
     Game.initialize(canvas);
-    setUpSaveButtons();
+    document.getElementById("download_save_data").onclick = SaveManager.downloadSaveData;
 };
-function setUpSaveButtons() {
-    document.getElementById("the_button").onclick = thisFunc;
-}
-function thisFunc() {
-    if (saveDownloadURL != "") {
-        window.URL.revokeObjectURL(saveDownloadURL);
-    }
-    let data = { "a": 1, "b": "1 \n 2 \n \"3\"" };
-    let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    saveDownloadURL = window.URL.createObjectURL(blob);
-    console.log(saveDownloadURL);
-    window.open(saveDownloadURL);
-}
-let saveDownloadURL = "";
 Material.addMaterial("SAND", {
     collisionLayers: 0x1
 });
@@ -7170,6 +7175,9 @@ var Comps;
                 this.actor.vx = vx;
                 this.actor.vy = vy;
                 this.updateAnimation();
+                if (Keys.keyPressed(Key.Num6)) {
+                    SaveManager.downloadSaveData();
+                }
             };
             this.idle = () => {
                 if (this.state === Hero_State.IDLE)

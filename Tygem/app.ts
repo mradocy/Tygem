@@ -34,32 +34,9 @@ window.onload = () => {
     
 
 
-    setUpSaveButtons();
+
+    // setting up the "Download Save Data" button
+    document.getElementById("download_save_data").onclick = SaveManager.downloadSaveData;
     
+
 };
-
-
-
-
-
-function setUpSaveButtons(): void {
-    document.getElementById("the_button").onclick = thisFunc;
-}
-
-function thisFunc(): void {
-
-    if (saveDownloadURL != "") {
-        window.URL.revokeObjectURL(saveDownloadURL);
-    }
-
-    let data: any = { "a": 1, "b": "1 \n 2 \n \"3\"" };
-
-    let blob: Blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-
-    saveDownloadURL = window.URL.createObjectURL(blob);
-    console.log(saveDownloadURL);
-    window.open(saveDownloadURL);
-}
-let saveDownloadURL: string = "";
-
-//window.URL.createObjectURL("a b c \n d")

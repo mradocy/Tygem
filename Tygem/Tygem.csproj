@@ -76,6 +76,7 @@
     <TypeScriptCompile Include="Tygem\RaycastTestGizmo.ts" />
     <TypeScriptCompile Include="Tygem\Rect.ts" />
     <TypeScriptCompile Include="Tygem\SaveBox.ts" />
+    <TypeScriptCompile Include="Tygem\SaveManager.ts" />
     <TypeScriptCompile Include="Tygem\ScreenFilter.ts" />
     <TypeScriptCompile Include="Tygem\SpriteRenderer.ts" />
     <TypeScriptCompile Include="Tygem\Spritesheet.ts" />

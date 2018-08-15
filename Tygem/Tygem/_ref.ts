@@ -13,6 +13,7 @@
 /// <reference path="Transform.ts" />
 
 /// <reference path="SaveBox.ts" />
+/// <reference path="SaveManager.ts" />
 
 /// <reference path="Keys.ts" />
 /// <reference path="Mouse.ts" />
