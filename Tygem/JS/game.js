@@ -4700,6 +4700,13 @@ class Actor extends ReceivesDamage {
             raycastHit.t = time;
             raycastHit.point.setValues(origin.x + direction.x * time, origin.y + direction.y * time);
         };
+        this.rectOverlaps = (rect, teamMask = Team.ALL) => {
+            if (!this.isInTeam(teamMask)) {
+                return false;
+            }
+            this.getRect(this.tempRect);
+            return rect.overlaps(this.tempRect);
+        };
         this.onAwake = () => {
             Actor.allActors.push(this);
         };
@@ -4730,6 +4737,7 @@ class Actor extends ReceivesDamage {
         };
         this.attachedMovingPlatformObject = null;
         this.tempVec2 = new Vec2();
+        this.tempRect = new Rect();
         this.name = "Actor";
         this.componentProperties.only1 = true;
         this.componentProperties.excludeComponent(Platform);
@@ -5881,6 +5889,17 @@ var Collision;
         });
     }
     Collision.rectOverlapAllPlatformObjectsNonAlloc = rectOverlapAllPlatformObjectsNonAlloc;
+    function rectOverlapAllActorsNonAlloc(actors, rect, teamMask = Team.ALL) {
+        actors.splice(0);
+        Actor.forEach(function (actor) {
+            if (actor.isInTeam(teamMask)) {
+                if (actor.rectOverlaps(rect, teamMask)) {
+                    actors.push(actor);
+                }
+            }
+        });
+    }
+    Collision.rectOverlapAllActorsNonAlloc = rectOverlapAllActorsNonAlloc;
     function maskCollidesWithLayers(collisionMask, collisionLayers) {
         return (collisionMask & collisionLayers) !== 0;
     }
@@ -6222,6 +6241,14 @@ var Debug;
         Scene.loadScene(sceneName);
     }
     Debug.loadScene = loadScene;
+    function listActors() {
+        let names = [];
+        Actor.forEach(function (actor) {
+            names.push(actor.gameObject.name);
+        });
+        return names;
+    }
+    Debug.listActors = listActors;
 })(Debug || (Debug = {}));
 class Game {
     static initialize(canvas) {
@@ -6799,7 +6826,7 @@ TiledMap.addMap("test5", { "height": 20,
             "x": 0,
             "y": 0
         }],
-    "nextobjectid": 3,
+    "nextobjectid": 5,
     "orientation": "orthogonal",
     "properties": {
         "prop1": "prop val"
@@ -6819,8 +6846,50 @@ TiledMap.addMap("test5", { "height": 20,
             "tilecount": 1440,
             "tileheight": 16,
             "tileproperties": {
+                "10": {
+                    "col": "true"
+                },
+                "126": {
+                    "col": "true"
+                },
+                "127": {
+                    "col": "true"
+                },
+                "128": {
+                    "col": "true"
+                },
+                "129": {
+                    "col": "true"
+                },
+                "130": {
+                    "col": "true"
+                },
+                "166": {
+                    "col": "true"
+                },
+                "167": {
+                    "col": "true"
+                },
+                "168": {
+                    "col": "true"
+                },
+                "169": {
+                    "col": "true"
+                },
+                "170": {
+                    "col": "true"
+                },
                 "283": {
                     "material": "WATER"
+                },
+                "46": {
+                    "col": "true"
+                },
+                "47": {
+                    "col": "true"
+                },
+                "48": {
+                    "col": "true"
                 },
                 "484": {
                     "material": "CLIFF"
@@ -6830,6 +6899,12 @@ TiledMap.addMap("test5", { "height": 20,
                 },
                 "486": {
                     "material": "CLIFF"
+                },
+                "49": {
+                    "col": "true"
+                },
+                "50": {
+                    "col": "true"
                 },
                 "521": {
                     "col": "true"
@@ -6870,6 +6945,9 @@ TiledMap.addMap("test5", { "height": 20,
                 "566": {
                     "material": "CLIFF"
                 },
+                "6": {
+                    "col": "true"
+                },
                 "600": {
                     "col": "true"
                 },
@@ -6898,6 +6976,30 @@ TiledMap.addMap("test5", { "height": 20,
                     "col": "true"
                 },
                 "686": {
+                    "col": "true"
+                },
+                "7": {
+                    "col": "true"
+                },
+                "8": {
+                    "col": "true"
+                },
+                "86": {
+                    "col": "true"
+                },
+                "87": {
+                    "col": "true"
+                },
+                "88": {
+                    "col": "true"
+                },
+                "89": {
+                    "col": "true"
+                },
+                "9": {
+                    "col": "true"
+                },
+                "90": {
                     "col": "true"
                 }
             },
@@ -7050,6 +7152,11 @@ var Comps;
         Character_State[Character_State["WALK"] = 2] = "WALK";
     })(Comps.Character_State || (Comps.Character_State = {}));
     var Character_State = Comps.Character_State;
+    (function (Character_PushMode) {
+        Character_PushMode[Character_PushMode["NONE"] = 0] = "NONE";
+        Character_PushMode[Character_PushMode["PUSHED"] = 1] = "PUSHED";
+    })(Comps.Character_PushMode || (Comps.Character_PushMode = {}));
+    var Character_PushMode = Comps.Character_PushMode;
     class Character extends Comps.TDActor {
         constructor() {
             super();
@@ -7058,10 +7165,23 @@ var Comps;
             this.canWalk = true;
             this.walkSpeed = 70;
             this.walkAccel = 500;
-            this.walkFriction = 700;
+            this.friction = 700;
+            this.applyFriction = true;
+            this.pushMode = Character_PushMode.PUSHED;
             this.idle = () => {
                 this._state = Character_State.IDLE;
                 this._time = 0;
+                this.applyFriction = true;
+                this.updateAnimation();
+            };
+            this.walkToPoint = (x, y) => {
+                this._targetX = x;
+                this._targetY = y;
+                if (this._state != Character_State.WALK) {
+                    this._state = Character_State.WALK;
+                    this._time = 0;
+                    this.applyFriction = false;
+                }
                 this.updateAnimation();
             };
             this.faceDirection = (direction) => {
@@ -7080,6 +7200,31 @@ var Comps;
                 this.idle();
             };
             this.onUpdate = () => {
+                this.transform.getGlobalPosition(this.tempVec2);
+                let x = this.tempVec2.x;
+                let foot = this.getFoot();
+                let vx = this.vx;
+                let vy = this.vy;
+                this._time += Game.deltaTime;
+                if (this.applyFriction) {
+                    let friction = this.friction;
+                    if (vx < 0) {
+                        vx = Math.min(0, vx + friction * Game.deltaTime);
+                    }
+                    else {
+                        vx = Math.max(0, vx - friction * Game.deltaTime);
+                    }
+                    if (vy < 0) {
+                        vy = Math.min(0, vy + friction * Game.deltaTime);
+                    }
+                    else {
+                        vy = Math.max(0, vy - friction * Game.deltaTime);
+                    }
+                }
+                if (this.pushMode === Character_PushMode.PUSHED) {
+                }
+                this.vx = vx;
+                this.vy = vy;
                 this.updateAnimation();
             };
             this.onDestroy = () => {
@@ -7130,6 +7275,8 @@ var Comps;
             this._state = Character_State.NONE;
             this._time = 0;
             this._direction = Direction.DOWN;
+            this._targetX = 0;
+            this._targetY = 0;
             this.name = "Character";
             this.componentProperties.requireComponent(Comps.TDSpriteRenderer);
         }
