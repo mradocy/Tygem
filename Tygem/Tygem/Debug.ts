@@ -43,5 +43,18 @@ namespace Debug {
     export function loadScene(sceneName: string): void {
         Scene.loadScene(sceneName);
     }
+
+    /**
+     * Lists the names of the GameObject of all Actors in the scene
+     */
+    export function listActors(): Array<string> {
+        let names: Array<string> = [];
+        Actor.forEach(
+            function (actor: Actor): void {
+                names.push(actor.gameObject.name);
+            }
+        );
+        return names;
+    }
     
 }
