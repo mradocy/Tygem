@@ -67,6 +67,7 @@ namespace Comps {
         
         // Called once for a Component.  Either called when a scene finishes loading, or just before update().
         onStart = (): void => {
+            this.health = this.maxHealth;
 
             this.tdSpriteRenderer = this.getComponent(TDSpriteRenderer);
 

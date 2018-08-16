@@ -42,6 +42,7 @@
 /// <reference path="DrawerComponent.ts" />
 /// <reference path="PackedImageRenderer.ts" />
 /// <reference path="SpriteRenderer.ts" />
+/// <reference path="ReceivesDamage.ts" />
 /// <reference path="TextArea.ts" />
 /// <reference path="InputTextArea.ts" />
 

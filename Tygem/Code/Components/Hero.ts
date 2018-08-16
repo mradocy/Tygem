@@ -153,11 +153,6 @@ namespace Comps {
             this.updateAnimation();
 
             
-
-            if (Keys.keyPressed(Key.Num6)) {
-                SaveManager.downloadSaveData();
-            }
-
         }
 
         idle = (): void => {

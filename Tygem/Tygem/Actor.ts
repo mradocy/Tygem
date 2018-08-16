@@ -27,37 +27,7 @@
     
  */
 
-/**
- * 
- */
-enum Team {
-    NONE = 0,
-    
-    PLAYER_1 = 1 << 0,
-    PLAYER_2 = 1 << 1,
-    PLAYER_3 = 1 << 2,
-    PLAYER_4 = 1 << 3,
-    /**
-     * Represents all players.
-     */
-    PLAYERS = PLAYER_1 | PLAYER_2 | PLAYER_3 | PLAYER_4,
-
-    ENEMY_1 = 1 << 8,
-    ENEMY_2 = 1 << 9,
-    ENEMY_3 = 1 << 10,
-    ENEMY_4 = 1 << 11,
-    /**
-     * Represents all enemies.
-     */
-    ENEMIES = ENEMY_1 | ENEMY_2 | ENEMY_3 | ENEMY_4,
-    
-    /**
-     * Represents all players and all enemies.
-     */
-    ALL = 0x7FFFFFFF
-}
-
-class Actor extends Component {
+class Actor extends ReceivesDamage {
 
     constructor() {
         super();
@@ -149,18 +119,6 @@ class Actor extends Component {
         return null;
     }
 
-    /**
-     * The "team" this actor belongs to.  Affects which attacks this actor gets hit by.
-     */
-    team: Team = Team.PLAYER_1;
-
-    /**
-     * If this actor is included in the given team.
-     */
-    isInTeam = (team: Team): boolean => {
-        return (team & this.team) != 0;
-    }
-    
     /**
      * Determines how an Actor is repositioned upon hitting a platform.
      * When false, Actors will stop immediately when hitting a platform.
@@ -284,6 +242,10 @@ class Actor extends Component {
      */
     onAwake = (): void => {
         Actor.allActors.push(this);
+    }
+
+    onStart = (): void => {
+        this.health = this.maxHealth;
     }
 
     onUpdate = (): void => { }

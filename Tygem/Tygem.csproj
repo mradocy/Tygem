@@ -76,6 +76,7 @@
     <TypeScriptCompile Include="Tygem\Platform.ts" />
     <TypeScriptCompile Include="Tygem\PlatformObject.ts" />
     <TypeScriptCompile Include="Tygem\RaycastTestGizmo.ts" />
+    <TypeScriptCompile Include="Tygem\ReceivesDamage.ts" />
     <TypeScriptCompile Include="Tygem\Rect.ts" />
     <TypeScriptCompile Include="Tygem\SaveBox.ts" />
     <TypeScriptCompile Include="Tygem\SaveManager.ts" />

@@ -3810,6 +3810,63 @@ class SpriteRenderer extends PackedImageRenderer {
         this.name = "SpriteRenderer";
     }
 }
+class ReceivesDamage extends Component {
+    constructor() {
+        super();
+        this.maxHealth = 10;
+        this.health = 0;
+        this.team = Team.PLAYERS;
+        this.isInTeam = (team) => {
+            return (team & this.team) != 0;
+        };
+        this.receiveDamage = (ai) => {
+            if (!this.isActiveAndEnabled())
+                return;
+            this.gameObject.sendMessage("preReceiveDamage", ai);
+            this.health = Math.max(0, this.health - ai.damage);
+            this.gameObject.sendMessage("onReceiveDamage", ai);
+        };
+        this.onStart = () => {
+            this.health = this.maxHealth;
+        };
+        this.name = "ReceivesDamage";
+    }
+}
+var Team;
+(function (Team) {
+    Team[Team["NONE"] = 0] = "NONE";
+    Team[Team["PLAYERS"] = 15] = "PLAYERS";
+    Team[Team["ENEMIES"] = 3840] = "ENEMIES";
+    Team[Team["ALL"] = 2147483647] = "ALL";
+})(Team || (Team = {}));
+class AttackInfo {
+    constructor() {
+        this.damage = 0;
+        this.resetValues = () => {
+            this.damage = 0;
+        };
+        this.recycled = false;
+    }
+    static createNew() {
+        let ret = null;
+        if (AttackInfo.privateAIs.length > 0) {
+            ret = AttackInfo.privateAIs.pop();
+            ret.recycled = true;
+        }
+        else {
+            ret = new AttackInfo();
+        }
+        ret.resetValues();
+        return ret;
+    }
+    static recycle(ai) {
+        if (ai.recycled)
+            return;
+        ai.recycled = true;
+        AttackInfo.privateAIs.push(ai);
+    }
+}
+AttackInfo.privateAIs = [];
 var HorizAlign;
 (function (HorizAlign) {
     HorizAlign[HorizAlign["LEFT"] = 0] = "LEFT";
@@ -4548,22 +4605,7 @@ class GameObject {
 GameObject.instanceIDCounter = 0;
 GameObject.allGameObjects = [];
 GameObject.gameObjectsMarkedForDestroy = [];
-var Team;
-(function (Team) {
-    Team[Team["NONE"] = 0] = "NONE";
-    Team[Team["PLAYER_1"] = 1] = "PLAYER_1";
-    Team[Team["PLAYER_2"] = 2] = "PLAYER_2";
-    Team[Team["PLAYER_3"] = 4] = "PLAYER_3";
-    Team[Team["PLAYER_4"] = 8] = "PLAYER_4";
-    Team[Team["PLAYERS"] = 15] = "PLAYERS";
-    Team[Team["ENEMY_1"] = 256] = "ENEMY_1";
-    Team[Team["ENEMY_2"] = 512] = "ENEMY_2";
-    Team[Team["ENEMY_3"] = 1024] = "ENEMY_3";
-    Team[Team["ENEMY_4"] = 2048] = "ENEMY_4";
-    Team[Team["ENEMIES"] = 3840] = "ENEMIES";
-    Team[Team["ALL"] = 2147483647] = "ALL";
-})(Team || (Team = {}));
-class Actor extends Component {
+class Actor extends ReceivesDamage {
     constructor() {
         super();
         this.getGlobalPosition = (outPos = null) => {
@@ -4589,10 +4631,6 @@ class Actor extends Component {
             this.offsetY = offsetY;
             this.halfWidth = halfWidth;
             this.halfHeight = halfHeight;
-        };
-        this.team = Team.PLAYER_1;
-        this.isInTeam = (team) => {
-            return (team & this.team) != 0;
         };
         this.projectCollision = true;
         this.zeroVelocityOnCollision = true;
@@ -4664,6 +4702,9 @@ class Actor extends Component {
         };
         this.onAwake = () => {
             Actor.allActors.push(this);
+        };
+        this.onStart = () => {
+            this.health = this.maxHealth;
         };
         this.onUpdate = () => { };
         this.onEnable = () => { };
@@ -7034,6 +7075,7 @@ var Comps;
                 return this._direction;
             };
             this.onStart = () => {
+                this.health = this.maxHealth;
                 this.tdSpriteRenderer = this.getComponent(Comps.TDSpriteRenderer);
                 this.idle();
             };
@@ -7314,9 +7356,6 @@ var Comps;
                 this.actor.vx = vx;
                 this.actor.vy = vy;
                 this.updateAnimation();
-                if (Keys.keyPressed(Key.Num6)) {
-                    SaveManager.downloadSaveData();
-                }
             };
             this.idle = () => {
                 if (this.state === Hero_State.IDLE)
@@ -7722,9 +7761,11 @@ var Prefabs;
         tdsr.imageSmoothingEnabled = false;
         let character = go.addComponent(Comps.Character);
         character.animPrefix = "log";
-        character.setBounds(0, 10, 6, 6);
+        character.setBounds(0, 9, 6, 6);
+        character.maxHealth = 10;
+        character.team = Team.PLAYERS;
         let tdas = go.addComponent(Comps.TDActorShadow);
-        tdas.setSize(0, 4, 5, 2);
+        tdas.setSize(0, 2, 5, 2);
         return go;
     }
     Prefabs.Log = Log;

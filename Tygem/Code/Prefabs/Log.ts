@@ -9,13 +9,15 @@ namespace Prefabs {
         let tdsr: Comps.TDSpriteRenderer = go.addComponent(Comps.TDSpriteRenderer);
         tdsr.imageSmoothingEnabled = false;
         
-        
+
 
 
         // create 'Log' from the Character component
         let character: Comps.Character = go.addComponent(Comps.Character);
         character.animPrefix = "log";
-        character.setBounds(0, 10, 6, 6);
+        character.setBounds(0, 9, 6, 6);
+        character.maxHealth = 10;
+        character.team = Team.PLAYERS;
 
 
 
@@ -23,7 +25,7 @@ namespace Prefabs {
         //let actorGizmo: ActorGizmo = go.addComponent(ActorGizmo);
         
         let tdas: Comps.TDActorShadow = go.addComponent(Comps.TDActorShadow);
-        tdas.setSize(0, 4, 5, 2);
+        tdas.setSize(0, 2, 5, 2);
 
         return go;
     }
