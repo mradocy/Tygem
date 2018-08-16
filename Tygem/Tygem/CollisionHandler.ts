@@ -133,6 +133,30 @@ namespace Collision {
 
     }
 
+    /**
+     * Fills the given actors array with all the actors the given rect overlaps.
+     * Note that since platform object are repositioned with a tiny bit of space between them and the actor they collided with,
+     * a platform object's rect should not be overlapping with the actor it collided with.
+     * @param actors Out parameter that will be filled with Actors.
+     * @param rect The rectangle to test.
+     * @param collisionMask Collision mask to filter collision.
+     */
+    export function rectOverlapAllActorsNonAlloc(actors: Array<Actor>, rect: Rect, teamMask: Team = Team.ALL): void {
+
+        actors.splice(0);
+
+        Actor.forEach(
+            function (actor: Actor): void {
+                if (actor.isInTeam(teamMask)) {
+                    if (actor.rectOverlaps(rect, teamMask)) {
+                        actors.push(actor);
+                    }
+                }
+            }
+        );
+        
+    }
+
     
     /**
      * Returns if an Actor with the given collisionMask will collide with a PlatformObject with the given collisionLayers.

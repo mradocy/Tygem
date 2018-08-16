@@ -47,6 +47,7 @@
     <TypeScriptCompile Include="Code\Components\TDActorShadow.ts" />
     <TypeScriptCompile Include="Code\Components\TDSpriteRenderer.ts" />
     <TypeScriptCompile Include="Code\Components\Template.ts" />
+    <TypeScriptCompile Include="Code\Components\TestCharacter.ts" />
     <TypeScriptCompile Include="Code\Components\TestRectOverlap.ts" />
     <TypeScriptCompile Include="Code\Components\TestSound.ts" />
     <TypeScriptCompile Include="Code\Components\Thing2.ts" />

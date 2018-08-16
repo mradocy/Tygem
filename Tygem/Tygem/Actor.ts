@@ -235,6 +235,18 @@ class Actor extends ReceivesDamage {
         
     }
 
+    /**
+     * Returns if the given rectangle overlaps with this actor.
+     */
+    rectOverlaps = (rect: Rect, teamMask: Team = Team.ALL): boolean => {
+
+        if (!this.isInTeam(teamMask)) {
+            return false;
+        }
+        
+        this.getRect(this.tempRect);
+        return rect.overlaps(this.tempRect);
+    }
     
     
     /**
@@ -296,6 +308,7 @@ class Actor extends ReceivesDamage {
     private attachedMovingPlatformObject: Collision.MovingPlatformObject = null;
 
     protected tempVec2: Vec2 = new Vec2();
+    protected tempRect: Rect = new Rect();
     private static allActors: Array<Actor> = [];
 
 

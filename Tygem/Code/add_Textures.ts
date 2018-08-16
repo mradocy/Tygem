@@ -51,6 +51,9 @@ Animation.addAnimation("log_idle_up", "log/log.png", [6], 10, true);
 Animation.addAnimation("log_idle_right", "log/log.png", [12], 10, true);
 Animation.addAnimation("log_idle_left", "log/log.png", [18], 10, true);
 Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
+Animation.addAnimation("log_walk_up", "log/log.png", [6, 7, 8, 9], 10, true);
+Animation.addAnimation("log_walk_right", "log/log.png", [12, 13, 14, 15], 10, true);
+Animation.addAnimation("log_walk_left", "log/log.png", [18, 19, 20, 21], 10, true);
 
 
 

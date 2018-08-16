@@ -301,7 +301,7 @@ TiledMap.addMap("test5",
          "x":0,
          "y":0
         }],
- "nextobjectid":3,
+ "nextobjectid":5,
  "orientation":"orthogonal",
  "properties":
     {
@@ -326,9 +326,65 @@ TiledMap.addMap("test5",
          "tileheight":16,
          "tileproperties":
             {
+             "10":
+                {
+                 "col":"true"
+                },
+             "126":
+                {
+                 "col":"true"
+                },
+             "127":
+                {
+                 "col":"true"
+                },
+             "128":
+                {
+                 "col":"true"
+                },
+             "129":
+                {
+                 "col":"true"
+                },
+             "130":
+                {
+                 "col":"true"
+                },
+             "166":
+                {
+                 "col":"true"
+                },
+             "167":
+                {
+                 "col":"true"
+                },
+             "168":
+                {
+                 "col":"true"
+                },
+             "169":
+                {
+                 "col":"true"
+                },
+             "170":
+                {
+                 "col":"true"
+                },
              "283":
                 {
                  "material":"WATER"
+                },
+             "46":
+                {
+                 "col":"true"
+                },
+             "47":
+                {
+                 "col":"true"
+                },
+             "48":
+                {
+                 "col":"true"
                 },
              "484":
                 {
@@ -341,6 +397,14 @@ TiledMap.addMap("test5",
              "486":
                 {
                  "material":"CLIFF"
+                },
+             "49":
+                {
+                 "col":"true"
+                },
+             "50":
+                {
+                 "col":"true"
                 },
              "521":
                 {
@@ -394,6 +458,10 @@ TiledMap.addMap("test5",
                 {
                  "material":"CLIFF"
                 },
+             "6":
+                {
+                 "col":"true"
+                },
              "600":
                 {
                  "col":"true"
@@ -431,6 +499,38 @@ TiledMap.addMap("test5",
                  "col":"true"
                 },
              "686":
+                {
+                 "col":"true"
+                },
+             "7":
+                {
+                 "col":"true"
+                },
+             "8":
+                {
+                 "col":"true"
+                },
+             "86":
+                {
+                 "col":"true"
+                },
+             "87":
+                {
+                 "col":"true"
+                },
+             "88":
+                {
+                 "col":"true"
+                },
+             "89":
+                {
+                 "col":"true"
+                },
+             "9":
+                {
+                 "col":"true"
+                },
+             "90":
                 {
                  "col":"true"
                 }

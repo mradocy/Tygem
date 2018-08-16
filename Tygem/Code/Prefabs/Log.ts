@@ -20,6 +20,10 @@ namespace Prefabs {
         character.team = Team.PLAYERS;
 
 
+        // enable testing
+        let testCharacter: Comps.TestCharacter = go.addComponent(Comps.TestCharacter);
+
+
 
 
         //let actorGizmo: ActorGizmo = go.addComponent(ActorGizmo);

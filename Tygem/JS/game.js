@@ -6430,6 +6430,9 @@ Animation.addAnimation("log_idle_up", "log/log.png", [6], 10, true);
 Animation.addAnimation("log_idle_right", "log/log.png", [12], 10, true);
 Animation.addAnimation("log_idle_left", "log/log.png", [18], 10, true);
 Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
+Animation.addAnimation("log_walk_up", "log/log.png", [6, 7, 8, 9], 10, true);
+Animation.addAnimation("log_walk_right", "log/log.png", [12, 13, 14, 15], 10, true);
+Animation.addAnimation("log_walk_left", "log/log.png", [18, 19, 20, 21], 10, true);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -7157,6 +7160,12 @@ var Comps;
         Character_PushMode[Character_PushMode["PUSHED"] = 1] = "PUSHED";
     })(Comps.Character_PushMode || (Comps.Character_PushMode = {}));
     var Character_PushMode = Comps.Character_PushMode;
+    (function (Character_WalkMode) {
+        Character_WalkMode[Character_WalkMode["NONE"] = 0] = "NONE";
+        Character_WalkMode[Character_WalkMode["TO_POINT"] = 1] = "TO_POINT";
+        Character_WalkMode[Character_WalkMode["TO_TDACTOR"] = 2] = "TO_TDACTOR";
+    })(Comps.Character_WalkMode || (Comps.Character_WalkMode = {}));
+    var Character_WalkMode = Comps.Character_WalkMode;
     class Character extends Comps.TDActor {
         constructor() {
             super();
@@ -7175,8 +7184,44 @@ var Comps;
                 this.updateAnimation();
             };
             this.walkToPoint = (x, y) => {
-                this._targetX = x;
-                this._targetY = y;
+                if (!this.canWalk)
+                    return;
+                this._walkMode = Character_WalkMode.TO_POINT;
+                this._targetRef = null;
+                this._targetOffsetX = x;
+                this._targetOffsetY = y;
+                this._startWalk();
+            };
+            this.walkToTDActor = (tdActor, offset) => {
+                if (!this.canWalk)
+                    return;
+                this._walkMode = Character_WalkMode.TO_TDACTOR;
+                this._targetRef = tdActor;
+                switch (offset) {
+                    case Direction.RIGHT:
+                        this._targetOffsetX = tdActor.halfWidth + this.halfWidth;
+                        this._targetOffsetY = 0;
+                        break;
+                    case Direction.DOWN:
+                        this._targetOffsetX = 0;
+                        this._targetOffsetY = tdActor.halfHeight + this.halfHeight;
+                        break;
+                    case Direction.LEFT:
+                        this._targetOffsetX = -tdActor.halfWidth - this.halfWidth;
+                        this._targetOffsetY = 0;
+                        break;
+                    case Direction.UP:
+                        this._targetOffsetX = 0;
+                        this._targetOffsetY = -tdActor.halfHeight - this.halfHeight;
+                        break;
+                    default:
+                        this._targetOffsetX = 0;
+                        this._targetOffsetY = 0;
+                        break;
+                }
+                this._startWalk();
+            };
+            this._startWalk = () => {
                 if (this._state != Character_State.WALK) {
                     this._state = Character_State.WALK;
                     this._time = 0;
@@ -7206,6 +7251,52 @@ var Comps;
                 let vx = this.vx;
                 let vy = this.vy;
                 this._time += Game.deltaTime;
+                switch (this._state) {
+                    case Character_State.IDLE:
+                        break;
+                    case Character_State.WALK:
+                        let wx = 0;
+                        let wy = 0;
+                        switch (this._walkMode) {
+                            case Character_WalkMode.TO_POINT:
+                                wx = this._targetOffsetX;
+                                wy = this._targetOffsetY;
+                                break;
+                            case Character_WalkMode.TO_TDACTOR:
+                                this._targetRef.getGlobalPosition(this.tempVec2);
+                                wx = this.tempVec2.x + this._targetOffsetX;
+                                wy = this._targetRef.getFoot() + this._targetOffsetY;
+                                break;
+                        }
+                        let dx = wx - x;
+                        let dy = wy - foot;
+                        let dMag = M.magnitude(dx, dy);
+                        if (dMag < this.walkSpeed * Game.deltaTime) {
+                            vx = dx / Game.deltaTime;
+                            vy = dy / Game.deltaTime;
+                            this.idle();
+                        }
+                        else {
+                            dx /= dMag;
+                            dy /= dMag;
+                            let targetVX = dx * this.walkSpeed;
+                            let targetVY = dy * this.walkSpeed;
+                            if (vx < targetVX) {
+                                vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
+                            }
+                            else {
+                                vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
+                            }
+                            if (vy < targetVY) {
+                                vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
+                            }
+                            else {
+                                vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
+                            }
+                        }
+                        this._direction = Collision.getNormalDirection(vx, vy);
+                        break;
+                }
                 if (this.applyFriction) {
                     let friction = this.friction;
                     if (vx < 0) {
@@ -7275,8 +7366,10 @@ var Comps;
             this._state = Character_State.NONE;
             this._time = 0;
             this._direction = Direction.DOWN;
-            this._targetX = 0;
-            this._targetY = 0;
+            this._walkMode = Character_WalkMode.NONE;
+            this._targetRef = null;
+            this._targetOffsetX = 0;
+            this._targetOffsetY = 0;
             this.name = "Character";
             this.componentProperties.requireComponent(Comps.TDSpriteRenderer);
         }
@@ -7714,6 +7807,28 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
+    class TestCharacter extends Component {
+        constructor() {
+            super();
+            this.onStart = () => {
+                this.character = this.getComponent(Comps.Character);
+            };
+            this.onUpdate = () => {
+                if (Keys.keyPressed(Key.Num1)) {
+                    let hero = GameObject.findObject("Hero").getComponent(Comps.TDActor);
+                    this.character.walkToTDActor(hero, Direction.RIGHT);
+                }
+            };
+            this.onDestroy = () => { };
+            this.character = null;
+            this.name = "TestCharacter";
+            this.componentProperties.requireComponent(Comps.Character);
+        }
+    }
+    Comps.TestCharacter = TestCharacter;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
     class TestRectOverlap extends Component {
         constructor() {
             super();
@@ -7911,6 +8026,7 @@ var Prefabs;
         character.setBounds(0, 9, 6, 6);
         character.maxHealth = 10;
         character.team = Team.PLAYERS;
+        let testCharacter = go.addComponent(Comps.TestCharacter);
         let tdas = go.addComponent(Comps.TDActorShadow);
         tdas.setSize(0, 2, 5, 2);
         return go;
