@@ -390,6 +390,7 @@ namespace Comps {
         // called just before the component is destroyed.
         onDestroy = (): void => {
             this.tdSpriteRenderer = null;
+            this.Actor_onDestroy();
         }
 
         protected _startIdleState = (): void => {

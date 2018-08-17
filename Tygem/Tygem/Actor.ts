@@ -283,6 +283,9 @@ class Actor extends ReceivesDamage {
      * Removes this actor from the list of all actors.
      */
     onDestroy = (): void => {
+        this.Actor_onDestroy();
+    }
+    protected Actor_onDestroy = (): void => {
         // detach from platform
         if (this.attachedMovingPlatformObject != null) {
             this.attachedMovingPlatformObject.detachActor(this);

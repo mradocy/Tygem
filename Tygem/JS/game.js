@@ -4727,6 +4727,9 @@ class Actor extends ReceivesDamage {
             this.attachedMovingPlatformObject = null;
         };
         this.onDestroy = () => {
+            this.Actor_onDestroy();
+        };
+        this.Actor_onDestroy = () => {
             if (this.attachedMovingPlatformObject != null) {
                 this.attachedMovingPlatformObject.detachActor(this);
             }
@@ -6542,6 +6545,8 @@ var Scenes;
                 textArea.borderWidth = 1;
                 textArea.layer = DrawLayer.UI;
                 textArea.order = 9999;
+                go.transform.scaleX = 2;
+                go.transform.scaleY = 1;
                 go = new GameObject();
                 let inputTextArea = go.addComponent(InputTextArea);
                 go.transform.x = 500;
@@ -7422,6 +7427,7 @@ var Comps;
             };
             this.onDestroy = () => {
                 this.tdSpriteRenderer = null;
+                this.Actor_onDestroy();
             };
             this._startIdleState = () => {
                 if (this._state != Character_State.IDLE) {
