@@ -96,7 +96,7 @@ class Actor extends ReceivesDamage {
         this.halfHeight = halfHeight;
     }
     
-    getRect(outRect: Rect = null): Rect {
+    getRect = (outRect: Rect = null): Rect => {
 
         this.getGlobalPosition(this.tempVec2);
         let x: number = this.tempVec2.x;
@@ -253,6 +253,9 @@ class Actor extends ReceivesDamage {
      * Called when a Component is added to a GameObject.  Adds Actor to the list containing all Actors.
      */
     onAwake = (): void => {
+        this.Actor_onAwake();
+    }
+    protected Actor_onAwake = (): void => {
         Actor.allActors.push(this);
     }
 

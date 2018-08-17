@@ -949,12 +949,15 @@ namespace TiledMap {
             for (let i: number = 0; i < this.layers.length; i++) {
                 if (this.layers[i].type !== LayerType.TILE_LAYER)
                     continue;
-
                 let tileLayer: TileLayer = (this.layers[i] as TileLayer);
+
                 let tileLayerGO: GameObject = new GameObject();
+                tileLayerGO.name = tileLayer.name;
+
                 let renderer: TiledMapTileLayerRenderer = tileLayerGO.addComponent(TiledMapTileLayerRenderer);
                 renderer.tiledMapLayer = tileLayer;
-
+                renderer.order = i; // set display order to match order of layers in Tiled
+                
                 let platform: TiledMapTileLayerPlatform = tileLayerGO.addComponent(TiledMapTileLayerPlatform);
                 platform.platformObject.tiledMapLayer = tileLayer;
 

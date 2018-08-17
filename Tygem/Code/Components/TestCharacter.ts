@@ -15,7 +15,7 @@ namespace Comps {
         onStart = (): void => {
             this.character = this.getComponent(Character);
 
-            console.log("TestCharacter: Press 1 to walk to Hero, press 2 to enable input");
+            console.log("TestCharacter: Press 1 to walk to Hero");
         }
         
         // called once per frame, during the update step.  Is not called if the component is disabled.
@@ -25,11 +25,7 @@ namespace Comps {
                 let hero: TDActor = GameObject.findObject("Hero").getComponent(TDActor);
                 this.character.walkToTDActor(hero, Direction.RIGHT);
             }
-
-            if (Keys.keyPressed(Key.Num2)) {
-                this.character.enableInput();
-            }
-
+            
         }
         
         // called just before the component is destroyed.

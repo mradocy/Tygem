@@ -3390,8 +3390,10 @@ var TiledMap;
                         continue;
                     let tileLayer = this.layers[i];
                     let tileLayerGO = new GameObject();
+                    tileLayerGO.name = tileLayer.name;
                     let renderer = tileLayerGO.addComponent(TiledMapTileLayerRenderer);
                     renderer.tiledMapLayer = tileLayer;
+                    renderer.order = i;
                     let platform = tileLayerGO.addComponent(TiledMapTileLayerPlatform);
                     platform.platformObject.tiledMapLayer = tileLayer;
                     tileLayerGO.transform.setParent(rootGO.transform);
@@ -4632,6 +4634,20 @@ class Actor extends ReceivesDamage {
             this.halfWidth = halfWidth;
             this.halfHeight = halfHeight;
         };
+        this.getRect = (outRect = null) => {
+            this.getGlobalPosition(this.tempVec2);
+            let x = this.tempVec2.x;
+            let y = this.tempVec2.y;
+            if (outRect === null) {
+                let ret = new Rect(x + this.offsetX - this.halfWidth, y + this.offsetY - this.halfHeight, this.halfWidth * 2, this.halfHeight * 2);
+                return ret;
+            }
+            outRect.x = x + this.offsetX - this.halfWidth;
+            outRect.y = y + this.offsetY - this.halfHeight;
+            outRect.width = this.halfWidth * 2;
+            outRect.height = this.halfHeight * 2;
+            return null;
+        };
         this.projectCollision = true;
         this.zeroVelocityOnCollision = true;
         this.crushAngleThreshold = 91;
@@ -4708,6 +4724,9 @@ class Actor extends ReceivesDamage {
             return rect.overlaps(this.tempRect);
         };
         this.onAwake = () => {
+            this.Actor_onAwake();
+        };
+        this.Actor_onAwake = () => {
             Actor.allActors.push(this);
         };
         this.onStart = () => {
@@ -4744,20 +4763,6 @@ class Actor extends ReceivesDamage {
         this.name = "Actor";
         this.componentProperties.only1 = true;
         this.componentProperties.excludeComponent(Platform);
-    }
-    getRect(outRect = null) {
-        this.getGlobalPosition(this.tempVec2);
-        let x = this.tempVec2.x;
-        let y = this.tempVec2.y;
-        if (outRect === null) {
-            let ret = new Rect(x + this.offsetX - this.halfWidth, y + this.offsetY - this.halfHeight, this.halfWidth * 2, this.halfHeight * 2);
-            return ret;
-        }
-        outRect.x = x + this.offsetX - this.halfWidth;
-        outRect.y = y + this.offsetY - this.halfHeight;
-        outRect.width = this.halfWidth * 2;
-        outRect.height = this.halfHeight * 2;
-        return null;
     }
     static forEach(callbackFn) {
         Actor.allActors.forEach(callbackFn);
@@ -6545,8 +6550,6 @@ var Scenes;
                 textArea.borderWidth = 1;
                 textArea.layer = DrawLayer.UI;
                 textArea.order = 9999;
-                go.transform.scaleX = 2;
-                go.transform.scaleY = 1;
                 go = new GameObject();
                 let inputTextArea = go.addComponent(InputTextArea);
                 go.transform.x = 500;
@@ -7215,9 +7218,13 @@ var Comps;
             };
             this.pushMode = Character_PushMode.PUSHED;
             this.enableInput = () => {
+                if (this._inputEnabled)
+                    return;
                 this._inputEnabled = true;
             };
             this.disableInput = () => {
+                if (!this._inputEnabled)
+                    return;
                 this._inputEnabled = false;
                 this.idle();
             };
@@ -7277,6 +7284,10 @@ var Comps;
                         break;
                 }
                 this._startWalkState();
+            };
+            this.onAwake = () => {
+                this.Actor_onAwake();
+                Character.allCharacters.push(this);
             };
             this.onStart = () => {
                 this.health = this.maxHealth;
@@ -7427,6 +7438,10 @@ var Comps;
             };
             this.onDestroy = () => {
                 this.tdSpriteRenderer = null;
+                let index = Character.allCharacters.indexOf(this);
+                if (index !== -1) {
+                    Character.allCharacters.splice(index, 1);
+                }
                 this.Actor_onDestroy();
             };
             this._startIdleState = () => {
@@ -7498,9 +7513,82 @@ var Comps;
             this.name = "Character";
             this.componentProperties.requireComponent(Comps.TDSpriteRenderer);
         }
+        static getCharacter(name) {
+            if (name == null || name === "")
+                return null;
+            for (let i; i < Character.allCharacters.length; i++) {
+                let c = Character.allCharacters[i];
+                if (c.gameObject.name === name)
+                    return c;
+            }
+            return null;
+        }
+        static forEach(callbackFn) {
+            Character.allCharacters.forEach(callbackFn);
+        }
+        static setInputCharacter(character) {
+            if (character == null || (typeof character === "string" && character === "")) {
+                Character.allCharacters.forEach(function (c) {
+                    c.disableInput();
+                });
+                return;
+            }
+            if (typeof character === "string") {
+                let found = false;
+                for (let i = 0; i < Character.allCharacters.length; i++) {
+                    let c = Character.allCharacters[i];
+                    if (c.gameObject.name === character) {
+                        c.enableInput();
+                        found = true;
+                    }
+                    else {
+                        c.disableInput();
+                    }
+                }
+                if (!found) {
+                    console.warn(character + " was not set as the input character because no character with that name exists.");
+                }
+            }
+            else {
+                for (let i = 0; i < Character.allCharacters.length; i++) {
+                    let c = Character.allCharacters[i];
+                    if (c === character) {
+                        c.enableInput();
+                    }
+                    else {
+                        c.disableInput();
+                    }
+                }
+            }
+        }
+        static getInputCharacter() {
+            for (let i = 0; i < Character.allCharacters.length; i++) {
+                let c = Character.allCharacters[i];
+                if (c.isInputEnabled()) {
+                    return c;
+                }
+            }
+            return null;
+        }
     }
+    Character.allCharacters = [];
     Comps.Character = Character;
 })(Comps || (Comps = {}));
+var Debug;
+(function (Debug) {
+    function listCharacters() {
+        let names = [];
+        Comps.Character.forEach(function (character) {
+            names.push(character.gameObject.name);
+        });
+        return names;
+    }
+    Debug.listCharacters = listCharacters;
+    function setInputCharacter(characterName) {
+        Comps.Character.setInputCharacter(characterName);
+    }
+    Debug.setInputCharacter = setInputCharacter;
+})(Debug || (Debug = {}));
 var Comps;
 (function (Comps) {
     class ControlCameraWithWASD extends Component {
@@ -7937,15 +8025,12 @@ var Comps;
             super();
             this.onStart = () => {
                 this.character = this.getComponent(Comps.Character);
-                console.log("TestCharacter: Press 1 to walk to Hero, press 2 to enable input");
+                console.log("TestCharacter: Press 1 to walk to Hero");
             };
             this.onUpdate = () => {
                 if (Keys.keyPressed(Key.Num1)) {
                     let hero = GameObject.findObject("Hero").getComponent(Comps.TDActor);
                     this.character.walkToTDActor(hero, Direction.RIGHT);
-                }
-                if (Keys.keyPressed(Key.Num2)) {
-                    this.character.enableInput();
                 }
             };
             this.onDestroy = () => { };

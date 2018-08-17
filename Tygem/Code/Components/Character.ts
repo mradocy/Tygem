@@ -107,12 +107,14 @@ namespace Comps {
          * Gives player control over this Character.
          */
         enableInput = (): void => {
+            if (this._inputEnabled) return;
             this._inputEnabled = true;
         }
         /**
          * Releases player control over this Character.
          */
         disableInput = (): void => {
+            if (!this._inputEnabled) return;
             this._inputEnabled = false;
             this.idle();
         }
@@ -194,6 +196,10 @@ namespace Comps {
 
 
         
+        onAwake = (): void => {
+            this.Actor_onAwake();
+            Character.allCharacters.push(this);
+        }
         
         // Called once for a Component.  Either called when a scene finishes loading, or just before update().
         onStart = (): void => {
@@ -390,8 +396,94 @@ namespace Comps {
         // called just before the component is destroyed.
         onDestroy = (): void => {
             this.tdSpriteRenderer = null;
+            let index: number = Character.allCharacters.indexOf(this);
+            if (index !== -1) {
+                Character.allCharacters.splice(index, 1);
+            }
             this.Actor_onDestroy();
         }
+
+
+
+        // Static:
+
+        /**
+         * Gets a Character whose gameObject has the given name.  Returns null if no character with the name could be found.
+         */
+        static getCharacter(name: string): Character {
+            if (name == null || name === "") return null;
+            for (let i: number; i < Character.allCharacters.length; i++) {
+                let c: Character = Character.allCharacters[i];
+                if (c.gameObject.name === name)
+                    return c;
+            }
+            return null;
+        }
+
+        /**
+         * Calls forEach() on all the characters.
+         * @param callbackFn Function to call on all the characters.
+         */
+        static forEach(callbackFn: (character: Character) => void): void {
+            Character.allCharacters.forEach(callbackFn);
+        }
+
+        /**
+         * Sets the given character to have input enabled, and input disabled for all other characters.
+         * Giving null as a parameter will disable input for all characters.
+         * @param character
+         */
+        static setInputCharacter(character: string | Character): void {
+            if (character == null || (typeof character === "string" && character === "")) {
+                Character.allCharacters.forEach(
+                    function (c: Character): void {
+                        c.disableInput();
+                    }
+                );
+                return;
+            }
+            if (typeof character === "string") {
+                let found: boolean = false;
+                for (let i: number = 0; i < Character.allCharacters.length; i++) {
+                    let c: Character = Character.allCharacters[i];
+                    if (c.gameObject.name === character) {
+                        c.enableInput();
+                        found = true;
+                    } else {
+                        c.disableInput();
+                    }
+                }
+                if (!found) {
+                    console.warn(character + " was not set as the input character because no character with that name exists.");
+                }
+            } else {
+                for (let i: number = 0; i < Character.allCharacters.length; i++) {
+                    let c: Character = Character.allCharacters[i];
+                    if (c === character) {
+                        c.enableInput();
+                    } else {
+                        c.disableInput();
+                    }
+                }
+            }
+        }
+
+        /**
+         * Gets the Character that has input enabled.  Or null if no character currently has input enabled.
+         */
+        static getInputCharacter(): Character {
+            for (let i: number = 0; i < Character.allCharacters.length; i++) {
+                let c: Character = Character.allCharacters[i];
+                if (c.isInputEnabled()) {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+
+
+        // Protected:
 
         protected _startIdleState = (): void => {
             if (this._state != Character_State.IDLE) {
@@ -472,6 +564,26 @@ namespace Comps {
         protected _targetRef: any = null;
         protected _targetOffsetX: number = 0;
         protected _targetOffsetY: number = 0;
+
+        private static allCharacters: Array<Character> = [];
+    }
+
+}
+
+namespace Debug {
+
+    export function listCharacters(): Array<string> {
+        let names: Array<string> = [];
+        Comps.Character.forEach(
+            function (character: Comps.Character): void {
+                names.push(character.gameObject.name);
+            }
+        );
+        return names;
+    }
+
+    export function setInputCharacter(characterName: string): void {
+        Comps.Character.setInputCharacter(characterName);
     }
 
 }
