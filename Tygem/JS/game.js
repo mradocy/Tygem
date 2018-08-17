@@ -7147,6 +7147,29 @@ var Comps;
     }
     Comps.TDActor = TDActor;
 })(Comps || (Comps = {}));
+var PlayerInput;
+(function (PlayerInput) {
+    function isLeftHeld() {
+        return Keys.keyHeld(Key.LeftArrow) || Keys.keyHeld(Key.A);
+    }
+    PlayerInput.isLeftHeld = isLeftHeld;
+    function isRightHeld() {
+        return Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
+    }
+    PlayerInput.isRightHeld = isRightHeld;
+    function isUpHeld() {
+        return Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
+    }
+    PlayerInput.isUpHeld = isUpHeld;
+    function isDownHeld() {
+        return Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
+    }
+    PlayerInput.isDownHeld = isDownHeld;
+    function isAttackPressed() {
+        return Keys.keyPressed(Key.X) || Keys.keyPressed(Key.ForwardSlash);
+    }
+    PlayerInput.isAttackPressed = isAttackPressed;
+})(PlayerInput || (PlayerInput = {}));
 var Comps;
 (function (Comps) {
     (function (Character_State) {
@@ -7176,23 +7199,52 @@ var Comps;
             this.walkAccel = 500;
             this.friction = 700;
             this.applyFriction = true;
+            this.getState = () => {
+                return this._state;
+            };
+            this.getDirection = () => {
+                return this._direction;
+            };
+            this.isInputEnabled = () => {
+                return this._inputEnabled;
+            };
             this.pushMode = Character_PushMode.PUSHED;
+            this.enableInput = () => {
+                this._inputEnabled = true;
+            };
+            this.disableInput = () => {
+                this._inputEnabled = false;
+                this.idle();
+            };
             this.idle = () => {
-                this._state = Character_State.IDLE;
-                this._time = 0;
-                this.applyFriction = true;
-                this.updateAnimation();
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.idle() when input is enabled");
+                }
+                this._startIdleState();
+            };
+            this.idleDirection = (direction) => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.idle() when input is enabled");
+                }
+                this._direction = direction;
+                this._startIdleState();
             };
             this.walkToPoint = (x, y) => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.walk() when input is enabled");
+                }
                 if (!this.canWalk)
                     return;
                 this._walkMode = Character_WalkMode.TO_POINT;
                 this._targetRef = null;
                 this._targetOffsetX = x;
                 this._targetOffsetY = y;
-                this._startWalk();
+                this._startWalkState();
             };
             this.walkToTDActor = (tdActor, offset) => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.walk() when input is enabled");
+                }
                 if (!this.canWalk)
                     return;
                 this._walkMode = Character_WalkMode.TO_TDACTOR;
@@ -7219,25 +7271,7 @@ var Comps;
                         this._targetOffsetY = 0;
                         break;
                 }
-                this._startWalk();
-            };
-            this._startWalk = () => {
-                if (this._state != Character_State.WALK) {
-                    this._state = Character_State.WALK;
-                    this._time = 0;
-                    this.applyFriction = false;
-                }
-                this.updateAnimation();
-            };
-            this.faceDirection = (direction) => {
-                this._direction = direction;
-                this.idle();
-            };
-            this.getState = () => {
-                return this._state;
-            };
-            this.getDirection = () => {
-                return this._direction;
+                this._startWalkState();
             };
             this.onStart = () => {
                 this.health = this.maxHealth;
@@ -7251,51 +7285,119 @@ var Comps;
                 let vx = this.vx;
                 let vy = this.vy;
                 this._time += Game.deltaTime;
-                switch (this._state) {
-                    case Character_State.IDLE:
-                        break;
-                    case Character_State.WALK:
-                        let wx = 0;
-                        let wy = 0;
-                        switch (this._walkMode) {
-                            case Character_WalkMode.TO_POINT:
-                                wx = this._targetOffsetX;
-                                wy = this._targetOffsetY;
-                                break;
-                            case Character_WalkMode.TO_TDACTOR:
-                                this._targetRef.getGlobalPosition(this.tempVec2);
-                                wx = this.tempVec2.x + this._targetOffsetX;
-                                wy = this._targetRef.getFoot() + this._targetOffsetY;
-                                break;
-                        }
-                        let dx = wx - x;
-                        let dy = wy - foot;
-                        let dMag = M.magnitude(dx, dy);
-                        if (dMag < this.walkSpeed * Game.deltaTime) {
-                            vx = dx / Game.deltaTime;
-                            vy = dy / Game.deltaTime;
-                            this.idle();
-                        }
-                        else {
-                            dx /= dMag;
-                            dy /= dMag;
-                            let targetVX = dx * this.walkSpeed;
-                            let targetVY = dy * this.walkSpeed;
-                            if (vx < targetVX) {
-                                vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
+                if (this.isInputEnabled()) {
+                    switch (this._state) {
+                        case Character_State.IDLE:
+                        case Character_State.WALK:
+                            if (PlayerInput.isLeftHeld() && !PlayerInput.isRightHeld()) {
+                                if (vx > 0) {
+                                    vx = Math.max(0, vx - this.friction * Game.deltaTime);
+                                }
+                                vx -= this.walkAccel * Game.deltaTime;
+                            }
+                            else if (PlayerInput.isRightHeld() && !PlayerInput.isLeftHeld()) {
+                                if (vx < 0) {
+                                    vx = Math.min(0, vx + this.friction * Game.deltaTime);
+                                }
+                                vx += this.walkAccel * Game.deltaTime;
                             }
                             else {
-                                vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
+                                if (vx > 0) {
+                                    vx = Math.max(0, vx - this.friction * Game.deltaTime);
+                                }
+                                else {
+                                    vx = Math.min(0, vx + this.friction * Game.deltaTime);
+                                }
                             }
-                            if (vy < targetVY) {
-                                vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
+                            if (PlayerInput.isUpHeld() && !PlayerInput.isDownHeld()) {
+                                if (vy > 0) {
+                                    vy = Math.max(0, vy - this.friction * Game.deltaTime);
+                                }
+                                vy -= this.walkAccel * Game.deltaTime;
+                            }
+                            else if (PlayerInput.isDownHeld() && !PlayerInput.isUpHeld()) {
+                                if (vy < 0) {
+                                    vy = Math.min(0, vy + this.friction * Game.deltaTime);
+                                }
+                                vy += this.walkAccel * Game.deltaTime;
                             }
                             else {
-                                vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
+                                if (vy > 0) {
+                                    vy = Math.max(0, vy - this.friction * Game.deltaTime);
+                                }
+                                else {
+                                    vy = Math.min(0, vy + this.friction * Game.deltaTime);
+                                }
                             }
-                        }
-                        this._direction = Collision.getNormalDirection(vx, vy);
-                        break;
+                            let vMag = M.magnitude(vx, vy);
+                            if (vMag >= this.walkSpeed) {
+                                vx *= this.walkSpeed / vMag;
+                                vy *= this.walkSpeed / vMag;
+                            }
+                            if (PlayerInput.isLeftHeld() !== PlayerInput.isRightHeld()) {
+                                if (!(PlayerInput.isUpHeld() && this._direction === Direction.UP) &&
+                                    !(PlayerInput.isDownHeld() && this._direction === Direction.DOWN)) {
+                                    this._direction = PlayerInput.isLeftHeld() ? Direction.LEFT : Direction.RIGHT;
+                                }
+                                this._startWalkState();
+                            }
+                            else if (PlayerInput.isUpHeld() !== PlayerInput.isDownHeld()) {
+                                this._direction = PlayerInput.isUpHeld() ? Direction.UP : Direction.DOWN;
+                                this._startWalkState();
+                            }
+                            else {
+                                this._startIdleState();
+                            }
+                            break;
+                    }
+                }
+                else {
+                    switch (this._state) {
+                        case Character_State.IDLE:
+                            break;
+                        case Character_State.WALK:
+                            let wx = 0;
+                            let wy = 0;
+                            switch (this._walkMode) {
+                                case Character_WalkMode.TO_POINT:
+                                    wx = this._targetOffsetX;
+                                    wy = this._targetOffsetY;
+                                    break;
+                                case Character_WalkMode.TO_TDACTOR:
+                                    this._targetRef.getGlobalPosition(this.tempVec2);
+                                    wx = this.tempVec2.x + this._targetOffsetX;
+                                    wy = this._targetRef.getFoot() + this._targetOffsetY;
+                                    break;
+                            }
+                            let dx = wx - x;
+                            let dy = wy - foot;
+                            let dMag = M.magnitude(dx, dy);
+                            if (dMag < this.walkSpeed * Game.deltaTime) {
+                                vx = dx / Game.deltaTime;
+                                vy = dy / Game.deltaTime;
+                                this.idle();
+                            }
+                            else {
+                                dx /= dMag;
+                                dy /= dMag;
+                                let targetVX = dx * this.walkSpeed;
+                                let targetVY = dy * this.walkSpeed;
+                                if (vx < targetVX) {
+                                    vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
+                                }
+                                else {
+                                    vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
+                                }
+                                if (vy < targetVY) {
+                                    vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
+                                }
+                                else {
+                                    vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
+                                }
+                            }
+                            this._direction = Collision.getNormalDirection(vx, vy);
+                            break;
+                    }
                 }
                 if (this.applyFriction) {
                     let friction = this.friction;
@@ -7320,6 +7422,22 @@ var Comps;
             };
             this.onDestroy = () => {
                 this.tdSpriteRenderer = null;
+            };
+            this._startIdleState = () => {
+                if (this._state != Character_State.IDLE) {
+                    this._state = Character_State.IDLE;
+                    this._time = 0;
+                    this.applyFriction = true;
+                }
+                this.updateAnimation();
+            };
+            this._startWalkState = () => {
+                if (this._state != Character_State.WALK) {
+                    this._state = Character_State.WALK;
+                    this._time = 0;
+                    this.applyFriction = false;
+                }
+                this.updateAnimation();
             };
             this.updateAnimation = () => {
                 let anim = this.animPrefix;
@@ -7366,6 +7484,7 @@ var Comps;
             this._state = Character_State.NONE;
             this._time = 0;
             this._direction = Direction.DOWN;
+            this._inputEnabled = false;
             this._walkMode = Character_WalkMode.NONE;
             this._targetRef = null;
             this._targetOffsetX = 0;
@@ -7812,11 +7931,15 @@ var Comps;
             super();
             this.onStart = () => {
                 this.character = this.getComponent(Comps.Character);
+                console.log("TestCharacter: Press 1 to walk to Hero, press 2 to enable input");
             };
             this.onUpdate = () => {
                 if (Keys.keyPressed(Key.Num1)) {
                     let hero = GameObject.findObject("Hero").getComponent(Comps.TDActor);
                     this.character.walkToTDActor(hero, Direction.RIGHT);
+                }
+                if (Keys.keyPressed(Key.Num2)) {
+                    this.character.enableInput();
                 }
             };
             this.onDestroy = () => { };
@@ -8028,7 +8151,7 @@ var Prefabs;
         character.team = Team.PLAYERS;
         let testCharacter = go.addComponent(Comps.TestCharacter);
         let tdas = go.addComponent(Comps.TDActorShadow);
-        tdas.setSize(0, 2, 5, 2);
+        tdas.setSize(0, 3, 6, 2);
         return go;
     }
     Prefabs.Log = Log;

@@ -29,7 +29,7 @@ namespace Prefabs {
         //let actorGizmo: ActorGizmo = go.addComponent(ActorGizmo);
         
         let tdas: Comps.TDActorShadow = go.addComponent(Comps.TDActorShadow);
-        tdas.setSize(0, 2, 5, 2);
+        tdas.setSize(0, 3, 6, 2);
 
         return go;
     }

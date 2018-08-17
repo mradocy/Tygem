@@ -51,6 +51,7 @@
     <TypeScriptCompile Include="Code\Components\TestRectOverlap.ts" />
     <TypeScriptCompile Include="Code\Components\TestSound.ts" />
     <TypeScriptCompile Include="Code\Components\Thing2.ts" />
+    <TypeScriptCompile Include="Code\PlayerInput.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Hero.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Log.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Sealime.ts" />
