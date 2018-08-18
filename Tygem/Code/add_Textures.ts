@@ -40,9 +40,12 @@ Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true)
 Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
 Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
 
-Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 15, false);
-Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 15, false);
-Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 15, false);
+Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
+Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
+Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
+
+Spritesheet.addSpritesheet("hero/sword slash.png", 32, 48, 8, 8);
+Animation.addAnimation("hero_sword_slash", "hero/sword slash.png", [0, 1, 2, 3, 4, 5, 6, 7], 8 / .25, false);
 
 
 Spritesheet.addSpritesheet("log/log.png", 32, 32, 6, 23);

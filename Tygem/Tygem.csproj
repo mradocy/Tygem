@@ -55,6 +55,7 @@
     <TypeScriptCompile Include="Code\Prefabs\Hero.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Log.ts" />
     <TypeScriptCompile Include="Code\Prefabs\Sealime.ts" />
+    <TypeScriptCompile Include="Code\Prefabs\SwordSlash.ts" />
     <TypeScriptCompile Include="Code\Prefabs\TestPlatform.ts" />
     <TypeScriptCompile Include="Code\Prefabs\TestPlatform2.ts" />
     <TypeScriptCompile Include="Code\Scenes\TestScene3.ts" />
@@ -112,6 +113,7 @@
     <TypeScriptCompile Include="Tygem\TiledMap.ts" />
     <TypeScriptCompile Include="Tygem\Transform.ts" />
     <TypeScriptCompile Include="Tygem\Vec2.ts" />
+    <TypeScriptCompile Include="Tygem\VisualEffect.ts" />
     <TypeScriptCompile Include="Tygem\_ref.ts" />
   </ItemGroup>
   <ItemGroup>

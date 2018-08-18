@@ -3732,6 +3732,23 @@ class SpriteRenderer extends PackedImageRenderer {
         this.isAnimationPlaying = () => {
             return this.animPlaying;
         };
+        this.isAtEndOfAnimation = () => {
+            if (this.animation === null)
+                return false;
+            if (this.animPlaying)
+                return false;
+            if (this.animSpeed >= 0) {
+                if (this.animTime >= this.animation.getDuration() - .0002) {
+                    return true;
+                }
+            }
+            else {
+                if (this.animTime <= .0001) {
+                    return true;
+                }
+            }
+            return false;
+        };
         this.getAnimationTime = () => {
             return this.animTime;
         };
@@ -3810,6 +3827,25 @@ class SpriteRenderer extends PackedImageRenderer {
         this.animSpeed = 1;
         this.animPlaying = false;
         this.name = "SpriteRenderer";
+    }
+}
+class VisualEffect extends Component {
+    constructor() {
+        super();
+        this.onStart = () => {
+            this.spriteRenderer = this.getComponent(SpriteRenderer);
+        };
+        this.onUpdate = () => {
+            if (this.spriteRenderer.isAtEndOfAnimation()) {
+                this.gameObject.markForDestroy();
+            }
+        };
+        this.onDestroy = () => {
+            this.spriteRenderer = null;
+        };
+        this.spriteRenderer = null;
+        this.name = "VisualEffect";
+        this.componentProperties.requireComponent(SpriteRenderer);
     }
 }
 class ReceivesDamage extends Component {
@@ -6429,9 +6465,11 @@ Animation.addAnimation("hero_idle_up", "hero/walk.png", [26], 10, true);
 Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true);
 Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
 Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
-Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 15, false);
-Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 15, false);
-Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 15, false);
+Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
+Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
+Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
+Spritesheet.addSpritesheet("hero/sword slash.png", 32, 48, 8, 8);
+Animation.addAnimation("hero_sword_slash", "hero/sword slash.png", [0, 1, 2, 3, 4, 5, 6, 7], 8 / .25, false);
 Spritesheet.addSpritesheet("log/log.png", 32, 32, 6, 23);
 Animation.addAnimation("log_idle_down", "log/log.png", [0], 10, true);
 Animation.addAnimation("log_idle_up", "log/log.png", [6], 10, true);
@@ -7700,10 +7738,10 @@ var Comps;
     class Hero extends Component {
         constructor() {
             super();
-            this.speed = 70;
+            this.speed = 90;
             this.accel = 500;
-            this.friction = 700;
-            this.slashDuration = .3;
+            this.friction = 800;
+            this.slashDuration = .25;
             this.onStart = () => {
                 this.actor = this.getComponent(Actor);
                 this.spriteRenderer = this.getComponent(SpriteRenderer);
@@ -7827,24 +7865,42 @@ var Comps;
                     return;
                 this.state = Hero_State.SLASH;
                 this.time = 0;
+                let slashOffsetMag = 16;
+                let rect = this.actor.getRect();
+                let ssGO = Prefabs.SwordSlash();
                 let anim = "";
                 switch (this.faceDirection) {
                     case Direction.LEFT:
+                        anim = "hero_slash_right";
+                        ssGO.transform.x = rect.x - slashOffsetMag;
+                        ssGO.transform.y = rect.y + rect.height / 2;
+                        ssGO.transform.scaleX = -1;
+                        break;
                     case Direction.RIGHT:
                         anim = "hero_slash_right";
+                        ssGO.transform.x = rect.x + rect.width + slashOffsetMag;
+                        ssGO.transform.y = rect.y + rect.height / 2;
                         break;
                     case Direction.UP:
                         anim = "hero_slash_up";
+                        ssGO.transform.x = rect.x + rect.width / 2;
+                        ssGO.transform.y = rect.y - slashOffsetMag;
+                        ssGO.transform.rotation = -90;
                         break;
                     case Direction.DOWN:
                         anim = "hero_slash_down";
+                        ssGO.transform.x = rect.x + rect.width / 2;
+                        ssGO.transform.y = rect.y + rect.height + slashOffsetMag;
+                        ssGO.transform.rotation = 90;
                         break;
                 }
                 this.spriteRenderer.playAnimation(anim);
             };
             this.updateAnimation = () => {
+                if ((this.faceDirection === Direction.LEFT) === this.transform.scaleX > 0) {
+                    this.transform.scaleX *= -1;
+                }
                 let anim = "hero";
-                let flipped = false;
                 switch (this.state) {
                     case Hero_State.NONE:
                     case Hero_State.SLASH:
@@ -7860,7 +7916,6 @@ var Comps;
                     case Direction.NONE:
                         return;
                     case Direction.LEFT:
-                        flipped = true;
                     case Direction.RIGHT:
                         anim += "_right";
                         break;
@@ -7870,9 +7925,6 @@ var Comps;
                     case Direction.DOWN:
                         anim += "_down";
                         break;
-                }
-                if (flipped === this.transform.scaleX > 0) {
-                    this.transform.scaleX *= -1;
                 }
                 if (this.spriteRenderer.getAnimation() === null ||
                     this.spriteRenderer.getAnimation().name !== anim) {
@@ -8270,6 +8322,18 @@ var Prefabs;
     }
     Prefabs.Sealime = Sealime;
     TiledMap.addObjectParser("Sealime", Sealime);
+})(Prefabs || (Prefabs = {}));
+var Prefabs;
+(function (Prefabs) {
+    function SwordSlash() {
+        let go = new GameObject();
+        let sr = go.addComponent(SpriteRenderer);
+        sr.imageSmoothingEnabled = false;
+        sr.playAnimation("hero_sword_slash");
+        let ve = go.addComponent(VisualEffect);
+        return go;
+    }
+    Prefabs.SwordSlash = SwordSlash;
 })(Prefabs || (Prefabs = {}));
 var Prefabs;
 (function (Prefabs) {

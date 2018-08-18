@@ -26,8 +26,8 @@ class Rect {
     }
 
     /**
-        * Returns if this rectangle overlaps the given rectangle.
-        */
+     * Returns if this rectangle overlaps the given rectangle.
+     */
     overlaps = (rect: Rect): boolean => {
 
         if (this.x + this.width < rect.x) return false;
@@ -39,14 +39,20 @@ class Rect {
     }
 
     /**
-        * Returns if this rectangle contains the given point.
-        */
+     * Returns if this rectangle contains the given point.
+     */
     containsPoint = (x: number, y: number): boolean => {
         return this.x <= x && x <= this.x + this.width &&
             this.y <= y && y <= this.y + this.height;
     }
 
+    /**
+     * x of the left side of the rectangle.
+     */
     x: number;
+    /**
+     * y of the top side of the rectangle.
+     */
     y: number;
     width: number;
     height: number;

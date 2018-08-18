@@ -148,6 +148,26 @@ class SpriteRenderer extends PackedImageRenderer {
     }
 
     /**
+     * If the current animation played and stopped upon reaching the end.
+     * Will never be true if the animation loops.
+     * Returns false if getAnimation() would return null.
+     */
+    isAtEndOfAnimation = (): boolean => {
+        if (this.animation === null) return false;
+        if (this.animPlaying) return false;
+        if (this.animSpeed >= 0) { // playing forward
+            if (this.animTime >= this.animation.getDuration() - .0002) { // if is at last frame
+                return true;
+            }
+        } else { // playing backward
+            if (this.animTime <= .0001) { // if is at first frame
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gets the current time for playing the current animation.
      */
     getAnimationTime = (): number => {

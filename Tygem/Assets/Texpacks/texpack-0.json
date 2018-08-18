@@ -17,6 +17,14 @@
 	"sourceSize": {"w":128,"h":128}
 },
 {
+	"filename": "Hero/sword slash.png",
+	"frame": {"x":717,"y":764,"w":238,"h":34},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":7,"y":7,"w":238,"h":34},
+	"sourceSize": {"w":256,"h":48}
+},
+{
 	"filename": "Hero/walk.png",
 	"frame": {"x":643,"y":431,"w":208,"h":120},
 	"rotated": false,
@@ -26,7 +34,7 @@
 },
 {
 	"filename": "Log/log.png",
-	"frame": {"x":717,"y":764,"w":183,"h":123},
+	"frame": {"x":717,"y":800,"w":183,"h":123},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":3,"y":5,"w":183,"h":123},
@@ -42,7 +50,7 @@
 },
 {
 	"filename": "platform.png",
-	"frame": {"x":902,"y":764,"w":98,"h":34},
+	"frame": {"x":902,"y":800,"w":98,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
@@ -50,7 +58,7 @@
 },
 {
 	"filename": "platform_2.png",
-	"frame": {"x":902,"y":800,"w":98,"h":34},
+	"frame": {"x":902,"y":836,"w":98,"h":34},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":34},
@@ -103,6 +111,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1011,"h":940},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:885ec83824dce4d397e9f4dc596b1b9e:eac72c58a6fa62b2e95c533c3814cbe6:eeaea9f1bcd474833b26acc93b6f2e89$"
+	"smartupdate": "$TexturePacker:SmartUpdate:87acb0b2f79d493172b7c2e2b981b4b8:7395ef54c8acc076837d47454e51c34d:eeaea9f1bcd474833b26acc93b6f2e89$"
 }
 }

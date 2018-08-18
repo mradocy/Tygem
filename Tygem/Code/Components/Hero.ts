@@ -11,10 +11,10 @@ namespace Comps {
 
     export class Hero extends Component {
 
-        speed: number = 70;
+        speed: number = 90;
         accel: number = 500;
-        friction: number = 700;
-        slashDuration: number = .3;
+        friction: number = 800;
+        slashDuration: number = .25;
 
         
         constructor() {
@@ -173,17 +173,35 @@ namespace Comps {
             this.state = Hero_State.SLASH;
             this.time = 0;
 
+            // spawn slash effect
+            let slashOffsetMag: number = 16;
+            let rect: Rect = this.actor.getRect();
+            let ssGO: GameObject = Prefabs.SwordSlash();
+
             let anim: string = "";
             switch (this.faceDirection) {
                 case Direction.LEFT:
+                    anim = "hero_slash_right"; // hero is flipped
+                    ssGO.transform.x = rect.x - slashOffsetMag;
+                    ssGO.transform.y = rect.y + rect.height / 2;
+                    ssGO.transform.scaleX = -1;
+                    break;
                 case Direction.RIGHT:
                     anim = "hero_slash_right";
+                    ssGO.transform.x = rect.x + rect.width + slashOffsetMag;
+                    ssGO.transform.y = rect.y + rect.height / 2;
                     break;
                 case Direction.UP:
                     anim = "hero_slash_up";
+                    ssGO.transform.x = rect.x + rect.width / 2;
+                    ssGO.transform.y = rect.y - slashOffsetMag;
+                    ssGO.transform.rotation = -90;
                     break;
                 case Direction.DOWN:
                     anim = "hero_slash_down";
+                    ssGO.transform.x = rect.x + rect.width / 2;
+                    ssGO.transform.y = rect.y + rect.height + slashOffsetMag;
+                    ssGO.transform.rotation = 90;
                     break;
             }
             this.spriteRenderer.playAnimation(anim);
@@ -191,12 +209,16 @@ namespace Comps {
 
         private updateAnimation = (): void => {
 
+            // flip around
+            if ((this.faceDirection === Direction.LEFT) === this.transform.scaleX > 0) {
+                this.transform.scaleX *= -1;
+            }
+
             let anim: string = "hero";
-            let flipped: boolean = false;
             switch (this.state) {
                 case Hero_State.NONE:
                 case Hero_State.SLASH:
-                    // no need to set
+                    // no need to set, return
                     return;
                 case Hero_State.IDLE:
                     anim += "_idle";
@@ -210,7 +232,6 @@ namespace Comps {
                 case Direction.NONE:
                     return;
                 case Direction.LEFT:
-                    flipped = true;
                 case Direction.RIGHT:
                     anim += "_right";
                     break;
@@ -221,11 +242,7 @@ namespace Comps {
                     anim += "_down";
                     break;
             }
-
-            if (flipped === this.transform.scaleX > 0) {
-                this.transform.scaleX *= -1;
-            }
-
+            
             if (this.spriteRenderer.getAnimation() === null ||
                 this.spriteRenderer.getAnimation().name !== anim) {
                 this.spriteRenderer.playAnimation(anim);
