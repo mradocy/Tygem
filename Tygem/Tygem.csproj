@@ -28,7 +28,10 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Code\Actions\Base.ts" />
+    <TypeScriptCompile Include="Code\Actions\_IDs.ts" />
+    <TypeScriptCompile Include="Code\Actions\_Info.ts" />
     <TypeScriptCompile Include="Code\Actions\SwordSlash.ts" />
+    <TypeScriptCompile Include="Code\add_Actions.ts" />
     <TypeScriptCompile Include="Code\add_Materials.ts" />
     <TypeScriptCompile Include="Code\add_Scenes.ts" />
     <TypeScriptCompile Include="Code\add_Sounds.ts" />

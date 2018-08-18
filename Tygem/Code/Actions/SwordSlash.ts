@@ -1,7 +1,7 @@
 ﻿/// <reference path="Base.ts" />
 
 namespace Actions {
-
+    
     export class SwordSlash extends Base {
 
         duration: number = .25;

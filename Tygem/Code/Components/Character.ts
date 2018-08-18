@@ -72,28 +72,38 @@ namespace Comps {
         friction: number = 700;
 
         /**
-         * Sets the action at the given actionIndex to a specified Action.
-         * Usage: character.setAction(0, Actions.SwordSlash);
-         * @param action The constructor of the action to set.
+         * Sets the action at the given index to a specified Action.
          */
-        setAction = <T extends Actions.Base>(actionIndex: number, action: new (character: Character) => T): void => {
-            if (actionIndex < 0) return;
+        setAction = (index: number, actionID: Actions.ID): void => {
+            if (index < 0) return;
 
             // extend actions array to include actionIndex
-            if (actionIndex >= this._actions.length && action === null) return;
-            while (actionIndex >= this._actions.length) {
+            if (index >= this._actions.length && actionID === Actions.ID.NONE) return;
+            while (index >= this._actions.length) {
                 this._actions.push(null);
+                this._actionInfos.push(null);
             }
 
             // end previous action at the index
-            let prevAction: Actions.Base = this._actions[actionIndex];
+            let prevAction: Actions.Base = this._actions[index];
             if (prevAction !== null) {
                 prevAction.stop();
             }
 
             // replace action
-            let actionInstance: Actions.Base = new action(this);
-            this._actions[actionIndex] = actionInstance;
+            let actionInfo: Actions.Info = Actions.getActionInfo(actionID);
+            this._actionInfos[index] = actionInfo;
+            let actionInstance: Actions.Base = new actionInfo.ctor(this);
+            this._actions[index] = actionInstance;
+        }
+        /**
+         * Gets the Actions.Info at the given index.
+         */
+        getActionInfo = (index: number): Actions.Info => {
+            if (index < 0 || index >= this._actionInfos.length)
+                return null;
+
+            return this._actionInfos[index];
         }
 
 
@@ -363,11 +373,7 @@ namespace Comps {
                             console.log("attack pressed");
                             this.startAction(0);
                         }
-
-
-                        //if (attackPressed) {
-                        //    this.slash();
-                        //}
+                        
                         
                     } else {
                         // input is disabled.  movement based on instructions
@@ -473,6 +479,8 @@ namespace Comps {
 
             this._endCurrentAction();
             this._actions.splice(0);
+            this._actions = null;
+            this._actionInfos.splice(0);
             this._actions = null;
 
             this.tdSpriteRenderer = null;
@@ -668,6 +676,7 @@ namespace Comps {
         protected _targetOffsetX: number = 0;
         protected _targetOffsetY: number = 0;
 
+        protected _actionInfos: Array<Actions.Info> = [];
         protected _actions: Array<Actions.Base> = [];
         protected _currentActionIndex: number = -1;
 

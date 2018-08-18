@@ -18,7 +18,7 @@ namespace Prefabs {
         character.setBounds(0, 9, 6, 6);
         character.maxHealth = 10;
         character.team = Team.PLAYERS;
-        character.setAction(0, Actions.SwordSlash);
+        character.setAction(0, Actions.ID.SWORD_SLASH);
 
 
         // enable testing

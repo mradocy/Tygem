@@ -1,5 +1,6 @@
 ﻿/// <reference path="../../Tygem/_ref.ts" />
 /// <reference path="../Components/Character.ts" />
+/// <reference path="_Info.ts" />
 
 namespace Actions {
     

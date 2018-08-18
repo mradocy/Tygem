@@ -7164,20 +7164,28 @@ var Comps;
             this.walkSpeed = 70;
             this.walkAccel = 500;
             this.friction = 700;
-            this.setAction = (actionIndex, action) => {
-                if (actionIndex < 0)
+            this.setAction = (index, actionID) => {
+                if (index < 0)
                     return;
-                if (actionIndex >= this._actions.length && action === null)
+                if (index >= this._actions.length && actionID === Actions.ID.NONE)
                     return;
-                while (actionIndex >= this._actions.length) {
+                while (index >= this._actions.length) {
                     this._actions.push(null);
+                    this._actionInfos.push(null);
                 }
-                let prevAction = this._actions[actionIndex];
+                let prevAction = this._actions[index];
                 if (prevAction !== null) {
                     prevAction.stop();
                 }
-                let actionInstance = new action(this);
-                this._actions[actionIndex] = actionInstance;
+                let actionInfo = Actions.getActionInfo(actionID);
+                this._actionInfos[index] = actionInfo;
+                let actionInstance = new actionInfo.ctor(this);
+                this._actions[index] = actionInstance;
+            };
+            this.getActionInfo = (index) => {
+                if (index < 0 || index >= this._actionInfos.length)
+                    return null;
+                return this._actionInfos[index];
             };
             this.applyFriction = true;
             this.getState = () => {
@@ -7438,6 +7446,8 @@ var Comps;
                 this._endCurrentAction();
                 this._actions.splice(0);
                 this._actions = null;
+                this._actionInfos.splice(0);
+                this._actions = null;
                 this.tdSpriteRenderer = null;
                 let index = Character.allCharacters.indexOf(this);
                 if (index !== -1) {
@@ -7525,6 +7535,7 @@ var Comps;
             this._targetRef = null;
             this._targetOffsetX = 0;
             this._targetOffsetY = 0;
+            this._actionInfos = [];
             this._actions = [];
             this._currentActionIndex = -1;
             this.name = "Character";
@@ -7608,6 +7619,86 @@ var Debug;
 })(Debug || (Debug = {}));
 var Actions;
 (function (Actions) {
+    (function (ID) {
+        ID[ID["NONE"] = 0] = "NONE";
+        ID[ID["SWORD_SLASH"] = 1] = "SWORD_SLASH";
+    })(Actions.ID || (Actions.ID = {}));
+    var ID = Actions.ID;
+})(Actions || (Actions = {}));
+var Actions;
+(function (Actions) {
+    class Info {
+        constructor(id, name, description, ctor) {
+            this.id = id;
+            this.name = name;
+            this.description = description;
+            this.ctor = ctor;
+        }
+    }
+    Actions.Info = Info;
+    function getActionInfo(id) {
+        let idN = id;
+        if (!map.hasOwnProperty(idN)) {
+            console.warn("No Actions.Info found with the id " + Actions.ID[id] + ".  It probably needs to be added internally with Actions.addAction()");
+            return null;
+        }
+        return map[idN];
+    }
+    Actions.getActionInfo = getActionInfo;
+    function addActionInfo(info) {
+        if (info == null) {
+            addInfoError("info is null");
+            return;
+        }
+        if (info.id == undefined) {
+            addInfoError("info.id is undefined or null");
+            return;
+        }
+        if (typeof info.id !== "number") {
+            addInfoError("info.id must be an Actions.ID");
+            return;
+        }
+        let id = info.id;
+        let idN = id;
+        if (id === Actions.ID.NONE) {
+            addInfoError("cannot add info with ID " + Actions.ID.NONE);
+            return;
+        }
+        if (map.hasOwnProperty(idN)) {
+            addInfoError("info with ID " + id + " already added.");
+            return;
+        }
+        if (info.name == undefined) {
+            addInfoError("info.name is undefined or null", id);
+            return;
+        }
+        if (typeof info.name !== "string") {
+            addInfoError("info.name must be a string", id);
+            return;
+        }
+        if (info.ctor == undefined) {
+            addInfoError("info.ctor is undefined or null", id);
+            return;
+        }
+        if (info.description == undefined) {
+            addInfoError("info.description is undefined or null", id);
+            return;
+        }
+        if (typeof info.description !== "string") {
+            addInfoError("info.description must be a string", id);
+            return;
+        }
+        map[idN] = info;
+    }
+    Actions.addActionInfo = addActionInfo;
+    function addInfoError(message, id = Actions.ID.NONE) {
+        let idStr = id === Actions.ID.NONE ? "" : " " + Actions.ID[id];
+        console.error("Error adding ActionInfo" + idStr + ": " + message);
+    }
+    let map = {};
+})(Actions || (Actions = {}));
+var Actions;
+(function (Actions) {
     class Base {
         constructor(character) {
             this.start = () => {
@@ -7687,6 +7778,12 @@ var Actions;
     }
     Actions.SwordSlash = SwordSlash;
 })(Actions || (Actions = {}));
+Actions.addActionInfo({
+    id: Actions.ID.SWORD_SLASH,
+    name: "Sword Slash",
+    ctor: Actions.SwordSlash,
+    description: "Slashes foes with a sword."
+});
 var Comps;
 (function (Comps) {
     class ArrowTestController extends Component {
@@ -8440,7 +8537,7 @@ var Prefabs;
         character.setBounds(0, 9, 6, 6);
         character.maxHealth = 10;
         character.team = Team.PLAYERS;
-        character.setAction(0, Actions.SwordSlash);
+        character.setAction(0, Actions.ID.SWORD_SLASH);
         let testCharacter = go.addComponent(Comps.TestCharacter);
         let tdas = go.addComponent(Comps.TDActorShadow);
         tdas.setSize(0, 3, 6, 2);
