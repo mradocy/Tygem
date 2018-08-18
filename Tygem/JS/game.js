@@ -6453,6 +6453,46 @@ Game._userInputSatisfied = false;
 Game.initialized = false;
 Game.lastTimeStamp = 0;
 Game._unscaledDeltaTime = 0;
+var Comps;
+(function (Comps) {
+    class TDActor extends Actor {
+        constructor() {
+            super();
+            this.getFoot = () => {
+                this.getGlobalPosition(this.tempVec2);
+                return this.tempVec2.y + this.offsetY;
+            };
+            this.setFoot = (foot) => {
+                this.getGlobalPosition(this.tempVec2);
+                this.setGlobalPosition(this.tempVec2.x, foot - this.offsetY);
+            };
+            this.getAir = () => {
+                return this.offsetY - this.baseOffsetY;
+            };
+            this.setAir = (air) => {
+                let foot = this.getFoot();
+                this.offsetY = air + this.baseOffsetY;
+                this.setFoot(foot);
+            };
+            this.baseOffsetY = 0;
+            this.setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
+                this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
+                this.baseOffsetY = offsetY;
+            };
+            this.name = "TDActor";
+        }
+    }
+    Comps.TDActor = TDActor;
+})(Comps || (Comps = {}));
+Material.addMaterial("SAND", {
+    collisionLayers: 0x1
+});
+Material.addMaterial("WATER", {
+    collisionLayers: 0x2
+});
+Material.addMaterial("CLIFF", {
+    collisionLayers: 0x4
+});
 TexPackManager.addTexturePack("Assets/Texpacks/texpack-0.json");
 Spritesheet.addSpritesheet("sealime.png", 64, 64, 8, 41);
 Animation.addAnimation("sealime_idle", "sealime.png", [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
@@ -6468,6 +6508,9 @@ Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, tru
 Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
 Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
 Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
+Animation.addAnimation("hero_attack_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
+Animation.addAnimation("hero_attack_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
+Animation.addAnimation("hero_attack_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
 Spritesheet.addSpritesheet("hero/sword slash.png", 32, 48, 8, 8);
 Animation.addAnimation("hero_sword_slash", "hero/sword slash.png", [0, 1, 2, 3, 4, 5, 6, 7], 8 / .25, false);
 Spritesheet.addSpritesheet("log/log.png", 32, 32, 6, 23);
@@ -6479,6 +6522,10 @@ Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
 Animation.addAnimation("log_walk_up", "log/log.png", [6, 7, 8, 9], 10, true);
 Animation.addAnimation("log_walk_right", "log/log.png", [12, 13, 14, 15], 10, true);
 Animation.addAnimation("log_walk_left", "log/log.png", [18, 19, 20, 21], 10, true);
+Animation.addAnimation("log_attack_down", "log/log.png", [2], 10, false);
+Animation.addAnimation("log_attack_up", "log/log.png", [8], 10, false);
+Animation.addAnimation("log_attack_right", "log/log.png", [14], 10, false);
+Animation.addAnimation("log_attack_left", "log/log.png", [20], 10, false);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -7065,15 +7112,581 @@ window.onload = () => {
     Game.initialize(canvas);
     document.getElementById("download_save_data").onclick = SaveManager.downloadSaveData;
 };
-Material.addMaterial("SAND", {
-    collisionLayers: 0x1
-});
-Material.addMaterial("WATER", {
-    collisionLayers: 0x2
-});
-Material.addMaterial("CLIFF", {
-    collisionLayers: 0x4
-});
+var PlayerInput;
+(function (PlayerInput) {
+    function isLeftHeld() {
+        return Keys.keyHeld(Key.LeftArrow) || Keys.keyHeld(Key.A);
+    }
+    PlayerInput.isLeftHeld = isLeftHeld;
+    function isRightHeld() {
+        return Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
+    }
+    PlayerInput.isRightHeld = isRightHeld;
+    function isUpHeld() {
+        return Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
+    }
+    PlayerInput.isUpHeld = isUpHeld;
+    function isDownHeld() {
+        return Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
+    }
+    PlayerInput.isDownHeld = isDownHeld;
+    function isAttackPressed() {
+        return Keys.keyPressed(Key.X) || Keys.keyPressed(Key.ForwardSlash);
+    }
+    PlayerInput.isAttackPressed = isAttackPressed;
+})(PlayerInput || (PlayerInput = {}));
+var Comps;
+(function (Comps) {
+    (function (Character_State) {
+        Character_State[Character_State["NONE"] = 0] = "NONE";
+        Character_State[Character_State["IDLE"] = 1] = "IDLE";
+        Character_State[Character_State["WALK"] = 2] = "WALK";
+        Character_State[Character_State["ACTION"] = 3] = "ACTION";
+    })(Comps.Character_State || (Comps.Character_State = {}));
+    var Character_State = Comps.Character_State;
+    (function (Character_PushMode) {
+        Character_PushMode[Character_PushMode["NONE"] = 0] = "NONE";
+        Character_PushMode[Character_PushMode["PUSHED"] = 1] = "PUSHED";
+    })(Comps.Character_PushMode || (Comps.Character_PushMode = {}));
+    var Character_PushMode = Comps.Character_PushMode;
+    (function (Character_WalkMode) {
+        Character_WalkMode[Character_WalkMode["NONE"] = 0] = "NONE";
+        Character_WalkMode[Character_WalkMode["TO_POINT"] = 1] = "TO_POINT";
+        Character_WalkMode[Character_WalkMode["TO_TDACTOR"] = 2] = "TO_TDACTOR";
+    })(Comps.Character_WalkMode || (Comps.Character_WalkMode = {}));
+    var Character_WalkMode = Comps.Character_WalkMode;
+    class Character extends Comps.TDActor {
+        constructor() {
+            super();
+            this.animPrefix = "[define animPrefix here]";
+            this.symmetrical = true;
+            this.canWalk = true;
+            this.walkSpeed = 70;
+            this.walkAccel = 500;
+            this.friction = 700;
+            this.setAction = (actionIndex, action) => {
+                if (actionIndex < 0)
+                    return;
+                if (actionIndex >= this._actions.length && action === null)
+                    return;
+                while (actionIndex >= this._actions.length) {
+                    this._actions.push(null);
+                }
+                let prevAction = this._actions[actionIndex];
+                if (prevAction !== null) {
+                    prevAction.stop();
+                }
+                let actionInstance = new action(this);
+                this._actions[actionIndex] = actionInstance;
+            };
+            this.applyFriction = true;
+            this.getState = () => {
+                return this._state;
+            };
+            this.getCurrentActionIndex = () => {
+                return this._currentActionIndex;
+            };
+            this.getDirection = () => {
+                return this._direction;
+            };
+            this.isInputEnabled = () => {
+                return this._inputEnabled;
+            };
+            this.pushMode = Character_PushMode.PUSHED;
+            this.enableInput = () => {
+                if (this._inputEnabled)
+                    return;
+                this._inputEnabled = true;
+            };
+            this.disableInput = () => {
+                if (!this._inputEnabled)
+                    return;
+                this._inputEnabled = false;
+                this.idle();
+            };
+            this.idle = () => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.idle() when input is enabled");
+                }
+                this._startIdleState();
+            };
+            this.idleDirection = (direction) => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.idle() when input is enabled");
+                }
+                this._direction = direction;
+                this._startIdleState();
+            };
+            this.walkToPoint = (x, y) => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.walk() when input is enabled");
+                }
+                if (!this.canWalk)
+                    return;
+                this._walkMode = Character_WalkMode.TO_POINT;
+                this._targetRef = null;
+                this._targetOffsetX = x;
+                this._targetOffsetY = y;
+                this._startWalkState();
+            };
+            this.walkToTDActor = (tdActor, offset) => {
+                if (this.isInputEnabled()) {
+                    console.warn("Shouldn't call Character.walk() when input is enabled");
+                }
+                if (!this.canWalk)
+                    return;
+                this._walkMode = Character_WalkMode.TO_TDACTOR;
+                this._targetRef = tdActor;
+                switch (offset) {
+                    case Direction.RIGHT:
+                        this._targetOffsetX = tdActor.halfWidth + this.halfWidth;
+                        this._targetOffsetY = 0;
+                        break;
+                    case Direction.DOWN:
+                        this._targetOffsetX = 0;
+                        this._targetOffsetY = tdActor.halfHeight + this.halfHeight;
+                        break;
+                    case Direction.LEFT:
+                        this._targetOffsetX = -tdActor.halfWidth - this.halfWidth;
+                        this._targetOffsetY = 0;
+                        break;
+                    case Direction.UP:
+                        this._targetOffsetX = 0;
+                        this._targetOffsetY = -tdActor.halfHeight - this.halfHeight;
+                        break;
+                    default:
+                        this._targetOffsetX = 0;
+                        this._targetOffsetY = 0;
+                        break;
+                }
+                this._startWalkState();
+            };
+            this.startAction = (actionIndex) => {
+                if (actionIndex < 0 || actionIndex >= this._actions.length) {
+                    console.warn("action index " + actionIndex + " is invalid.  Could not start action");
+                    return;
+                }
+                let action = this._actions[actionIndex];
+                if (action === null) {
+                    console.warn("action at action index " + actionIndex + " is null.  Could not start action");
+                    return;
+                }
+                this._endCurrentAction();
+                this._state = Character_State.ACTION;
+                this._currentActionIndex = actionIndex;
+                action.start();
+            };
+            this.onAwake = () => {
+                this.Actor_onAwake();
+                Character.allCharacters.push(this);
+            };
+            this.onStart = () => {
+                this.health = this.maxHealth;
+                this.tdSpriteRenderer = this.getComponent(Comps.TDSpriteRenderer);
+                this.idle();
+            };
+            this.onUpdate = () => {
+                this.transform.getGlobalPosition(this.tempVec2);
+                let x = this.tempVec2.x;
+                let foot = this.getFoot();
+                let vx = this.vx;
+                let vy = this.vy;
+                this._time += Game.deltaTime;
+                switch (this._state) {
+                    case Character_State.IDLE:
+                    case Character_State.WALK:
+                        if (this.isInputEnabled()) {
+                            if (PlayerInput.isLeftHeld() && !PlayerInput.isRightHeld()) {
+                                if (vx > 0) {
+                                    vx = Math.max(0, vx - this.friction * Game.deltaTime);
+                                }
+                                vx -= this.walkAccel * Game.deltaTime;
+                            }
+                            else if (PlayerInput.isRightHeld() && !PlayerInput.isLeftHeld()) {
+                                if (vx < 0) {
+                                    vx = Math.min(0, vx + this.friction * Game.deltaTime);
+                                }
+                                vx += this.walkAccel * Game.deltaTime;
+                            }
+                            else {
+                                if (vx > 0) {
+                                    vx = Math.max(0, vx - this.friction * Game.deltaTime);
+                                }
+                                else {
+                                    vx = Math.min(0, vx + this.friction * Game.deltaTime);
+                                }
+                            }
+                            if (PlayerInput.isUpHeld() && !PlayerInput.isDownHeld()) {
+                                if (vy > 0) {
+                                    vy = Math.max(0, vy - this.friction * Game.deltaTime);
+                                }
+                                vy -= this.walkAccel * Game.deltaTime;
+                            }
+                            else if (PlayerInput.isDownHeld() && !PlayerInput.isUpHeld()) {
+                                if (vy < 0) {
+                                    vy = Math.min(0, vy + this.friction * Game.deltaTime);
+                                }
+                                vy += this.walkAccel * Game.deltaTime;
+                            }
+                            else {
+                                if (vy > 0) {
+                                    vy = Math.max(0, vy - this.friction * Game.deltaTime);
+                                }
+                                else {
+                                    vy = Math.min(0, vy + this.friction * Game.deltaTime);
+                                }
+                            }
+                            let vMag = M.magnitude(vx, vy);
+                            if (vMag >= this.walkSpeed) {
+                                vx *= this.walkSpeed / vMag;
+                                vy *= this.walkSpeed / vMag;
+                            }
+                            if (PlayerInput.isLeftHeld() !== PlayerInput.isRightHeld()) {
+                                if (!(PlayerInput.isUpHeld() && this._direction === Direction.UP) &&
+                                    !(PlayerInput.isDownHeld() && this._direction === Direction.DOWN)) {
+                                    this._direction = PlayerInput.isLeftHeld() ? Direction.LEFT : Direction.RIGHT;
+                                }
+                                this._startWalkState();
+                            }
+                            else if (PlayerInput.isUpHeld() !== PlayerInput.isDownHeld()) {
+                                this._direction = PlayerInput.isUpHeld() ? Direction.UP : Direction.DOWN;
+                                this._startWalkState();
+                            }
+                            else {
+                                this._startIdleState();
+                            }
+                            if (PlayerInput.isAttackPressed()) {
+                                console.log("attack pressed");
+                                this.startAction(0);
+                            }
+                        }
+                        else {
+                            if (this._state === Character_State.WALK) {
+                                let wx = 0;
+                                let wy = 0;
+                                switch (this._walkMode) {
+                                    case Character_WalkMode.TO_POINT:
+                                        wx = this._targetOffsetX;
+                                        wy = this._targetOffsetY;
+                                        break;
+                                    case Character_WalkMode.TO_TDACTOR:
+                                        this._targetRef.getGlobalPosition(this.tempVec2);
+                                        wx = this.tempVec2.x + this._targetOffsetX;
+                                        wy = this._targetRef.getFoot() + this._targetOffsetY;
+                                        break;
+                                }
+                                let dx = wx - x;
+                                let dy = wy - foot;
+                                let dMag = M.magnitude(dx, dy);
+                                if (dMag < this.walkSpeed * Game.deltaTime) {
+                                    vx = dx / Game.deltaTime;
+                                    vy = dy / Game.deltaTime;
+                                    this.idle();
+                                }
+                                else {
+                                    dx /= dMag;
+                                    dy /= dMag;
+                                    let targetVX = dx * this.walkSpeed;
+                                    let targetVY = dy * this.walkSpeed;
+                                    if (vx < targetVX) {
+                                        vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
+                                    }
+                                    else {
+                                        vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
+                                    }
+                                    if (vy < targetVY) {
+                                        vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
+                                    }
+                                    else {
+                                        vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
+                                    }
+                                }
+                                this._direction = Collision.getNormalDirection(vx, vy);
+                            }
+                        }
+                        break;
+                    case Character_State.ACTION:
+                        let action = this._getCurrentAction();
+                        action.onUpdate();
+                        if (!action.isRunning()) {
+                            this._startIdleState();
+                        }
+                        break;
+                }
+                if (this.applyFriction) {
+                    let friction = this.friction;
+                    if (vx < 0) {
+                        vx = Math.min(0, vx + friction * Game.deltaTime);
+                    }
+                    else {
+                        vx = Math.max(0, vx - friction * Game.deltaTime);
+                    }
+                    if (vy < 0) {
+                        vy = Math.min(0, vy + friction * Game.deltaTime);
+                    }
+                    else {
+                        vy = Math.max(0, vy - friction * Game.deltaTime);
+                    }
+                }
+                if (this.pushMode === Character_PushMode.PUSHED) {
+                }
+                this.vx = vx;
+                this.vy = vy;
+                this.updateAnimation();
+            };
+            this.onDestroy = () => {
+                this._endCurrentAction();
+                this._actions.splice(0);
+                this._actions = null;
+                this.tdSpriteRenderer = null;
+                let index = Character.allCharacters.indexOf(this);
+                if (index !== -1) {
+                    Character.allCharacters.splice(index, 1);
+                }
+                this.Actor_onDestroy();
+            };
+            this._startIdleState = () => {
+                this._endCurrentAction();
+                if (this._state != Character_State.IDLE) {
+                    this._state = Character_State.IDLE;
+                    this._time = 0;
+                    this.applyFriction = true;
+                }
+                this.updateAnimation();
+            };
+            this._startWalkState = () => {
+                this._endCurrentAction();
+                if (this._state != Character_State.WALK) {
+                    this._state = Character_State.WALK;
+                    this._time = 0;
+                    this.applyFriction = false;
+                }
+                this.updateAnimation();
+            };
+            this.updateAnimation = () => {
+                if ((this._direction === Direction.LEFT && this.symmetrical) === this.transform.scaleX > 0) {
+                    this.transform.scaleX *= -1;
+                }
+                let anim = this.animPrefix;
+                switch (this._state) {
+                    case Character_State.IDLE:
+                        anim += "_idle";
+                        break;
+                    case Character_State.WALK:
+                        anim += "_walk";
+                        break;
+                    default:
+                        return;
+                }
+                switch (this._direction) {
+                    case Direction.NONE:
+                        return;
+                    case Direction.LEFT:
+                        if (this.symmetrical) {
+                            anim += "_right";
+                        }
+                        else {
+                            anim += "_left";
+                        }
+                        break;
+                    case Direction.RIGHT:
+                        anim += "_right";
+                        break;
+                    case Direction.UP:
+                        anim += "_up";
+                        break;
+                    case Direction.DOWN:
+                        anim += "_down";
+                        break;
+                }
+                if (this.tdSpriteRenderer.getAnimation() === null ||
+                    this.tdSpriteRenderer.getAnimation().name !== anim) {
+                    this.tdSpriteRenderer.playAnimation(anim);
+                }
+            };
+            this._getCurrentAction = () => {
+                if (this._currentActionIndex < 0 || this._currentActionIndex >= this._actions.length)
+                    return null;
+                return this._actions[this._currentActionIndex];
+            };
+            this._endCurrentAction = () => {
+                let action = this._getCurrentAction();
+                if (action === null)
+                    return;
+                action.stop();
+                this._currentActionIndex = -1;
+            };
+            this.tdSpriteRenderer = null;
+            this._state = Character_State.NONE;
+            this._time = 0;
+            this._direction = Direction.DOWN;
+            this._inputEnabled = false;
+            this._walkMode = Character_WalkMode.NONE;
+            this._targetRef = null;
+            this._targetOffsetX = 0;
+            this._targetOffsetY = 0;
+            this._actions = [];
+            this._currentActionIndex = -1;
+            this.name = "Character";
+            this.componentProperties.requireComponent(Comps.TDSpriteRenderer);
+        }
+        static getCharacter(name) {
+            if (name == null || name === "")
+                return null;
+            for (let i; i < Character.allCharacters.length; i++) {
+                let c = Character.allCharacters[i];
+                if (c.gameObject.name === name)
+                    return c;
+            }
+            return null;
+        }
+        static forEach(callbackFn) {
+            Character.allCharacters.forEach(callbackFn);
+        }
+        static setInputCharacter(character) {
+            if (character == null || (typeof character === "string" && character === "")) {
+                Character.allCharacters.forEach(function (c) {
+                    c.disableInput();
+                });
+                return;
+            }
+            if (typeof character === "string") {
+                let found = false;
+                for (let i = 0; i < Character.allCharacters.length; i++) {
+                    let c = Character.allCharacters[i];
+                    if (c.gameObject.name === character) {
+                        c.enableInput();
+                        found = true;
+                    }
+                    else {
+                        c.disableInput();
+                    }
+                }
+                if (!found) {
+                    console.warn(character + " was not set as the input character because no character with that name exists.");
+                }
+            }
+            else {
+                for (let i = 0; i < Character.allCharacters.length; i++) {
+                    let c = Character.allCharacters[i];
+                    if (c === character) {
+                        c.enableInput();
+                    }
+                    else {
+                        c.disableInput();
+                    }
+                }
+            }
+        }
+        static getInputCharacter() {
+            for (let i = 0; i < Character.allCharacters.length; i++) {
+                let c = Character.allCharacters[i];
+                if (c.isInputEnabled()) {
+                    return c;
+                }
+            }
+            return null;
+        }
+    }
+    Character.allCharacters = [];
+    Comps.Character = Character;
+})(Comps || (Comps = {}));
+var Debug;
+(function (Debug) {
+    function listCharacters() {
+        let names = [];
+        Comps.Character.forEach(function (character) {
+            names.push(character.gameObject.name);
+        });
+        return names;
+    }
+    Debug.listCharacters = listCharacters;
+    function setInputCharacter(characterName) {
+        Comps.Character.setInputCharacter(characterName);
+    }
+    Debug.setInputCharacter = setInputCharacter;
+})(Debug || (Debug = {}));
+var Actions;
+(function (Actions) {
+    class Base {
+        constructor(character) {
+            this.start = () => {
+                if (this.isRunning())
+                    return;
+                this._running = true;
+                this.onStart();
+            };
+            this.stop = () => {
+                if (!this.isRunning())
+                    return;
+                this.onEnd();
+                this._running = false;
+            };
+            this.isRunning = () => {
+                return this._running;
+            };
+            this.onStart = () => { };
+            this.onUpdate = () => { };
+            this.onEnd = () => { };
+            this.character = null;
+            this._running = false;
+            this.character = character;
+        }
+    }
+    Actions.Base = Base;
+})(Actions || (Actions = {}));
+var Actions;
+(function (Actions) {
+    class SwordSlash extends Actions.Base {
+        constructor(character) {
+            super(character);
+            this.duration = .25;
+            this.onStart = () => {
+                this.character.applyFriction = true;
+                this.time = 0;
+                let slashOffsetMag = 16;
+                let rect = this.character.getRect();
+                let ssGO = Prefabs.SwordSlash();
+                let charAnim = this.character.animPrefix + "_attack";
+                switch (this.character.getDirection()) {
+                    case Direction.LEFT:
+                        charAnim += this.character.symmetrical ? "_right" : "_left";
+                        ssGO.transform.x = rect.x - slashOffsetMag;
+                        ssGO.transform.y = rect.y + rect.height / 2;
+                        ssGO.transform.scaleX = -1;
+                        break;
+                    case Direction.RIGHT:
+                        charAnim += "_right";
+                        ssGO.transform.x = rect.x + rect.width + slashOffsetMag;
+                        ssGO.transform.y = rect.y + rect.height / 2;
+                        break;
+                    case Direction.UP:
+                        charAnim += "_up";
+                        ssGO.transform.x = rect.x + rect.width / 2;
+                        ssGO.transform.y = rect.y - slashOffsetMag;
+                        ssGO.transform.rotation = -90;
+                        break;
+                    case Direction.DOWN:
+                        charAnim += "_down";
+                        ssGO.transform.x = rect.x + rect.width / 2;
+                        ssGO.transform.y = rect.y + rect.height + slashOffsetMag;
+                        ssGO.transform.rotation = 90;
+                        break;
+                }
+                this.character.getComponent(SpriteRenderer).playAnimation(charAnim);
+            };
+            this.onUpdate = () => {
+                this.time += Game.deltaTime;
+                if (this.time >= this.duration) {
+                    this.stop();
+                }
+            };
+            this.onEnd = () => { };
+            this.time = 0;
+        }
+    }
+    Actions.SwordSlash = SwordSlash;
+})(Actions || (Actions = {}));
 var Comps;
 (function (Comps) {
     class ArrowTestController extends Component {
@@ -7162,471 +7775,6 @@ var Comps;
     }
     Comps.ArrowTestPlatController = ArrowTestPlatController;
 })(Comps || (Comps = {}));
-var Comps;
-(function (Comps) {
-    class TDActor extends Actor {
-        constructor() {
-            super();
-            this.getFoot = () => {
-                this.getGlobalPosition(this.tempVec2);
-                return this.tempVec2.y + this.offsetY;
-            };
-            this.setFoot = (foot) => {
-                this.getGlobalPosition(this.tempVec2);
-                this.setGlobalPosition(this.tempVec2.x, foot - this.offsetY);
-            };
-            this.getAir = () => {
-                return this.offsetY - this.baseOffsetY;
-            };
-            this.setAir = (air) => {
-                let foot = this.getFoot();
-                this.offsetY = air + this.baseOffsetY;
-                this.setFoot(foot);
-            };
-            this.baseOffsetY = 0;
-            this.setBounds = (offsetX, offsetY, halfWidth, halfHeight) => {
-                this.Actor_setBounds(offsetX, offsetY, halfWidth, halfHeight);
-                this.baseOffsetY = offsetY;
-            };
-            this.name = "TDActor";
-        }
-    }
-    Comps.TDActor = TDActor;
-})(Comps || (Comps = {}));
-var PlayerInput;
-(function (PlayerInput) {
-    function isLeftHeld() {
-        return Keys.keyHeld(Key.LeftArrow) || Keys.keyHeld(Key.A);
-    }
-    PlayerInput.isLeftHeld = isLeftHeld;
-    function isRightHeld() {
-        return Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
-    }
-    PlayerInput.isRightHeld = isRightHeld;
-    function isUpHeld() {
-        return Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
-    }
-    PlayerInput.isUpHeld = isUpHeld;
-    function isDownHeld() {
-        return Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
-    }
-    PlayerInput.isDownHeld = isDownHeld;
-    function isAttackPressed() {
-        return Keys.keyPressed(Key.X) || Keys.keyPressed(Key.ForwardSlash);
-    }
-    PlayerInput.isAttackPressed = isAttackPressed;
-})(PlayerInput || (PlayerInput = {}));
-var Comps;
-(function (Comps) {
-    (function (Character_State) {
-        Character_State[Character_State["NONE"] = 0] = "NONE";
-        Character_State[Character_State["IDLE"] = 1] = "IDLE";
-        Character_State[Character_State["WALK"] = 2] = "WALK";
-    })(Comps.Character_State || (Comps.Character_State = {}));
-    var Character_State = Comps.Character_State;
-    (function (Character_PushMode) {
-        Character_PushMode[Character_PushMode["NONE"] = 0] = "NONE";
-        Character_PushMode[Character_PushMode["PUSHED"] = 1] = "PUSHED";
-    })(Comps.Character_PushMode || (Comps.Character_PushMode = {}));
-    var Character_PushMode = Comps.Character_PushMode;
-    (function (Character_WalkMode) {
-        Character_WalkMode[Character_WalkMode["NONE"] = 0] = "NONE";
-        Character_WalkMode[Character_WalkMode["TO_POINT"] = 1] = "TO_POINT";
-        Character_WalkMode[Character_WalkMode["TO_TDACTOR"] = 2] = "TO_TDACTOR";
-    })(Comps.Character_WalkMode || (Comps.Character_WalkMode = {}));
-    var Character_WalkMode = Comps.Character_WalkMode;
-    class Character extends Comps.TDActor {
-        constructor() {
-            super();
-            this.animPrefix = "[define animPrefix here]";
-            this.symmetrical = true;
-            this.canWalk = true;
-            this.walkSpeed = 70;
-            this.walkAccel = 500;
-            this.friction = 700;
-            this.applyFriction = true;
-            this.getState = () => {
-                return this._state;
-            };
-            this.getDirection = () => {
-                return this._direction;
-            };
-            this.isInputEnabled = () => {
-                return this._inputEnabled;
-            };
-            this.pushMode = Character_PushMode.PUSHED;
-            this.enableInput = () => {
-                if (this._inputEnabled)
-                    return;
-                this._inputEnabled = true;
-            };
-            this.disableInput = () => {
-                if (!this._inputEnabled)
-                    return;
-                this._inputEnabled = false;
-                this.idle();
-            };
-            this.idle = () => {
-                if (this.isInputEnabled()) {
-                    console.warn("Shouldn't call Character.idle() when input is enabled");
-                }
-                this._startIdleState();
-            };
-            this.idleDirection = (direction) => {
-                if (this.isInputEnabled()) {
-                    console.warn("Shouldn't call Character.idle() when input is enabled");
-                }
-                this._direction = direction;
-                this._startIdleState();
-            };
-            this.walkToPoint = (x, y) => {
-                if (this.isInputEnabled()) {
-                    console.warn("Shouldn't call Character.walk() when input is enabled");
-                }
-                if (!this.canWalk)
-                    return;
-                this._walkMode = Character_WalkMode.TO_POINT;
-                this._targetRef = null;
-                this._targetOffsetX = x;
-                this._targetOffsetY = y;
-                this._startWalkState();
-            };
-            this.walkToTDActor = (tdActor, offset) => {
-                if (this.isInputEnabled()) {
-                    console.warn("Shouldn't call Character.walk() when input is enabled");
-                }
-                if (!this.canWalk)
-                    return;
-                this._walkMode = Character_WalkMode.TO_TDACTOR;
-                this._targetRef = tdActor;
-                switch (offset) {
-                    case Direction.RIGHT:
-                        this._targetOffsetX = tdActor.halfWidth + this.halfWidth;
-                        this._targetOffsetY = 0;
-                        break;
-                    case Direction.DOWN:
-                        this._targetOffsetX = 0;
-                        this._targetOffsetY = tdActor.halfHeight + this.halfHeight;
-                        break;
-                    case Direction.LEFT:
-                        this._targetOffsetX = -tdActor.halfWidth - this.halfWidth;
-                        this._targetOffsetY = 0;
-                        break;
-                    case Direction.UP:
-                        this._targetOffsetX = 0;
-                        this._targetOffsetY = -tdActor.halfHeight - this.halfHeight;
-                        break;
-                    default:
-                        this._targetOffsetX = 0;
-                        this._targetOffsetY = 0;
-                        break;
-                }
-                this._startWalkState();
-            };
-            this.onAwake = () => {
-                this.Actor_onAwake();
-                Character.allCharacters.push(this);
-            };
-            this.onStart = () => {
-                this.health = this.maxHealth;
-                this.tdSpriteRenderer = this.getComponent(Comps.TDSpriteRenderer);
-                this.idle();
-            };
-            this.onUpdate = () => {
-                this.transform.getGlobalPosition(this.tempVec2);
-                let x = this.tempVec2.x;
-                let foot = this.getFoot();
-                let vx = this.vx;
-                let vy = this.vy;
-                this._time += Game.deltaTime;
-                if (this.isInputEnabled()) {
-                    switch (this._state) {
-                        case Character_State.IDLE:
-                        case Character_State.WALK:
-                            if (PlayerInput.isLeftHeld() && !PlayerInput.isRightHeld()) {
-                                if (vx > 0) {
-                                    vx = Math.max(0, vx - this.friction * Game.deltaTime);
-                                }
-                                vx -= this.walkAccel * Game.deltaTime;
-                            }
-                            else if (PlayerInput.isRightHeld() && !PlayerInput.isLeftHeld()) {
-                                if (vx < 0) {
-                                    vx = Math.min(0, vx + this.friction * Game.deltaTime);
-                                }
-                                vx += this.walkAccel * Game.deltaTime;
-                            }
-                            else {
-                                if (vx > 0) {
-                                    vx = Math.max(0, vx - this.friction * Game.deltaTime);
-                                }
-                                else {
-                                    vx = Math.min(0, vx + this.friction * Game.deltaTime);
-                                }
-                            }
-                            if (PlayerInput.isUpHeld() && !PlayerInput.isDownHeld()) {
-                                if (vy > 0) {
-                                    vy = Math.max(0, vy - this.friction * Game.deltaTime);
-                                }
-                                vy -= this.walkAccel * Game.deltaTime;
-                            }
-                            else if (PlayerInput.isDownHeld() && !PlayerInput.isUpHeld()) {
-                                if (vy < 0) {
-                                    vy = Math.min(0, vy + this.friction * Game.deltaTime);
-                                }
-                                vy += this.walkAccel * Game.deltaTime;
-                            }
-                            else {
-                                if (vy > 0) {
-                                    vy = Math.max(0, vy - this.friction * Game.deltaTime);
-                                }
-                                else {
-                                    vy = Math.min(0, vy + this.friction * Game.deltaTime);
-                                }
-                            }
-                            let vMag = M.magnitude(vx, vy);
-                            if (vMag >= this.walkSpeed) {
-                                vx *= this.walkSpeed / vMag;
-                                vy *= this.walkSpeed / vMag;
-                            }
-                            if (PlayerInput.isLeftHeld() !== PlayerInput.isRightHeld()) {
-                                if (!(PlayerInput.isUpHeld() && this._direction === Direction.UP) &&
-                                    !(PlayerInput.isDownHeld() && this._direction === Direction.DOWN)) {
-                                    this._direction = PlayerInput.isLeftHeld() ? Direction.LEFT : Direction.RIGHT;
-                                }
-                                this._startWalkState();
-                            }
-                            else if (PlayerInput.isUpHeld() !== PlayerInput.isDownHeld()) {
-                                this._direction = PlayerInput.isUpHeld() ? Direction.UP : Direction.DOWN;
-                                this._startWalkState();
-                            }
-                            else {
-                                this._startIdleState();
-                            }
-                            break;
-                    }
-                }
-                else {
-                    switch (this._state) {
-                        case Character_State.IDLE:
-                            break;
-                        case Character_State.WALK:
-                            let wx = 0;
-                            let wy = 0;
-                            switch (this._walkMode) {
-                                case Character_WalkMode.TO_POINT:
-                                    wx = this._targetOffsetX;
-                                    wy = this._targetOffsetY;
-                                    break;
-                                case Character_WalkMode.TO_TDACTOR:
-                                    this._targetRef.getGlobalPosition(this.tempVec2);
-                                    wx = this.tempVec2.x + this._targetOffsetX;
-                                    wy = this._targetRef.getFoot() + this._targetOffsetY;
-                                    break;
-                            }
-                            let dx = wx - x;
-                            let dy = wy - foot;
-                            let dMag = M.magnitude(dx, dy);
-                            if (dMag < this.walkSpeed * Game.deltaTime) {
-                                vx = dx / Game.deltaTime;
-                                vy = dy / Game.deltaTime;
-                                this.idle();
-                            }
-                            else {
-                                dx /= dMag;
-                                dy /= dMag;
-                                let targetVX = dx * this.walkSpeed;
-                                let targetVY = dy * this.walkSpeed;
-                                if (vx < targetVX) {
-                                    vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
-                                }
-                                else {
-                                    vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
-                                }
-                                if (vy < targetVY) {
-                                    vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
-                                }
-                                else {
-                                    vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
-                                }
-                            }
-                            this._direction = Collision.getNormalDirection(vx, vy);
-                            break;
-                    }
-                }
-                if (this.applyFriction) {
-                    let friction = this.friction;
-                    if (vx < 0) {
-                        vx = Math.min(0, vx + friction * Game.deltaTime);
-                    }
-                    else {
-                        vx = Math.max(0, vx - friction * Game.deltaTime);
-                    }
-                    if (vy < 0) {
-                        vy = Math.min(0, vy + friction * Game.deltaTime);
-                    }
-                    else {
-                        vy = Math.max(0, vy - friction * Game.deltaTime);
-                    }
-                }
-                if (this.pushMode === Character_PushMode.PUSHED) {
-                }
-                this.vx = vx;
-                this.vy = vy;
-                this.updateAnimation();
-            };
-            this.onDestroy = () => {
-                this.tdSpriteRenderer = null;
-                let index = Character.allCharacters.indexOf(this);
-                if (index !== -1) {
-                    Character.allCharacters.splice(index, 1);
-                }
-                this.Actor_onDestroy();
-            };
-            this._startIdleState = () => {
-                if (this._state != Character_State.IDLE) {
-                    this._state = Character_State.IDLE;
-                    this._time = 0;
-                    this.applyFriction = true;
-                }
-                this.updateAnimation();
-            };
-            this._startWalkState = () => {
-                if (this._state != Character_State.WALK) {
-                    this._state = Character_State.WALK;
-                    this._time = 0;
-                    this.applyFriction = false;
-                }
-                this.updateAnimation();
-            };
-            this.updateAnimation = () => {
-                let anim = this.animPrefix;
-                let flipped = false;
-                switch (this._state) {
-                    case Character_State.IDLE:
-                        anim += "_idle";
-                        break;
-                    case Character_State.WALK:
-                        anim += "_walk";
-                        break;
-                }
-                switch (this._direction) {
-                    case Direction.NONE:
-                        return;
-                    case Direction.LEFT:
-                        if (this.symmetrical) {
-                            flipped = true;
-                            anim += "_right";
-                        }
-                        else {
-                            anim += "_left";
-                        }
-                        break;
-                    case Direction.RIGHT:
-                        anim += "_right";
-                        break;
-                    case Direction.UP:
-                        anim += "_up";
-                        break;
-                    case Direction.DOWN:
-                        anim += "_down";
-                        break;
-                }
-                if (flipped === this.transform.scaleX > 0) {
-                    this.transform.scaleX *= -1;
-                }
-                if (this.tdSpriteRenderer.getAnimation() === null ||
-                    this.tdSpriteRenderer.getAnimation().name !== anim) {
-                    this.tdSpriteRenderer.playAnimation(anim);
-                }
-            };
-            this.tdSpriteRenderer = null;
-            this._state = Character_State.NONE;
-            this._time = 0;
-            this._direction = Direction.DOWN;
-            this._inputEnabled = false;
-            this._walkMode = Character_WalkMode.NONE;
-            this._targetRef = null;
-            this._targetOffsetX = 0;
-            this._targetOffsetY = 0;
-            this.name = "Character";
-            this.componentProperties.requireComponent(Comps.TDSpriteRenderer);
-        }
-        static getCharacter(name) {
-            if (name == null || name === "")
-                return null;
-            for (let i; i < Character.allCharacters.length; i++) {
-                let c = Character.allCharacters[i];
-                if (c.gameObject.name === name)
-                    return c;
-            }
-            return null;
-        }
-        static forEach(callbackFn) {
-            Character.allCharacters.forEach(callbackFn);
-        }
-        static setInputCharacter(character) {
-            if (character == null || (typeof character === "string" && character === "")) {
-                Character.allCharacters.forEach(function (c) {
-                    c.disableInput();
-                });
-                return;
-            }
-            if (typeof character === "string") {
-                let found = false;
-                for (let i = 0; i < Character.allCharacters.length; i++) {
-                    let c = Character.allCharacters[i];
-                    if (c.gameObject.name === character) {
-                        c.enableInput();
-                        found = true;
-                    }
-                    else {
-                        c.disableInput();
-                    }
-                }
-                if (!found) {
-                    console.warn(character + " was not set as the input character because no character with that name exists.");
-                }
-            }
-            else {
-                for (let i = 0; i < Character.allCharacters.length; i++) {
-                    let c = Character.allCharacters[i];
-                    if (c === character) {
-                        c.enableInput();
-                    }
-                    else {
-                        c.disableInput();
-                    }
-                }
-            }
-        }
-        static getInputCharacter() {
-            for (let i = 0; i < Character.allCharacters.length; i++) {
-                let c = Character.allCharacters[i];
-                if (c.isInputEnabled()) {
-                    return c;
-                }
-            }
-            return null;
-        }
-    }
-    Character.allCharacters = [];
-    Comps.Character = Character;
-})(Comps || (Comps = {}));
-var Debug;
-(function (Debug) {
-    function listCharacters() {
-        let names = [];
-        Comps.Character.forEach(function (character) {
-            names.push(character.gameObject.name);
-        });
-        return names;
-    }
-    Debug.listCharacters = listCharacters;
-    function setInputCharacter(characterName) {
-        Comps.Character.setInputCharacter(characterName);
-    }
-    Debug.setInputCharacter = setInputCharacter;
-})(Debug || (Debug = {}));
 var Comps;
 (function (Comps) {
     class ControlCameraWithWASD extends Component {
@@ -8292,6 +8440,7 @@ var Prefabs;
         character.setBounds(0, 9, 6, 6);
         character.maxHealth = 10;
         character.team = Team.PLAYERS;
+        character.setAction(0, Actions.SwordSlash);
         let testCharacter = go.addComponent(Comps.TestCharacter);
         let tdas = go.addComponent(Comps.TDActorShadow);
         tdas.setSize(0, 3, 6, 2);

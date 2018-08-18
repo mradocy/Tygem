@@ -14,8 +14,7 @@ namespace Comps {
 
         // TODO: custom actions defined by functions
 
-        //ACTION_1,
-        //ACTION_2,
+        ACTION,
     }
 
     export enum Character_PushMode {
@@ -45,7 +44,7 @@ namespace Comps {
         }
 
 
-        // "Constant" Properties:
+        // "Unique" Properties (to be set upon creating the Character component to give the character its unique properties):
 
         /**
          * Prefix on animation names.
@@ -72,6 +71,32 @@ namespace Comps {
          */
         friction: number = 700;
 
+        /**
+         * Sets the action at the given actionIndex to a specified Action.
+         * Usage: character.setAction(0, Actions.SwordSlash);
+         * @param action The constructor of the action to set.
+         */
+        setAction = <T extends Actions.Base>(actionIndex: number, action: new (character: Character) => T): void => {
+            if (actionIndex < 0) return;
+
+            // extend actions array to include actionIndex
+            if (actionIndex >= this._actions.length && action === null) return;
+            while (actionIndex >= this._actions.length) {
+                this._actions.push(null);
+            }
+
+            // end previous action at the index
+            let prevAction: Actions.Base = this._actions[actionIndex];
+            if (prevAction !== null) {
+                prevAction.stop();
+            }
+
+            // replace action
+            let actionInstance: Actions.Base = new action(this);
+            this._actions[actionIndex] = actionInstance;
+        }
+
+
 
         // Toggle Properties:
         
@@ -85,6 +110,12 @@ namespace Comps {
          */
         getState = (): Character_State => {
             return this._state;
+        }
+        /**
+         * Gets the index of the current action.
+         */
+        getCurrentActionIndex = (): number => {
+            return this._currentActionIndex;
         }
         /**
          * Gets the direction the character is facing.
@@ -101,7 +132,7 @@ namespace Comps {
 
 
 
-        // Actions:
+        // Instructions:
 
         /**
          * Gives player control over this Character.
@@ -187,7 +218,39 @@ namespace Comps {
             }
             this._startWalkState();
         }
+
+        /**
+         * Starts the action at the given index.  Does nothing if the action at the index is set to null.
+         * This character's state will be set to ACTION.
+         * Note: to stop an action, call another instruction function like idle().
+         */
+        startAction = (actionIndex: number): void => {
+            if (actionIndex < 0 || actionIndex >= this._actions.length) {
+                console.warn("action index " + actionIndex + " is invalid.  Could not start action");
+                return;
+            }
+
+            let action: Actions.Base = this._actions[actionIndex];
+            if (action === null) {
+                console.warn("action at action index " + actionIndex + " is null.  Could not start action");
+                return;
+            }
+
+            this._endCurrentAction();
+
+            this._state = Character_State.ACTION;
+            this._currentActionIndex = actionIndex;
+            action.start();
+        }
+
         
+
+        
+
+        
+
+        
+
 
         
 
@@ -221,14 +284,14 @@ namespace Comps {
             let vy: number = this.vy;
 
             this._time += Game.deltaTime;
+            
+            switch (this._state) {
 
+                case Character_State.IDLE:
+                case Character_State.WALK:
 
-            if (this.isInputEnabled()) {
-                // movement based on player input
-
-                switch (this._state) {
-                    case Character_State.IDLE:
-                    case Character_State.WALK:
+                    if (this.isInputEnabled()) {
+                        // movement based on player input
 
                         if (PlayerInput.isLeftHeld() && !PlayerInput.isRightHeld()) {
                             // left held
@@ -295,73 +358,85 @@ namespace Comps {
                             this._startIdleState();
                         }
 
+
+                        if (PlayerInput.isAttackPressed()) {
+                            console.log("attack pressed");
+                            this.startAction(0);
+                        }
+
+
                         //if (attackPressed) {
                         //    this.slash();
                         //}
+                        
+                    } else {
+                        // input is disabled.  movement based on instructions
 
-                        break;
-                }
+                        if (this._state === Character_State.WALK) {
 
-            } else {
-                // input is disabled.  movement based on instructions
-                
-                switch (this._state) {
-                    case Character_State.IDLE:
-                        break;
-                    case Character_State.WALK:
-
-                        // get destination
-                        let wx: number = 0;
-                        let wy: number = 0;
-                        switch (this._walkMode) {
-                            case Character_WalkMode.TO_POINT:
-                                wx = this._targetOffsetX;
-                                wy = this._targetOffsetY;
-                                break;
-                            case Character_WalkMode.TO_TDACTOR:
-                                (this._targetRef as TDActor).getGlobalPosition(this.tempVec2);
-                                wx = this.tempVec2.x + this._targetOffsetX;
-                                wy = (this._targetRef as TDActor).getFoot() + this._targetOffsetY;
-                                break;
-                        }
+                            // get destination
+                            let wx: number = 0;
+                            let wy: number = 0;
+                            switch (this._walkMode) {
+                                case Character_WalkMode.TO_POINT:
+                                    wx = this._targetOffsetX;
+                                    wy = this._targetOffsetY;
+                                    break;
+                                case Character_WalkMode.TO_TDACTOR:
+                                    (this._targetRef as TDActor).getGlobalPosition(this.tempVec2);
+                                    wx = this.tempVec2.x + this._targetOffsetX;
+                                    wy = (this._targetRef as TDActor).getFoot() + this._targetOffsetY;
+                                    break;
+                            }
                     
-                        // get distance to destination
-                        let dx: number = wx - x;
-                        let dy: number = wy - foot;
-                        let dMag: number = M.magnitude(dx, dy);
+                            // get distance to destination
+                            let dx: number = wx - x;
+                            let dy: number = wy - foot;
+                            let dMag: number = M.magnitude(dx, dy);
 
-                        // determine velocity
-                        if (dMag < this.walkSpeed * Game.deltaTime) {
-                            // should arrive at destination next frame
-                            vx = dx / Game.deltaTime;
-                            vy = dy / Game.deltaTime;
+                            // determine velocity
+                            if (dMag < this.walkSpeed * Game.deltaTime) {
+                                // should arrive at destination next frame
+                                vx = dx / Game.deltaTime;
+                                vy = dy / Game.deltaTime;
 
-                            this.idle();
+                                this.idle();
 
-                        } else {
-                            // accel to target velocity
-                            dx /= dMag;
-                            dy /= dMag;
-
-                            let targetVX: number = dx * this.walkSpeed;
-                            let targetVY: number = dy * this.walkSpeed;
-                            if (vx < targetVX) {
-                                vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
                             } else {
-                                vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
+                                // accel to target velocity
+                                dx /= dMag;
+                                dy /= dMag;
+
+                                let targetVX: number = dx * this.walkSpeed;
+                                let targetVY: number = dy * this.walkSpeed;
+                                if (vx < targetVX) {
+                                    vx = Math.min(targetVX, vx + this.walkAccel * Game.deltaTime);
+                                } else {
+                                    vx = Math.max(targetVX, vx - this.walkAccel * Game.deltaTime);
+                                }
+                                if (vy < targetVY) {
+                                    vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
+                                } else {
+                                    vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
+                                }
                             }
-                            if (vy < targetVY) {
-                                vy = Math.min(targetVY, vy + this.walkAccel * Game.deltaTime);
-                            } else {
-                                vy = Math.max(targetVY, vy - this.walkAccel * Game.deltaTime);
-                            }
+
+                            this._direction = Collision.getNormalDirection(vx, vy);
                         }
+                    }
 
-                        this._direction = Collision.getNormalDirection(vx, vy);
+                    break; // ends case Character_State.IDLE and Character_State.WALK
 
-                        break;
-                }
-                
+                case Character_State.ACTION:
+
+                    let action: Actions.Base = this._getCurrentAction();
+                    action.onUpdate();
+                    if (!action.isRunning()) {
+                        // action finished, start another state
+                        this._startIdleState();
+                    }
+
+                    break;
             }
             
             // apply friction if toggled
@@ -395,6 +470,11 @@ namespace Comps {
         
         // called just before the component is destroyed.
         onDestroy = (): void => {
+
+            this._endCurrentAction();
+            this._actions.splice(0);
+            this._actions = null;
+
             this.tdSpriteRenderer = null;
             let index: number = Character.allCharacters.indexOf(this);
             if (index !== -1) {
@@ -486,6 +566,9 @@ namespace Comps {
         // Protected:
 
         protected _startIdleState = (): void => {
+            // end previous state?
+            this._endCurrentAction();
+
             if (this._state != Character_State.IDLE) {
                 this._state = Character_State.IDLE;
                 this._time = 0;
@@ -496,6 +579,9 @@ namespace Comps {
         }
 
         protected _startWalkState = (): void => {
+            // end previous state?
+            this._endCurrentAction();
+
             if (this._state != Character_State.WALK) {
                 this._state = Character_State.WALK;
                 this._time = 0;
@@ -507,8 +593,12 @@ namespace Comps {
 
         protected updateAnimation = (): void => {
 
+            // flip around
+            if ((this._direction === Direction.LEFT && this.symmetrical) === this.transform.scaleX > 0) {
+                this.transform.scaleX *= -1;
+            }
+
             let anim: string = this.animPrefix;
-            let flipped: boolean = false;
             switch (this._state) {
                 case Character_State.IDLE:
                     anim += "_idle";
@@ -516,13 +606,15 @@ namespace Comps {
                 case Character_State.WALK:
                     anim += "_walk";
                     break;
+                default:
+                    // other state, don't set animation here.
+                    return;
             }
             switch (this._direction) {
                 case Direction.NONE:
                     return;
                 case Direction.LEFT:
                     if (this.symmetrical) {
-                        flipped = true;
                         anim += "_right";
                     } else {
                         anim += "_left";
@@ -538,18 +630,29 @@ namespace Comps {
                     anim += "_down";
                     break;
             }
-
-            if (flipped === this.transform.scaleX > 0) {
-                this.transform.scaleX *= -1;
-            }
-
+            
             if (this.tdSpriteRenderer.getAnimation() === null ||
                 this.tdSpriteRenderer.getAnimation().name !== anim) {
                 this.tdSpriteRenderer.playAnimation(anim);
             }
 
         }
+
+        protected _getCurrentAction = (): Actions.Base => {
+            if (this._currentActionIndex < 0 || this._currentActionIndex >= this._actions.length)
+                return null;
+
+            return this._actions[this._currentActionIndex];
+        }
         
+        protected _endCurrentAction = (): void => {
+
+            let action: Actions.Base = this._getCurrentAction();
+            if (action === null) return;
+
+            action.stop();
+            this._currentActionIndex = -1;
+        }
 
         
 
@@ -564,6 +667,9 @@ namespace Comps {
         protected _targetRef: any = null;
         protected _targetOffsetX: number = 0;
         protected _targetOffsetY: number = 0;
+
+        protected _actions: Array<Actions.Base> = [];
+        protected _currentActionIndex: number = -1;
 
         private static allCharacters: Array<Character> = [];
     }

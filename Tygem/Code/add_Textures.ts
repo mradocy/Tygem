@@ -40,9 +40,13 @@ Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true)
 Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
 Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
 
-Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
-Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
-Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
+Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false); // remove
+Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false); // remove
+Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false); // remove
+
+Animation.addAnimation("hero_attack_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
+Animation.addAnimation("hero_attack_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
+Animation.addAnimation("hero_attack_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
 
 Spritesheet.addSpritesheet("hero/sword slash.png", 32, 48, 8, 8);
 Animation.addAnimation("hero_sword_slash", "hero/sword slash.png", [0, 1, 2, 3, 4, 5, 6, 7], 8 / .25, false);
@@ -57,6 +61,11 @@ Animation.addAnimation("log_walk_down", "log/log.png", [0, 1, 2, 3], 10, true);
 Animation.addAnimation("log_walk_up", "log/log.png", [6, 7, 8, 9], 10, true);
 Animation.addAnimation("log_walk_right", "log/log.png", [12, 13, 14, 15], 10, true);
 Animation.addAnimation("log_walk_left", "log/log.png", [18, 19, 20, 21], 10, true);
+
+Animation.addAnimation("log_attack_down", "log/log.png", [2], 10, false); // get better animation
+Animation.addAnimation("log_attack_up", "log/log.png", [8], 10, false); // get better animation
+Animation.addAnimation("log_attack_right", "log/log.png", [14], 10, false); // get better animation
+Animation.addAnimation("log_attack_left", "log/log.png", [20], 10, false); // get better animation
 
 
 

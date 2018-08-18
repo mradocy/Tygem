@@ -27,6 +27,8 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Code\Actions\Base.ts" />
+    <TypeScriptCompile Include="Code\Actions\SwordSlash.ts" />
     <TypeScriptCompile Include="Code\add_Materials.ts" />
     <TypeScriptCompile Include="Code\add_Scenes.ts" />
     <TypeScriptCompile Include="Code\add_Sounds.ts" />
