@@ -12,6 +12,8 @@ namespace Comps {
         WALK,
         
         ACTION,
+
+        KNOCKBACK,
     }
 
     export enum Character_PushMode {
@@ -58,7 +60,7 @@ namespace Comps {
         /**
          * Speed when walking
          */
-        walkSpeed: number = 70;
+        walkSpeed: number = 100;
         /**
          * Acceleration when walking
          */
@@ -66,7 +68,7 @@ namespace Comps {
         /**
          * Friction when the applyFriction property is set to true.
          */
-        friction: number = 700;
+        friction: number = 800;
 
         /**
          * Sets the action at the given index to a specified Action.
@@ -103,6 +105,15 @@ namespace Comps {
             return this._actionInfos[index];
         }
 
+        knockbackFriction: number = 600;
+
+        // Mercy invincibility properties: 
+
+        mercyInvincibilityDuration: number = .4;
+        mercyInvincibleFlashPeriod: number = .1;
+        mercyInvincibleTintColor: string = "red";
+        mercyInvincibleTintAmount1: number = .6;
+        mercyInvincibleTintAmount2: number = .2;
 
 
         // Toggle Properties:
@@ -130,9 +141,17 @@ namespace Comps {
         getDirection = (): Direction => {
             return this._direction;
         }
-
+        /**
+         * If Player input controls this Character.
+         */
         isInputEnabled = (): boolean => {
             return this._inputEnabled;
+        }
+        /**
+         * If is during the brief period after being hit that character is invincible
+         */
+        isMercyInvincible = (): boolean => {
+            return this._mercyInvincibleTime < this.mercyInvincibilityDuration;
         }
 
         pushMode: Character_PushMode = Character_PushMode.PUSHED;
@@ -249,9 +268,7 @@ namespace Comps {
             this._currentActionIndex = actionIndex;
             action.start();
         }
-
         
-
         
 
         
@@ -291,6 +308,7 @@ namespace Comps {
             let vy: number = this.vy;
 
             this._time += Game.deltaTime;
+            this._mercyInvincibleTime += Game.deltaTime;
             
             switch (this._state) {
 
@@ -439,6 +457,23 @@ namespace Comps {
                     }
 
                     break;
+
+                case Character_State.KNOCKBACK:
+
+                    // apply knockback friction
+                    let vMag0: number = M.magnitude(vx, vy);
+                    if (vMag0 > .00001) {
+                        let vMag1 = Math.max(0, vMag0 - this.knockbackFriction * Game.deltaTime);
+                        vx *= vMag1 / vMag0;
+                        vy *= vMag1 / vMag0;
+                    }
+
+                    // end knockback state
+                    if (this._time >= this._knockbackDuration) {
+                        this._startIdleState();
+                    }
+                    
+                    break;
             }
             
             // apply friction if toggled
@@ -472,12 +507,25 @@ namespace Comps {
 
         // called just before taking damage (so values can be tweaked)
         preReceiveDamage = (ai: AttackInfo): void => {
+
+            // negate damage if mercy invincible
+            if (this.isMercyInvincible()) {
+                ai.damage = 0;
+            }
+
         }
 
         // called on taking damage
         onReceiveDamage = (ai: AttackInfo): void => {
 
             console.log("received damage.  damage: " + ai.damage + " health: " + this.health);
+
+            if (ai.damage > 0) {
+
+                // start knockback state
+                this._startKnockbackState(ai.knockbackSpeed, ai.knockbackHeading, ai.knockbackDuration, true);
+
+            }
 
         }
         
@@ -606,11 +654,47 @@ namespace Comps {
             this.updateAnimation();
         }
 
+        protected _startKnockbackState = (speed: number, heading: number, duration: number, startMercyInvincibility: boolean): void => {
+            // end previous state?
+            this._endCurrentAction();
+
+            if (this._state !== Character_State.KNOCKBACK) {
+                this._state = Character_State.KNOCKBACK;
+            }
+            // apply knockback
+            this.vx = speed * Math.cos(heading * M.degToRad);
+            this.vy = speed * Math.sin(heading * M.degToRad);
+            this._time = 0;
+            this._knockbackDuration = duration;
+            this.applyFriction = false;
+
+            // mercy invincibility
+            if (startMercyInvincibility) {
+                this._mercyInvincibleTime = 0;
+            }
+
+            this.updateAnimation();
+        }
+
         protected updateAnimation = (): void => {
 
             // flip around
             if ((this._direction === Direction.LEFT && this.symmetrical) === this.transform.scaleX > 0) {
                 this.transform.scaleX *= -1;
+            }
+
+            // color effects
+            if (this.isMercyInvincible()) {
+                
+                this.tdSpriteRenderer.tintColor = this.mercyInvincibleTintColor;
+                if (M.fmod(this._mercyInvincibleTime, this.mercyInvincibleFlashPeriod) < this.mercyInvincibleFlashPeriod / 2) {
+                    this.tdSpriteRenderer.tintAmount = this.mercyInvincibleTintAmount1;
+                } else {
+                    this.tdSpriteRenderer.tintAmount = this.mercyInvincibleTintAmount2;
+                }
+
+            } else {
+                this.tdSpriteRenderer.tintAmount = 0;
             }
 
             let anim: string = this.animPrefix;
@@ -650,7 +734,7 @@ namespace Comps {
                 this.tdSpriteRenderer.getAnimation().name !== anim) {
                 this.tdSpriteRenderer.playAnimation(anim);
             }
-
+            
         }
 
         protected _getCurrentAction = (): Actions.Base => {
@@ -682,6 +766,9 @@ namespace Comps {
         protected _targetRef: any = null;
         protected _targetOffsetX: number = 0;
         protected _targetOffsetY: number = 0;
+
+        protected _knockbackDuration: number = 0;
+        protected _mercyInvincibleTime: number = 9999;
 
         protected _actionInfos: Array<Actions.Info> = [];
         protected _actions: Array<Actions.Base> = [];

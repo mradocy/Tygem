@@ -3927,8 +3927,14 @@ var Team;
 class AttackInfo {
     constructor() {
         this.damage = 0;
+        this.knockbackHeading = 0;
+        this.knockbackSpeed = AttackInfo.DEFAULT_KNOCKBACK_SPEED;
+        this.knockbackDuration = AttackInfo.DEFAULT_KNOCKBACK_DURATION;
         this.resetValues = () => {
             this.damage = 0;
+            this.knockbackHeading = 0;
+            this.knockbackSpeed = AttackInfo.DEFAULT_KNOCKBACK_SPEED;
+            this.knockbackDuration = AttackInfo.DEFAULT_KNOCKBACK_DURATION;
         };
         this.recycled = false;
     }
@@ -3951,6 +3957,8 @@ class AttackInfo {
         AttackInfo.privateAIs.push(ai);
     }
 }
+AttackInfo.DEFAULT_KNOCKBACK_SPEED = 120;
+AttackInfo.DEFAULT_KNOCKBACK_DURATION = .2;
 AttackInfo.privateAIs = [];
 var HorizAlign;
 (function (HorizAlign) {
@@ -7237,6 +7245,7 @@ var Comps;
         Character_State[Character_State["IDLE"] = 1] = "IDLE";
         Character_State[Character_State["WALK"] = 2] = "WALK";
         Character_State[Character_State["ACTION"] = 3] = "ACTION";
+        Character_State[Character_State["KNOCKBACK"] = 4] = "KNOCKBACK";
     })(Comps.Character_State || (Comps.Character_State = {}));
     var Character_State = Comps.Character_State;
     (function (Character_PushMode) {
@@ -7256,9 +7265,9 @@ var Comps;
             this.animPrefix = "[define animPrefix here]";
             this.symmetrical = true;
             this.canWalk = true;
-            this.walkSpeed = 70;
+            this.walkSpeed = 100;
             this.walkAccel = 500;
-            this.friction = 700;
+            this.friction = 800;
             this.setAction = (index, actionID) => {
                 if (index < 0)
                     return;
@@ -7282,6 +7291,12 @@ var Comps;
                     return null;
                 return this._actionInfos[index];
             };
+            this.knockbackFriction = 600;
+            this.mercyInvincibilityDuration = .4;
+            this.mercyInvincibleFlashPeriod = .1;
+            this.mercyInvincibleTintColor = "red";
+            this.mercyInvincibleTintAmount1 = .6;
+            this.mercyInvincibleTintAmount2 = .2;
             this.applyFriction = true;
             this.getState = () => {
                 return this._state;
@@ -7294,6 +7309,9 @@ var Comps;
             };
             this.isInputEnabled = () => {
                 return this._inputEnabled;
+            };
+            this.isMercyInvincible = () => {
+                return this._mercyInvincibleTime < this.mercyInvincibilityDuration;
             };
             this.pushMode = Character_PushMode.PUSHED;
             this.enableInput = () => {
@@ -7395,6 +7413,7 @@ var Comps;
                 let vx = this.vx;
                 let vy = this.vy;
                 this._time += Game.deltaTime;
+                this._mercyInvincibleTime += Game.deltaTime;
                 switch (this._state) {
                     case Character_State.IDLE:
                     case Character_State.WALK:
@@ -7514,6 +7533,17 @@ var Comps;
                             this._startIdleState();
                         }
                         break;
+                    case Character_State.KNOCKBACK:
+                        let vMag0 = M.magnitude(vx, vy);
+                        if (vMag0 > .00001) {
+                            let vMag1 = Math.max(0, vMag0 - this.knockbackFriction * Game.deltaTime);
+                            vx *= vMag1 / vMag0;
+                            vy *= vMag1 / vMag0;
+                        }
+                        if (this._time >= this._knockbackDuration) {
+                            this._startIdleState();
+                        }
+                        break;
                 }
                 if (this.applyFriction) {
                     let friction = this.friction;
@@ -7537,9 +7567,15 @@ var Comps;
                 this.updateAnimation();
             };
             this.preReceiveDamage = (ai) => {
+                if (this.isMercyInvincible()) {
+                    ai.damage = 0;
+                }
             };
             this.onReceiveDamage = (ai) => {
                 console.log("received damage.  damage: " + ai.damage + " health: " + this.health);
+                if (ai.damage > 0) {
+                    this._startKnockbackState(ai.knockbackSpeed, ai.knockbackHeading, ai.knockbackDuration, true);
+                }
             };
             this.onDestroy = () => {
                 this._endCurrentAction();
@@ -7572,9 +7608,36 @@ var Comps;
                 }
                 this.updateAnimation();
             };
+            this._startKnockbackState = (speed, heading, duration, startMercyInvincibility) => {
+                this._endCurrentAction();
+                if (this._state !== Character_State.KNOCKBACK) {
+                    this._state = Character_State.KNOCKBACK;
+                }
+                this.vx = speed * Math.cos(heading * M.degToRad);
+                this.vy = speed * Math.sin(heading * M.degToRad);
+                this._time = 0;
+                this._knockbackDuration = duration;
+                this.applyFriction = false;
+                if (startMercyInvincibility) {
+                    this._mercyInvincibleTime = 0;
+                }
+                this.updateAnimation();
+            };
             this.updateAnimation = () => {
                 if ((this._direction === Direction.LEFT && this.symmetrical) === this.transform.scaleX > 0) {
                     this.transform.scaleX *= -1;
+                }
+                if (this.isMercyInvincible()) {
+                    this.tdSpriteRenderer.tintColor = this.mercyInvincibleTintColor;
+                    if (M.fmod(this._mercyInvincibleTime, this.mercyInvincibleFlashPeriod) < this.mercyInvincibleFlashPeriod / 2) {
+                        this.tdSpriteRenderer.tintAmount = this.mercyInvincibleTintAmount1;
+                    }
+                    else {
+                        this.tdSpriteRenderer.tintAmount = this.mercyInvincibleTintAmount2;
+                    }
+                }
+                else {
+                    this.tdSpriteRenderer.tintAmount = 0;
                 }
                 let anim = this.animPrefix;
                 switch (this._state) {
@@ -7634,6 +7697,8 @@ var Comps;
             this._targetRef = null;
             this._targetOffsetX = 0;
             this._targetOffsetY = 0;
+            this._knockbackDuration = 0;
+            this._mercyInvincibleTime = 9999;
             this._actionInfos = [];
             this._actions = [];
             this._currentActionIndex = -1;
@@ -7856,6 +7921,7 @@ var Actions;
                 hitCircle.radius = 13;
                 hitCircle.attackDelay = .03;
                 hitCircle.attackDuration = .06;
+                hitCircle.headingMode = Comps.HitCircle_HeadingMode.CHARACTER_POSITION;
                 let slashOffsetMag = 16;
                 let rect = this.character.getRect();
                 let charAnim = this.character.animPrefix + "_attack";
@@ -8110,6 +8176,12 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
+    (function (HitCircle_HeadingMode) {
+        HitCircle_HeadingMode[HitCircle_HeadingMode["CIRCLE_POSITION"] = 0] = "CIRCLE_POSITION";
+        HitCircle_HeadingMode[HitCircle_HeadingMode["CHARACTER_POSITION"] = 1] = "CHARACTER_POSITION";
+        HitCircle_HeadingMode[HitCircle_HeadingMode["MANUAL"] = 2] = "MANUAL";
+    })(Comps.HitCircle_HeadingMode || (Comps.HitCircle_HeadingMode = {}));
+    var HitCircle_HeadingMode = Comps.HitCircle_HeadingMode;
     class HitCircle extends DrawerComponent {
         constructor() {
             super();
@@ -8119,6 +8191,8 @@ var Comps;
             this.offsetY = 0;
             this.attackDelay = 0;
             this.attackDuration = 9999;
+            this.headingMode = HitCircle_HeadingMode.CIRCLE_POSITION;
+            this.manualHeading = 0;
             this.gizmoColor = "red";
             this.isAttackActive = () => {
                 return this.attackDelay <= this._attackTime && this._attackTime <= this.attackDelay + this.attackDuration;
@@ -8143,6 +8217,7 @@ var Comps;
                     trans = trans.getParent();
                 }
                 let thisHitCircle = this;
+                let tempVec2 = this.tempVec2;
                 let tempRect = this.tempRect;
                 Actor.forEach(function (actor) {
                     if (!actor.isInTeam(thisHitCircle.teamTargeting))
@@ -8151,6 +8226,20 @@ var Comps;
                     if (M.circleRectangleIntersects(cx, cy, r, tempRect.x, tempRect.y, tempRect.width, tempRect.height)) {
                         let ai = AttackInfo.createNew();
                         ai.damage = thisHitCircle.actionRef.power;
+                        switch (thisHitCircle.headingMode) {
+                            case HitCircle_HeadingMode.CIRCLE_POSITION:
+                                ai.knockbackHeading = Math.atan2(tempRect.y + tempRect.height / 2 - cy, tempRect.x + tempRect.width / 2 - cx) * M.radToDeg;
+                                break;
+                            case HitCircle_HeadingMode.CHARACTER_POSITION:
+                                thisHitCircle.actionRef.character.transform.getGlobalPosition(tempVec2);
+                                let charX = tempVec2.x;
+                                let charY = thisHitCircle.actionRef.character.getFoot();
+                                ai.knockbackHeading = Math.atan2(tempRect.y + tempRect.height / 2 - charY, tempRect.x + tempRect.width / 2 - charX) * M.radToDeg;
+                                break;
+                            case HitCircle_HeadingMode.MANUAL:
+                                ai.knockbackHeading = thisHitCircle.manualHeading;
+                                break;
+                        }
                         actor.receiveDamage(ai);
                         AttackInfo.recycle(ai);
                     }
@@ -8527,9 +8616,6 @@ var Prefabs;
         character.maxHealth = 10;
         character.team = Team.PLAYERS;
         character.setAction(0, Actions.ID.SWORD_SLASH);
-        character.walkSpeed = 90;
-        character.walkAccel = 500;
-        character.friction = 800;
         character.enableInput();
         go.addComponent(Comps.CameraFollow);
         let tdas = go.addComponent(Comps.TDActorShadow);

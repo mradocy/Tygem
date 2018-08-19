@@ -46,6 +46,8 @@ namespace Actions {
             hitCircle.radius = 13;
             hitCircle.attackDelay = .03;
             hitCircle.attackDuration = .06;
+            hitCircle.headingMode = Comps.HitCircle_HeadingMode.CHARACTER_POSITION;
+            //hitCircle.manualHeading = 0;
 
             // position effect
             let slashOffsetMag: number = 16;

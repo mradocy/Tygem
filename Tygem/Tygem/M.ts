@@ -70,7 +70,7 @@ namespace M {
     }
 
     /**
-     * Calculates x mod y for floats.  Always returns a positive value.
+     * Calculates the floor mod, x mod y.  Always returns a positive value.
      */
     export function fmod(x: number, y: number): number {
         return x - Math.floor(x / y) * y;

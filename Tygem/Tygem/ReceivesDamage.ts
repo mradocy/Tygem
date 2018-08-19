@@ -88,10 +88,32 @@ enum Team {
 
 class AttackInfo {
 
+    static DEFAULT_KNOCKBACK_SPEED: number = 120;
+    static DEFAULT_KNOCKBACK_DURATION: number = .2;
+
+    /**
+     * Damage dealt to the ReceivesDamage.
+     */
     damage: number = 0;
+    /**
+     * Angle (in degrees) of the direction of the knockback
+     */
+    knockbackHeading: number = 0;
+
+    /**
+     * Initial speed of the knockback.  Can be altered on the receiving end.
+     */
+    knockbackSpeed: number = AttackInfo.DEFAULT_KNOCKBACK_SPEED;
+    /**
+     * How long receiver will be in the knockback state.  Can be altered on the receiving end.
+     */
+    knockbackDuration: number = AttackInfo.DEFAULT_KNOCKBACK_DURATION;
 
     resetValues = (): void => {
         this.damage = 0;
+        this.knockbackHeading = 0;
+        this.knockbackSpeed = AttackInfo.DEFAULT_KNOCKBACK_SPEED;
+        this.knockbackDuration = AttackInfo.DEFAULT_KNOCKBACK_DURATION;
     }
 
     private recycled: boolean = false;

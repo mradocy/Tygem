@@ -18,9 +18,6 @@ namespace Prefabs {
         character.maxHealth = 10;
         character.team = Team.PLAYERS;
         character.setAction(0, Actions.ID.SWORD_SLASH);
-        character.walkSpeed = 90;
-        character.walkAccel = 500;
-        character.friction = 800;
         
 
         // start off as this character

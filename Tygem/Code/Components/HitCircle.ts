@@ -2,6 +2,21 @@
 
 namespace Comps {
 
+    export enum HitCircle_HeadingMode {
+        /**
+         * Based on the position of this circle
+         */
+        CIRCLE_POSITION,
+        /**
+         * Based on the position of the character that launched the attack.
+         */
+        CHARACTER_POSITION,
+        /**
+         * Heading is manually provided in the HitCircle.manualHeading property.
+         */
+        MANUAL,
+    }
+
     export class HitCircle extends DrawerComponent {
 
         static SHOW_GIZMO: boolean = true;
@@ -29,6 +44,16 @@ namespace Comps {
          * Once the attack is active, how long until the attack deactivates.
          */
         attackDuration: number = 9999;
+
+        /**
+         * How the heading of the AttackInfo is determined upon dealing damage
+         */
+        headingMode: HitCircle_HeadingMode = HitCircle_HeadingMode.CIRCLE_POSITION;
+        /**
+         * The heading of the AttackInfo if headingMode is set to HitCircle_HeadingMode.MANUAL
+         */
+        manualHeading: number = 0;
+        
 
         gizmoColor: string = "red";
 
@@ -81,6 +106,7 @@ namespace Comps {
             
             // hitting target
             let thisHitCircle: HitCircle = this;
+            let tempVec2: Vec2 = this.tempVec2;
             let tempRect: Rect = this.tempRect;
             Actor.forEach(
                 function (actor: Actor): void {
@@ -96,6 +122,31 @@ namespace Comps {
 
                         // damage calculation (should be expanded on)
                         ai.damage = thisHitCircle.actionRef.power;
+
+                        // knockback
+                        switch (thisHitCircle.headingMode) {
+                            case HitCircle_HeadingMode.CIRCLE_POSITION:
+                                // setting heading to angle pointing from circle to actor's position
+                                ai.knockbackHeading = Math.atan2(
+                                    tempRect.y + tempRect.height / 2 - cy,
+                                    tempRect.x + tempRect.width / 2 - cx
+                                ) * M.radToDeg;
+                                break;
+                            case HitCircle_HeadingMode.CHARACTER_POSITION:
+                                // setting heading to angle pointing from attacking character to actor's position
+                                thisHitCircle.actionRef.character.transform.getGlobalPosition(tempVec2);
+                                let charX: number = tempVec2.x;
+                                let charY: number = thisHitCircle.actionRef.character.getFoot();
+                                ai.knockbackHeading = Math.atan2(
+                                    tempRect.y + tempRect.height / 2 - charY,
+                                    tempRect.x + tempRect.width / 2 - charX
+                                ) * M.radToDeg;
+                                break;
+                            case HitCircle_HeadingMode.MANUAL:
+                                ai.knockbackHeading = thisHitCircle.manualHeading;
+                                break;
+                        }
+                        // will leave speed and duration at default values
 
                         // deal damage
                         actor.receiveDamage(ai);
