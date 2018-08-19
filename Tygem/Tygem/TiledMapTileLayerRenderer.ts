@@ -60,10 +60,10 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
         // restricting tiles drawn to only those visible on screen
         if (this.cameraCulling) {
 
-            let boundXMin: number = Camera.leftBound;
-            let boundYMin: number = Camera.topBound;
-            let boundXMax: number = Camera.rightBound;
-            let boundYMax: number = Camera.bottomBound;
+            let boundXMin: number = Camera.getLeftBound();
+            let boundYMin: number = Camera.getTopBound();
+            let boundXMax: number = Camera.getRightBound();
+            let boundYMax: number = Camera.getBottomBound();
 
             let minPoint: Vec2 = this._transform.globalToLocal(boundXMin, boundYMin);
             let maxPoint: Vec2 = this._transform.globalToLocal(boundXMax, boundYMax);

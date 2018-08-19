@@ -21,7 +21,7 @@ class ScreenFilter extends DrawerComponent {
 
             context.globalCompositeOperation = "saturation";
             context.fillStyle = "hsl(0,0%,50%)";
-            context.fillRect(0, 0, Camera.canvasWidth, Camera.canvasHeight);
+            context.fillRect(0, 0, Camera.getCanvasWidth(), Camera.getCanvasHeight());
 
         }
 
@@ -29,7 +29,7 @@ class ScreenFilter extends DrawerComponent {
 
             context.globalCompositeOperation = "difference";
             context.fillStyle = "#FFFFFF";
-            context.fillRect(0, 0, Camera.canvasWidth, Camera.canvasHeight);
+            context.fillRect(0, 0, Camera.getCanvasWidth(), Camera.getCanvasHeight());
 
         }
 

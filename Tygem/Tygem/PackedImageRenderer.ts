@@ -5,9 +5,16 @@
  */
 class PackedImageRenderer extends DrawerComponent {
 
+    /**
+     * Default value for this.imageSmoothingEnabled.  Can be set to false to have a pixel art look by default for images.
+     */
+    static IMAGE_SMOOTHING_ENABLED_DEFAULT: boolean = true;
+
     constructor() {
         super();
         this.name = "PackedImageRenderer";
+
+        this.imageSmoothingEnabled = PackedImageRenderer.IMAGE_SMOOTHING_ENABLED_DEFAULT;
     }
     
     /**

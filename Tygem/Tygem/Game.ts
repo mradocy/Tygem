@@ -253,7 +253,7 @@ class Game {
         Scene._loadScenesToLoad();
 
         
-        // call update() on all GameObjects
+        // call onUpdate() on all GameObjects
         GameObject._updateAll();
 
 
@@ -261,8 +261,9 @@ class Game {
         Collision.Handler._update();
 
 
-
-        // (move camera here)
+        
+        // call onLateUpdate() on all GameObjects
+        GameObject._lateUpdateAll();
         
 
         // draw all Drawers

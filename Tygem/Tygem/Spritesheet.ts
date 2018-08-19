@@ -69,7 +69,7 @@ class Spritesheet {
         }
         let ret: Spritesheet = new Spritesheet();
         ret.imageFilename = imageFilename;
-        Spritesheet.spritesheetDic[imageFilename] = ret;
+        Spritesheet.spritesheetDic[imageFilename.toLowerCase()] = ret;
         return ret;
     }
 
@@ -92,8 +92,9 @@ class Spritesheet {
      * @param imageFilename Filename of the original image.
      */
     static getSpritesheet(imageFilename: string): Spritesheet {
-        if (!Spritesheet.spritesheetDic.hasOwnProperty(imageFilename)) return null;
-        return Spritesheet.spritesheetDic[imageFilename];
+        let fn: string = imageFilename.toLowerCase();
+        if (!Spritesheet.spritesheetDic.hasOwnProperty(fn)) return null;
+        return Spritesheet.spritesheetDic[fn];
     }
 
     /**

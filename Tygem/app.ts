@@ -19,6 +19,7 @@
 Game.preloadScene = "Preload"; // this is optional, default is "BasePreloadScene" which will automatically start Game.startScene once the game is done loading.
 Game.startScene = "TestScene3"; // this must be set.
 
+PackedImageRenderer.IMAGE_SMOOTHING_ENABLED_DEFAULT = false; // pixel art style by default for images
 
 
 

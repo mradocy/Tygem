@@ -4,7 +4,7 @@
  * An extension of PackedImageRenderer for rendering SpriteFrames and Animations.
  */
 class SpriteRenderer extends PackedImageRenderer {
-
+    
     constructor() {
         super();
         this.name = "SpriteRenderer";

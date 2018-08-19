@@ -349,12 +349,23 @@ class GameObject {
     }
     
     /**
-     * Calls update() on all the gameObjects.
+     * Calls onUpdate() on all the gameObjects.
      */
     static _updateAll(): void {
         GameObject._forEach(
             function (gameObject: GameObject, index: number, array: GameObject[]) {
                 gameObject._update();
+            }
+        );
+    }
+
+    /**
+     * Calls onLateUpdate() on all the gameObjects.
+     */
+    static _lateUpdateAll(): void {
+        GameObject._forEach(
+            function (gameObject: GameObject, index: number, array: GameObject[]) {
+                gameObject._lateUpdate();
             }
         );
     }
@@ -409,6 +420,28 @@ class GameObject {
             }
         }
         
+    }
+
+    private _lateUpdate = (): void => {
+
+        // start all components that haven't been started yet
+        for (let i: number = 0; i < this.components.length; i++) {
+            if (!this.components[i].isStarted()) {
+                Component._startUnstarted(this.components[i]);
+            }
+        }
+
+        // call onLateUpdate() for all components
+        if (this.isActive()) {
+            for (let i: number = 0; i < this.components.length; i++) {
+                let component: Component = this.components[i];
+                if (!component.isEnabled()) continue;
+                if ((component as any).onLateUpdate != undefined) {
+                    (component as any).onLateUpdate();
+                }
+            }
+        }
+
     }
 
     /**

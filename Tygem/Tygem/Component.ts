@@ -11,6 +11,9 @@
     
     // called once per frame, during the update step.  Is not called if the component is disabled.
     onUpdate = (): void => { }
+
+    // called once per frame, during the late update step (after collision handler update, but before drawing update)
+    onLateUpdate = (): void => { }
     
     // called when the component is enabled.
     onEnable = (): void => { }

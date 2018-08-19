@@ -2,29 +2,24 @@
 
 namespace Prefabs {
 
-    export function Log(props: TiledMap.Object): GameObject {
+    export function Goblin(props: TiledMap.Object): GameObject {
 
         let go: GameObject = new GameObject();
-        
+
         let tdsr: Comps.TDSpriteRenderer = go.addComponent(Comps.TDSpriteRenderer);
         
 
 
 
-        // create 'Log' from the Character component
+        // create 'Goblin' from the Character component
         let character: Comps.Character = go.addComponent(Comps.Character);
-        character.animPrefix = "log";
-        character.setBounds(0, 9, 6, 6);
+        character.animPrefix = "goblin";
+        character.setBounds(0, 7, 6, 6);
         character.maxHealth = 10;
-        character.team = Team.PLAYERS;
+        character.team = Team.ENEMIES;
         character.setAction(0, Actions.ID.SWORD_SLASH);
 
-
-        // enable testing
-        let testCharacter: Comps.TestCharacter = go.addComponent(Comps.TestCharacter);
-
-
-
+        
 
         //let actorGizmo: ActorGizmo = go.addComponent(ActorGizmo);
         
@@ -33,6 +28,6 @@ namespace Prefabs {
 
         return go;
     }
-    TiledMap.addObjectParser("Log", Log);
+    TiledMap.addObjectParser("Goblin", Goblin);
 
 }

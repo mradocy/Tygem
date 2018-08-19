@@ -2445,13 +2445,14 @@ class Spritesheet {
         }
         let ret = new Spritesheet();
         ret.imageFilename = imageFilename;
-        Spritesheet.spritesheetDic[imageFilename] = ret;
+        Spritesheet.spritesheetDic[imageFilename.toLowerCase()] = ret;
         return ret;
     }
     static getSpritesheet(imageFilename) {
-        if (!Spritesheet.spritesheetDic.hasOwnProperty(imageFilename))
+        let fn = imageFilename.toLowerCase();
+        if (!Spritesheet.spritesheetDic.hasOwnProperty(fn))
             return null;
-        return Spritesheet.spritesheetDic[imageFilename];
+        return Spritesheet.spritesheetDic[fn];
     }
     static getSpriteFrame(imageFilename, frameIndex) {
         let ss = Spritesheet.getSpritesheet(imageFilename);
@@ -2533,97 +2534,108 @@ class Animation {
     }
 }
 Animation.animationsDic = {};
-class Camera {
-    static _initialize(context) {
-        if (Camera._initialized)
+var Camera;
+(function (Camera) {
+    function _initialize(ctx) {
+        if (_initialized)
             return;
-        Camera._context = context;
-        Camera._initialized = true;
+        Camera.context = ctx;
+        _initialized = true;
     }
-    static get context() {
-        return Camera._context;
-    }
-    static setCenter(center) {
+    Camera._initialize = _initialize;
+    Camera.context = null;
+    Camera.centerX = 0;
+    Camera.centerY = 0;
+    Camera.scale = 1;
+    function setCenter(center) {
         Camera.centerX = center.x;
         Camera.centerY = center.y;
     }
-    static get canvasWidth() {
+    Camera.setCenter = setCenter;
+    function getCanvasWidth() {
         return Camera.context.canvas.width;
     }
-    static get canvasHeight() {
+    Camera.getCanvasWidth = getCanvasWidth;
+    function getCanvasHeight() {
         return Camera.context.canvas.height;
     }
-    static get leftBound() {
-        return Camera.centerX - Camera.canvasWidth / 2 / Camera.scale;
+    Camera.getCanvasHeight = getCanvasHeight;
+    function getLeftBound() {
+        return Camera.centerX - getCanvasWidth() / 2 / Camera.scale;
     }
-    static get topBound() {
-        return Camera.centerY - Camera.canvasHeight / 2 / Camera.scale;
+    Camera.getLeftBound = getLeftBound;
+    function getTopBound() {
+        return Camera.centerY - getCanvasHeight() / 2 / Camera.scale;
     }
-    static get rightBound() {
-        return Camera.centerX + Camera.canvasWidth / 2 / Camera.scale;
+    Camera.getTopBound = getTopBound;
+    function getRightBound() {
+        return Camera.centerX + getCanvasWidth() / 2 / Camera.scale;
     }
-    static get bottomBound() {
-        return Camera.centerY + Camera.canvasHeight / 2 / Camera.scale;
+    Camera.getRightBound = getRightBound;
+    function getBottomBound() {
+        return Camera.centerY + getCanvasHeight() / 2 / Camera.scale;
     }
-    static canvasToGlobal(x, y, outPos = null) {
-        Camera.setMat(Camera.tempMatrix);
-        Camera.tempMatrix.invert();
+    Camera.getBottomBound = getBottomBound;
+    function canvasToGlobal(x, y, outPos = null) {
+        setMat(tempMatrix);
+        tempMatrix.invert();
         if (outPos === null) {
             let v = new Vec2(x, y);
-            Camera.tempMatrix.transformVec2(v);
+            tempMatrix.transformVec2(v);
             return v;
         }
         else {
-            Camera.tempMatrix.transformVec2(outPos);
+            tempMatrix.transformVec2(outPos);
             return null;
         }
     }
-    static globalToCanvas(x, y, outPos = null) {
-        Camera.setMat(Camera.tempMatrix);
+    Camera.canvasToGlobal = canvasToGlobal;
+    function globalToCanvas(x, y, outPos = null) {
+        setMat(tempMatrix);
         if (outPos === null) {
             let v = new Vec2(x, y);
-            Camera.tempMatrix.transformVec2(v);
+            tempMatrix.transformVec2(v);
             return v;
         }
         else {
-            Camera.tempMatrix.transformVec2(outPos);
+            tempMatrix.transformVec2(outPos);
             return null;
         }
     }
-    static get matrix() {
-        Camera.setMat(Camera.tempMatrix);
-        return Camera.tempMatrix.clone();
+    Camera.globalToCanvas = globalToCanvas;
+    function getMatrix() {
+        setMat(tempMatrix);
+        return tempMatrix.clone();
     }
-    static setContextTransform(transform) {
+    Camera.getMatrix = getMatrix;
+    function setContextTransform(transform) {
         if (Camera.context == null)
             return;
-        let temp = Camera.tempMatrix;
-        Camera.setMat(temp);
+        let temp = tempMatrix;
+        setMat(temp);
         transform.multiplyByGlobalMatrix(temp);
         temp.e = Math.floor(temp.e);
         temp.f = Math.floor(temp.f);
         Camera.context.setTransform(temp.a, temp.b, temp.c, temp.d, temp.e, temp.f);
     }
-    static setContextTransformFromMatrix(matrix) {
+    Camera.setContextTransform = setContextTransform;
+    function setContextTransformFromMatrix(matrix) {
         if (Camera.context == null)
             return;
-        let temp = Camera.tempMatrix;
-        Camera.setMat(temp);
+        let temp = tempMatrix;
+        setMat(temp);
         temp.multiply(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
         Camera.context.setTransform(temp.a, temp.b, temp.c, temp.d, temp.e, temp.f);
     }
-    static setMat(matrix) {
-        let tx = Camera.canvasWidth / 2 - Camera.centerX * Camera.scale;
-        let ty = Camera.canvasHeight / 2 - Camera.centerY * Camera.scale;
+    Camera.setContextTransformFromMatrix = setContextTransformFromMatrix;
+    let _initialized = false;
+    function setMat(matrix) {
+        let tx = getCanvasWidth() / 2 - Camera.centerX * Camera.scale;
+        let ty = getCanvasHeight() / 2 - Camera.centerY * Camera.scale;
         matrix.setValues(Camera.scale, 0, 0, Camera.scale, tx, ty);
     }
-}
-Camera.centerX = 0;
-Camera.centerY = 0;
-Camera.scale = 1;
-Camera._context = null;
-Camera._initialized = false;
-Camera.tempMatrix = new Matrix2x3();
+    let tempMatrix = new Matrix2x3();
+})(Camera || (Camera = {}));
 class Scene {
     constructor() {
         this.getID = () => {
@@ -3642,8 +3654,10 @@ class PackedImageRenderer extends DrawerComponent {
         this.image = null;
         this.colorParser = new ColorParser();
         this.name = "PackedImageRenderer";
+        this.imageSmoothingEnabled = PackedImageRenderer.IMAGE_SMOOTHING_ENABLED_DEFAULT;
     }
 }
+PackedImageRenderer.IMAGE_SMOOTHING_ENABLED_DEFAULT = true;
 class SpriteRenderer extends PackedImageRenderer {
     constructor() {
         super();
@@ -4211,10 +4225,10 @@ class TiledMapTileLayerRenderer extends DrawerComponent {
             let tileWidth = this.tiledMapLayer.mapData.tileWidth;
             let tileHeight = this.tiledMapLayer.mapData.tileHeight;
             if (this.cameraCulling) {
-                let boundXMin = Camera.leftBound;
-                let boundYMin = Camera.topBound;
-                let boundXMax = Camera.rightBound;
-                let boundYMax = Camera.bottomBound;
+                let boundXMin = Camera.getLeftBound();
+                let boundYMin = Camera.getTopBound();
+                let boundXMax = Camera.getRightBound();
+                let boundYMax = Camera.getBottomBound();
                 let minPoint = this._transform.globalToLocal(boundXMin, boundYMin);
                 let maxPoint = this._transform.globalToLocal(boundXMax, boundYMax);
                 tileXMin = Math.max(0, Math.min(this.tiledMapLayer.width - 1, Math.floor(minPoint.x / tileWidth - 2)));
@@ -4304,12 +4318,12 @@ class ScreenFilter extends DrawerComponent {
             if (this.grayscale) {
                 context.globalCompositeOperation = "saturation";
                 context.fillStyle = "hsl(0,0%,50%)";
-                context.fillRect(0, 0, Camera.canvasWidth, Camera.canvasHeight);
+                context.fillRect(0, 0, Camera.getCanvasWidth(), Camera.getCanvasHeight());
             }
             if (this.invert) {
                 context.globalCompositeOperation = "difference";
                 context.fillStyle = "#FFFFFF";
-                context.fillRect(0, 0, Camera.canvasWidth, Camera.canvasHeight);
+                context.fillRect(0, 0, Camera.getCanvasWidth(), Camera.getCanvasHeight());
             }
         };
         this.anchored = true;
@@ -4332,7 +4346,7 @@ class BasePreloader extends DrawerComponent {
             else {
                 text = Math.floor(Game.percentLoaded * 100) + "%";
             }
-            context.fillText(text, Camera.canvasWidth / 2, Camera.canvasHeight / 2);
+            context.fillText(text, Camera.getCanvasWidth() / 2, Camera.getCanvasHeight() / 2);
         };
         this.onUpdate = () => {
             this.onUpdate_BasePreloader();
@@ -4515,6 +4529,23 @@ class GameObject {
                 }
             }
         };
+        this._lateUpdate = () => {
+            for (let i = 0; i < this.components.length; i++) {
+                if (!this.components[i].isStarted()) {
+                    Component._startUnstarted(this.components[i]);
+                }
+            }
+            if (this.isActive()) {
+                for (let i = 0; i < this.components.length; i++) {
+                    let component = this.components[i];
+                    if (!component.isEnabled())
+                        continue;
+                    if (component.onLateUpdate != undefined) {
+                        component.onLateUpdate();
+                    }
+                }
+            }
+        };
         this.destroyImmediately = () => {
             if (this.transform != null) {
                 let children = this.transform.getChildren();
@@ -4620,6 +4651,11 @@ class GameObject {
     static _updateAll() {
         GameObject._forEach(function (gameObject, index, array) {
             gameObject._update();
+        });
+    }
+    static _lateUpdateAll() {
+        GameObject._forEach(function (gameObject, index, array) {
+            gameObject._lateUpdate();
         });
     }
     static _startAllUnstartedComponents() {
@@ -6412,6 +6448,7 @@ class Game {
         Scene._loadScenesToLoad();
         GameObject._updateAll();
         Collision.Handler._update();
+        GameObject._lateUpdateAll();
         Drawers._drawAll();
         Scene._destroyGameObjectsInScenesToUnload();
         GameObject._destroyAllMarked();
@@ -6505,9 +6542,6 @@ Animation.addAnimation("hero_idle_up", "hero/walk.png", [26], 10, true);
 Animation.addAnimation("hero_walk_down", "hero/walk.png", [0, 1, 2, 3], 8, true);
 Animation.addAnimation("hero_walk_right", "hero/walk.png", [13, 14, 15, 16], 8, true);
 Animation.addAnimation("hero_walk_up", "hero/walk.png", [26, 27, 28, 29], 8, true);
-Animation.addAnimation("hero_slash_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
-Animation.addAnimation("hero_slash_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
-Animation.addAnimation("hero_slash_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
 Animation.addAnimation("hero_attack_down", "hero/attack.png", [0, 1, 2, 3], 4 / .2, false);
 Animation.addAnimation("hero_attack_up", "hero/attack.png", [4, 5, 6, 7], 4 / .2, false);
 Animation.addAnimation("hero_attack_right", "hero/attack.png", [8, 9, 10, 11], 4 / .2, false);
@@ -6526,6 +6560,16 @@ Animation.addAnimation("log_attack_down", "log/log.png", [2], 10, false);
 Animation.addAnimation("log_attack_up", "log/log.png", [8], 10, false);
 Animation.addAnimation("log_attack_right", "log/log.png", [14], 10, false);
 Animation.addAnimation("log_attack_left", "log/log.png", [20], 10, false);
+Spritesheet.addSpritesheet("Goblin/goblin.png", 26, 26, 4, 36);
+Animation.addAnimation("goblin_idle_down", "goblin/goblin.png", [32, 33], 8, true);
+Animation.addAnimation("goblin_idle_up", "goblin/goblin.png", [20, 21], 8, true);
+Animation.addAnimation("goblin_idle_right", "goblin/goblin.png", [8, 9], 8, true);
+Animation.addAnimation("goblin_walk_down", "goblin/goblin.png", [28, 29, 30, 31], 10, true);
+Animation.addAnimation("goblin_walk_up", "goblin/goblin.png", [16, 17, 18, 19], 10, true);
+Animation.addAnimation("goblin_walk_right", "goblin/goblin.png", [4, 5, 6], 10, true);
+Animation.addAnimation("goblin_attack_down", "goblin/goblin.png", [24, 25, 26], 4 / .2, false);
+Animation.addAnimation("goblin_attack_up", "goblin/goblin.png", [12, 13, 14], 4 / .2, false);
+Animation.addAnimation("goblin_attack_right", "goblin/goblin.png", [0, 1, 2], 4 / .2, false);
 AudioManager.addAudioSprites("Assets/Audiosprites/audioSprites.json");
 var Scenes;
 (function (Scenes) {
@@ -6862,33 +6906,33 @@ TiledMap.addMap("test4", { "height": 40,
     "version": 1,
     "width": 60
 });
-TiledMap.addMap("test5", { "height": 20,
+TiledMap.addMap("test5", { "height": 30,
     "layers": [
         {
-            "data": [406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 243, 244, 244, 244, 245, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 403, 244, 244, 244, 245, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 323, 324, 324, 324, 364, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 323, 324, 324, 324, 325, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 409, 406, 406, 406, 406, 406, 406, 406, 406, 406, 446, 446, 446, 446, 446, 446, 1, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 486, 486, 486, 486, 486, 486, 405, 406, 406, 406, 406, 406, 1, 1, 1, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 526, 445, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 526, 526, 526, 526, 526, 526, 526, 526, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526],
-            "height": 20,
+            "data": [406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 243, 244, 244, 244, 245, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 403, 244, 244, 244, 245, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 1175, 1176, 1176, 1176, 1176, 1176, 1176, 1176, 1176, 1176, 1176, 1177, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 1215, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 283, 284, 284, 284, 284, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 1215, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 323, 324, 324, 324, 364, 284, 284, 284, 285, 406, 406, 406, 406, 406, 406, 1215, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 323, 324, 324, 324, 325, 406, 406, 406, 406, 406, 406, 1215, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 1255, 1256, 1256, 1296, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 1215, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 1215, 1216, 1216, 1216, 1216, 1216, 1216, 1216, 1217, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 409, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 1255, 1256, 1256, 1256, 1256, 1256, 1256, 1256, 1257, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 446, 446, 446, 446, 446, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 486, 486, 486, 486, 486, 405, 406, 406, 406, 406, 406, 406, 1, 1, 1, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 406, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 407, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 405, 406, 406, 406, 406, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 407, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 445, 446, 446, 446, 446, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 407, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 486, 486, 486, 486, 486, 526, 526, 526, 526, 526, 405, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 406, 407, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 445, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 446, 447, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 486, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526, 526],
+            "height": 30,
             "name": "ground",
             "opacity": 1,
             "type": "tilelayer",
             "visible": true,
-            "width": 24,
+            "width": 50,
             "x": 0,
             "y": 0
         },
         {
-            "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 561, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 646, 647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 686, 687, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 522, 523, 603, 603, 603, 603, 604, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 562, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 602, 603, 603, 603, 642, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "height": 20,
+            "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 561, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 646, 647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 686, 687, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 522, 523, 603, 603, 603, 603, 604, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 562, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 602, 603, 603, 603, 642, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 204, 205, 205, 205, 205, 205, 205, 206, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 522, 603, 603, 603, 603, 603, 603, 603, 603, 603, 603, 524, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 562, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 562, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 561, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 561, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 564, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "height": 30,
             "name": "tile objects",
             "opacity": 1,
             "type": "tilelayer",
             "visible": true,
-            "width": 24,
+            "width": 50,
             "x": 0,
             "y": 0
         },
         {
             "draworder": "topdown",
-            "height": 20,
+            "height": 0,
             "name": "objects",
             "objects": [
                 {
@@ -6914,15 +6958,27 @@ TiledMap.addMap("test5", { "height": 20,
                     "width": 0,
                     "x": 227.5,
                     "y": 194
+                },
+                {
+                    "height": 0,
+                    "id": 5,
+                    "name": "Goblin",
+                    "properties": {},
+                    "rotation": 0,
+                    "type": "Goblin",
+                    "visible": true,
+                    "width": 0,
+                    "x": 117.5,
+                    "y": 195
                 }],
             "opacity": 1,
             "type": "objectgroup",
             "visible": true,
-            "width": 24,
+            "width": 0,
             "x": 0,
             "y": 0
         }],
-    "nextobjectid": 5,
+    "nextobjectid": 6,
     "orientation": "orthogonal",
     "properties": {
         "prop1": "prop val"
@@ -6973,6 +7029,15 @@ TiledMap.addMap("test5", { "height": 20,
                     "col": "true"
                 },
                 "170": {
+                    "col": "true"
+                },
+                "203": {
+                    "col": "true"
+                },
+                "204": {
+                    "col": "true"
+                },
+                "205": {
                     "col": "true"
                 },
                 "283": {
@@ -7103,10 +7168,11 @@ TiledMap.addMap("test5", { "height": 20,
         }],
     "tilewidth": 16,
     "version": 1,
-    "width": 24
+    "width": 50
 });
 Game.preloadScene = "Preload";
 Game.startScene = "TestScene3";
+PackedImageRenderer.IMAGE_SMOOTHING_ENABLED_DEFAULT = false;
 window.onload = () => {
     let canvas = document.getElementById("canvas");
     Game.initialize(canvas);
@@ -7291,7 +7357,7 @@ var Comps;
             this.onStart = () => {
                 this.health = this.maxHealth;
                 this.tdSpriteRenderer = this.getComponent(Comps.TDSpriteRenderer);
-                this.idle();
+                this._startIdleState();
             };
             this.onUpdate = () => {
                 this.transform.getGlobalPosition(this.tempVec2);
@@ -7735,9 +7801,12 @@ var Actions;
             this.onStart = () => {
                 this.character.applyFriction = true;
                 this.time = 0;
+                let ssGO = new GameObject();
+                let sr = ssGO.addComponent(SpriteRenderer);
+                sr.playAnimation("hero_sword_slash");
+                let ve = ssGO.addComponent(VisualEffect);
                 let slashOffsetMag = 16;
                 let rect = this.character.getRect();
-                let ssGO = Prefabs.SwordSlash();
                 let charAnim = this.character.animPrefix + "_attack";
                 switch (this.character.getDirection()) {
                     case Direction.LEFT:
@@ -7874,6 +7943,22 @@ var Comps;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
+    class CameraFollow extends Component {
+        constructor() {
+            super();
+            this.onLateUpdate = () => {
+                this.transform.getGlobalPosition(this.tempVec2);
+                Camera.centerX = this.tempVec2.x;
+                Camera.centerY = this.tempVec2.y;
+            };
+            this.tempVec2 = new Vec2();
+            this.name = "CameraFollow";
+        }
+    }
+    Comps.CameraFollow = CameraFollow;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
     class ControlCameraWithWASD extends Component {
         constructor() {
             super();
@@ -7970,224 +8055,6 @@ var Comps;
         }
     }
     Comps.FacesMouse = FacesMouse;
-})(Comps || (Comps = {}));
-var Comps;
-(function (Comps) {
-    var Hero_State;
-    (function (Hero_State) {
-        Hero_State[Hero_State["NONE"] = 0] = "NONE";
-        Hero_State[Hero_State["IDLE"] = 1] = "IDLE";
-        Hero_State[Hero_State["WALK"] = 2] = "WALK";
-        Hero_State[Hero_State["SLASH"] = 3] = "SLASH";
-    })(Hero_State || (Hero_State = {}));
-    class Hero extends Component {
-        constructor() {
-            super();
-            this.speed = 90;
-            this.accel = 500;
-            this.friction = 800;
-            this.slashDuration = .25;
-            this.onStart = () => {
-                this.actor = this.getComponent(Actor);
-                this.spriteRenderer = this.getComponent(SpriteRenderer);
-                this.faceDirection = Direction.DOWN;
-                this.idle();
-            };
-            this.onUpdate = () => {
-                this.leftHeld = Keys.keyHeld(Key.LeftArrow) || Keys.keyHeld(Key.A);
-                this.rightHeld = Keys.keyHeld(Key.RightArrow) || Keys.keyHeld(Key.D);
-                this.upHeld = Keys.keyHeld(Key.UpArrow) || Keys.keyHeld(Key.W);
-                this.downHeld = Keys.keyHeld(Key.DownArrow) || Keys.keyHeld(Key.S);
-                let attackPressed = Keys.keyPressed(Key.X) || Keys.keyPressed(Key.ForwardSlash);
-                let vx = this.actor.vx;
-                let vy = this.actor.vy;
-                let speed = this.speed;
-                let accel = this.accel;
-                let friction = this.friction;
-                this.time += Game.deltaTime;
-                switch (this.state) {
-                    case Hero_State.IDLE:
-                    case Hero_State.WALK:
-                        if (this.leftHeld == this.rightHeld) {
-                            if (vx < 0) {
-                                vx = Math.min(0, vx + friction * Game.deltaTime);
-                            }
-                            else {
-                                vx = Math.max(0, vx - friction * Game.deltaTime);
-                            }
-                        }
-                        else if (this.leftHeld) {
-                            if (vx > 0) {
-                                vx = Math.max(0, vx - friction * Game.deltaTime);
-                            }
-                            vx -= accel * Game.deltaTime;
-                        }
-                        else {
-                            if (vx < 0) {
-                                vx = Math.min(0, vx + friction * Game.deltaTime);
-                            }
-                            vx += accel * Game.deltaTime;
-                        }
-                        if (this.upHeld == this.downHeld) {
-                            if (vy < 0) {
-                                vy = Math.min(0, vy + friction * Game.deltaTime);
-                            }
-                            else {
-                                vy = Math.max(0, vy - friction * Game.deltaTime);
-                            }
-                        }
-                        else if (this.upHeld) {
-                            if (vy > 0) {
-                                vy = Math.max(0, vy - friction * Game.deltaTime);
-                            }
-                            vy -= accel * Game.deltaTime;
-                        }
-                        else {
-                            if (vy < 0) {
-                                vy = Math.min(0, vy + friction * Game.deltaTime);
-                            }
-                            vy += accel * Game.deltaTime;
-                        }
-                        if (this.leftHeld !== this.rightHeld) {
-                            if (!(this.upHeld && this.faceDirection === Direction.UP) &&
-                                !(this.downHeld && this.faceDirection === Direction.DOWN)) {
-                                this.faceDirection = this.leftHeld ? Direction.LEFT : Direction.RIGHT;
-                            }
-                            this.walk();
-                        }
-                        else if (this.upHeld !== this.downHeld) {
-                            this.faceDirection = this.upHeld ? Direction.UP : Direction.DOWN;
-                            this.walk();
-                        }
-                        else {
-                            this.idle();
-                        }
-                        if (attackPressed) {
-                            this.slash();
-                        }
-                        break;
-                    case Hero_State.SLASH:
-                        if (vx < 0) {
-                            vx = Math.min(0, vx + friction * Game.deltaTime);
-                        }
-                        else {
-                            vx = Math.max(0, vx - friction * Game.deltaTime);
-                        }
-                        if (vy < 0) {
-                            vy = Math.min(0, vy + friction * Game.deltaTime);
-                        }
-                        else {
-                            vy = Math.max(0, vy - friction * Game.deltaTime);
-                        }
-                        if (this.time >= this.slashDuration) {
-                            this.idle();
-                        }
-                        break;
-                }
-                let mag = M.magnitude(vx, vy);
-                if (mag > speed) {
-                    vx *= speed / mag;
-                    vy *= speed / mag;
-                }
-                this.actor.vx = vx;
-                this.actor.vy = vy;
-                this.updateAnimation();
-            };
-            this.idle = () => {
-                if (this.state === Hero_State.IDLE)
-                    return;
-                this.state = Hero_State.IDLE;
-                this.time = 0;
-            };
-            this.walk = () => {
-                if (this.state === Hero_State.WALK)
-                    return;
-                this.state = Hero_State.WALK;
-                this.time = 0;
-            };
-            this.slash = () => {
-                if (this.state === Hero_State.SLASH)
-                    return;
-                this.state = Hero_State.SLASH;
-                this.time = 0;
-                let slashOffsetMag = 16;
-                let rect = this.actor.getRect();
-                let ssGO = Prefabs.SwordSlash();
-                let anim = "";
-                switch (this.faceDirection) {
-                    case Direction.LEFT:
-                        anim = "hero_slash_right";
-                        ssGO.transform.x = rect.x - slashOffsetMag;
-                        ssGO.transform.y = rect.y + rect.height / 2;
-                        ssGO.transform.scaleX = -1;
-                        break;
-                    case Direction.RIGHT:
-                        anim = "hero_slash_right";
-                        ssGO.transform.x = rect.x + rect.width + slashOffsetMag;
-                        ssGO.transform.y = rect.y + rect.height / 2;
-                        break;
-                    case Direction.UP:
-                        anim = "hero_slash_up";
-                        ssGO.transform.x = rect.x + rect.width / 2;
-                        ssGO.transform.y = rect.y - slashOffsetMag;
-                        ssGO.transform.rotation = -90;
-                        break;
-                    case Direction.DOWN:
-                        anim = "hero_slash_down";
-                        ssGO.transform.x = rect.x + rect.width / 2;
-                        ssGO.transform.y = rect.y + rect.height + slashOffsetMag;
-                        ssGO.transform.rotation = 90;
-                        break;
-                }
-                this.spriteRenderer.playAnimation(anim);
-            };
-            this.updateAnimation = () => {
-                if ((this.faceDirection === Direction.LEFT) === this.transform.scaleX > 0) {
-                    this.transform.scaleX *= -1;
-                }
-                let anim = "hero";
-                switch (this.state) {
-                    case Hero_State.NONE:
-                    case Hero_State.SLASH:
-                        return;
-                    case Hero_State.IDLE:
-                        anim += "_idle";
-                        break;
-                    case Hero_State.WALK:
-                        anim += "_walk";
-                        break;
-                }
-                switch (this.faceDirection) {
-                    case Direction.NONE:
-                        return;
-                    case Direction.LEFT:
-                    case Direction.RIGHT:
-                        anim += "_right";
-                        break;
-                    case Direction.UP:
-                        anim += "_up";
-                        break;
-                    case Direction.DOWN:
-                        anim += "_down";
-                        break;
-                }
-                if (this.spriteRenderer.getAnimation() === null ||
-                    this.spriteRenderer.getAnimation().name !== anim) {
-                    this.spriteRenderer.playAnimation(anim);
-                }
-            };
-            this.onDestroy = () => { };
-            this.leftHeld = false;
-            this.rightHeld = false;
-            this.upHeld = false;
-            this.downHeld = false;
-            this.state = Hero_State.NONE;
-            this.faceDirection = Direction.NONE;
-            this.time = 0;
-            this.name = "Hero";
-        }
-    }
-    Comps.Hero = Hero;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
@@ -8510,15 +8377,38 @@ var Comps;
 })(Comps || (Comps = {}));
 var Prefabs;
 (function (Prefabs) {
+    function Goblin(props) {
+        let go = new GameObject();
+        let tdsr = go.addComponent(Comps.TDSpriteRenderer);
+        let character = go.addComponent(Comps.Character);
+        character.animPrefix = "goblin";
+        character.setBounds(0, 7, 6, 6);
+        character.maxHealth = 10;
+        character.team = Team.ENEMIES;
+        character.setAction(0, Actions.ID.SWORD_SLASH);
+        let tdas = go.addComponent(Comps.TDActorShadow);
+        tdas.setSize(0, 3, 6, 2);
+        return go;
+    }
+    Prefabs.Goblin = Goblin;
+    TiledMap.addObjectParser("Goblin", Goblin);
+})(Prefabs || (Prefabs = {}));
+var Prefabs;
+(function (Prefabs) {
     function Hero(props) {
         let go = new GameObject();
-        let tdActor = go.addComponent(Comps.TDActor);
-        tdActor.setBounds(0, 6, 6, 6);
-        let actorGizmo = go.addComponent(ActorGizmo);
-        actorGizmo.disable();
-        let hero = go.addComponent(Comps.Hero);
         let tdsr = go.addComponent(Comps.TDSpriteRenderer);
-        tdsr.imageSmoothingEnabled = false;
+        let character = go.addComponent(Comps.Character);
+        character.animPrefix = "hero";
+        character.setBounds(0, 6, 6, 6);
+        character.maxHealth = 10;
+        character.team = Team.PLAYERS;
+        character.setAction(0, Actions.ID.SWORD_SLASH);
+        character.walkSpeed = 90;
+        character.walkAccel = 500;
+        character.friction = 800;
+        character.enableInput();
+        go.addComponent(Comps.CameraFollow);
         let tdas = go.addComponent(Comps.TDActorShadow);
         tdas.setSize(0, 4, 5, 2);
         return go;
@@ -8531,7 +8421,6 @@ var Prefabs;
     function Log(props) {
         let go = new GameObject();
         let tdsr = go.addComponent(Comps.TDSpriteRenderer);
-        tdsr.imageSmoothingEnabled = false;
         let character = go.addComponent(Comps.Character);
         character.animPrefix = "log";
         character.setBounds(0, 9, 6, 6);
@@ -8568,18 +8457,6 @@ var Prefabs;
     }
     Prefabs.Sealime = Sealime;
     TiledMap.addObjectParser("Sealime", Sealime);
-})(Prefabs || (Prefabs = {}));
-var Prefabs;
-(function (Prefabs) {
-    function SwordSlash() {
-        let go = new GameObject();
-        let sr = go.addComponent(SpriteRenderer);
-        sr.imageSmoothingEnabled = false;
-        sr.playAnimation("hero_sword_slash");
-        let ve = go.addComponent(VisualEffect);
-        return go;
-    }
-    Prefabs.SwordSlash = SwordSlash;
 })(Prefabs || (Prefabs = {}));
 var Prefabs;
 (function (Prefabs) {

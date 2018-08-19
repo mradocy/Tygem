@@ -36,8 +36,8 @@ class BasePreloader extends DrawerComponent {
 
         context.fillText(
             text,
-            Camera.canvasWidth / 2,
-            Camera.canvasHeight / 2);
+            Camera.getCanvasWidth() / 2,
+            Camera.getCanvasHeight() / 2);
 
     }
 

@@ -20,11 +20,15 @@ namespace Actions {
 
             this.time = 0;
 
-            // spawn slash effect
+            // create slash effect
+            let ssGO: GameObject = new GameObject();
+            let sr: SpriteRenderer = ssGO.addComponent(SpriteRenderer);
+            sr.playAnimation("hero_sword_slash");
+            let ve: VisualEffect = ssGO.addComponent(VisualEffect);
+
+            // position effect
             let slashOffsetMag: number = 16;
             let rect: Rect = this.character.getRect();
-            let ssGO: GameObject = Prefabs.SwordSlash();
-
             let charAnim: string = this.character.animPrefix + "_attack";
             switch (this.character.getDirection()) {
                 case Direction.LEFT:

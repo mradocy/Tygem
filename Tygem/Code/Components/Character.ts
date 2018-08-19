@@ -10,10 +10,7 @@ namespace Comps {
 
         IDLE,
         WALK,
-
-
-        // TODO: custom actions defined by functions
-
+        
         ACTION,
     }
 
@@ -280,7 +277,7 @@ namespace Comps {
 
             this.tdSpriteRenderer = this.getComponent(TDSpriteRenderer);
 
-            this.idle();
+            this._startIdleState();
 
         }
         

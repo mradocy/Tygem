@@ -1,6 +1,14 @@
 {"frames": [
 
 {
+	"filename": "Goblin/goblin.png",
+	"frame": {"x":856,"y":233,"w":98,"h":232},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":1,"w":98,"h":232},
+	"sourceSize": {"w":104,"h":234}
+},
+{
 	"filename": "grid.png",
 	"frame": {"x":857,"y":123,"w":109,"h":108},
 	"rotated": false,
@@ -111,6 +119,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1011,"h":940},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:87acb0b2f79d493172b7c2e2b981b4b8:7395ef54c8acc076837d47454e51c34d:eeaea9f1bcd474833b26acc93b6f2e89$"
+	"smartupdate": "$TexturePacker:SmartUpdate:89395501027f07d86d2d1ae8da90ed26:97797828488bceed6bac766d969e3afb:eeaea9f1bcd474833b26acc93b6f2e89$"
 }
 }
