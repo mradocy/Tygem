@@ -255,6 +255,39 @@ var M;
         return t;
     }
     M.segmentSegmentIntersection = segmentSegmentIntersection;
+    function circleVerticalSegmentIntersects(circleX, circleY, circleRadius, segmentX, segmentP0y, segmentP1y) {
+        let xDist = segmentX - circleX;
+        if (Math.abs(xDist) > circleRadius)
+            return false;
+        let yOff = Math.sqrt(circleRadius * circleRadius - xDist * xDist);
+        return circleY - yOff <= Math.max(segmentP0y, segmentP1y) &&
+            circleY + yOff >= Math.min(segmentP0y, segmentP1y);
+    }
+    M.circleVerticalSegmentIntersects = circleVerticalSegmentIntersects;
+    function circleHorizontalSegmentIntersects(circleX, circleY, circleRadius, segmentY, segmentP0x, segmentP1x) {
+        let yDist = segmentY - circleY;
+        if (Math.abs(yDist) > circleRadius)
+            return false;
+        let xOff = Math.sqrt(circleRadius * circleRadius - yDist * yDist);
+        return circleX - xOff <= Math.max(segmentP0x, segmentP1x) &&
+            circleX + xOff >= Math.min(segmentP0x, segmentP1x);
+    }
+    M.circleHorizontalSegmentIntersects = circleHorizontalSegmentIntersects;
+    function circleRectangleIntersects(circleX, circleY, circleRadius, rectX, rectY, rectWidth, rectHeight) {
+        if (rectX <= circleX && circleX < rectX + rectWidth &&
+            rectY <= circleY && circleY < rectY + rectHeight)
+            return true;
+        if (circleVerticalSegmentIntersects(circleX, circleY, circleRadius, rectX, rectY, rectY + rectHeight))
+            return true;
+        if (circleVerticalSegmentIntersects(circleX, circleY, circleRadius, rectX + rectWidth, rectY, rectY + rectHeight))
+            return true;
+        if (circleHorizontalSegmentIntersects(circleX, circleY, circleRadius, rectY, rectX, rectX + rectWidth))
+            return true;
+        if (circleHorizontalSegmentIntersects(circleX, circleY, circleRadius, rectY + rectHeight, rectX, rectX + rectWidth))
+            return true;
+        return false;
+    }
+    M.circleRectangleIntersects = circleRectangleIntersects;
     function pointToLeft(lineP0x, lineP0y, lineP1x, lineP1y, pointX, pointY) {
         return ((lineP1x - lineP0x) * (pointY - lineP0y) - (lineP1y - lineP0y) * (pointX - lineP0x)) > 0;
     }
@@ -6383,19 +6416,15 @@ class Game {
     static requestFullscreen() {
         let canvas = Game.canvas;
         if (canvas.requestFullscreen) {
-            console.log("requestFullscreen");
             canvas.requestFullscreen();
         }
         else if (canvas.webkitRequestFullscreen) {
-            console.log("webkitRequestFullscreen");
             canvas.webkitRequestFullscreen();
         }
         else if (canvas.mozRequestFullScreen) {
-            console.log("mozRequestFullScreen");
             canvas.mozRequestFullScreen();
         }
         else if (canvas.msRequestFullscreen) {
-            console.log("msRequestFullscreen");
             canvas.msRequestFullscreen();
         }
     }
@@ -7430,7 +7459,6 @@ var Comps;
                                 this._startIdleState();
                             }
                             if (PlayerInput.isAttackPressed()) {
-                                console.log("attack pressed");
                                 this.startAction(0);
                             }
                         }
@@ -7507,6 +7535,11 @@ var Comps;
                 this.vx = vx;
                 this.vy = vy;
                 this.updateAnimation();
+            };
+            this.preReceiveDamage = (ai) => {
+            };
+            this.onReceiveDamage = (ai) => {
+                console.log("received damage.  damage: " + ai.damage + " health: " + this.health);
             };
             this.onDestroy = () => {
                 this._endCurrentAction();
@@ -7767,6 +7800,7 @@ var Actions;
 (function (Actions) {
     class Base {
         constructor(character) {
+            this.power = 0;
             this.start = () => {
                 if (this.isRunning())
                     return;
@@ -7805,6 +7839,23 @@ var Actions;
                 let sr = ssGO.addComponent(SpriteRenderer);
                 sr.playAnimation("hero_sword_slash");
                 let ve = ssGO.addComponent(VisualEffect);
+                let hitCircle = ssGO.addComponent(Comps.HitCircle);
+                hitCircle.actionRef = this;
+                switch (this.character.team) {
+                    case Team.PLAYERS:
+                        hitCircle.teamTargeting = Team.ENEMIES;
+                        break;
+                    case Team.ENEMIES:
+                        hitCircle.teamTargeting = Team.PLAYERS;
+                        break;
+                    default:
+                        hitCircle.teamTargeting = Team.ALL;
+                }
+                hitCircle.offsetX = -3;
+                hitCircle.offsetY = 0;
+                hitCircle.radius = 13;
+                hitCircle.attackDelay = .03;
+                hitCircle.attackDuration = .06;
                 let slashOffsetMag = 16;
                 let rect = this.character.getRect();
                 let charAnim = this.character.animPrefix + "_attack";
@@ -7843,6 +7894,7 @@ var Actions;
             };
             this.onEnd = () => { };
             this.time = 0;
+            this.power = 1;
         }
     }
     Actions.SwordSlash = SwordSlash;
@@ -8055,6 +8107,76 @@ var Comps;
         }
     }
     Comps.FacesMouse = FacesMouse;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
+    class HitCircle extends DrawerComponent {
+        constructor() {
+            super();
+            this.teamTargeting = Team.ENEMIES;
+            this.radius = 10;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.attackDelay = 0;
+            this.attackDuration = 9999;
+            this.gizmoColor = "red";
+            this.isAttackActive = () => {
+                return this.attackDelay <= this._attackTime && this._attackTime <= this.attackDelay + this.attackDuration;
+            };
+            this.actionRef = null;
+            this.onStart = () => {
+                if (this.actionRef === null) {
+                    console.warn("actionRef has not been specified for this HitCircle");
+                }
+            };
+            this.onUpdate = () => {
+                this._attackTime += Game.deltaTime;
+                if (!this.isAttackActive())
+                    return;
+                let trans = this.transform;
+                trans.localToGlobal(this.offsetX, this.offsetY, this.tempVec2);
+                let cx = this.tempVec2.x;
+                let cy = this.tempVec2.y;
+                let r = this.radius;
+                while (trans !== null) {
+                    r *= (Math.abs(trans.scaleX) + Math.abs(trans.scaleY)) / 2;
+                    trans = trans.getParent();
+                }
+                let thisHitCircle = this;
+                let tempRect = this.tempRect;
+                Actor.forEach(function (actor) {
+                    if (!actor.isInTeam(thisHitCircle.teamTargeting))
+                        return;
+                    actor.getRect(tempRect);
+                    if (M.circleRectangleIntersects(cx, cy, r, tempRect.x, tempRect.y, tempRect.width, tempRect.height)) {
+                        let ai = AttackInfo.createNew();
+                        ai.damage = thisHitCircle.actionRef.power;
+                        actor.receiveDamage(ai);
+                        AttackInfo.recycle(ai);
+                    }
+                });
+            };
+            this.onDestroy = () => { };
+            this.draw = (context) => {
+                if (!HitCircle.SHOW_GIZMO)
+                    return;
+                if (!this.isAttackActive())
+                    return;
+                context.beginPath();
+                context.strokeStyle = this.gizmoColor;
+                context.lineWidth = 1;
+                context.arc(this.offsetX, this.offsetY, this.radius, 0, Math.PI * 2);
+                context.stroke();
+            };
+            this._attackTime = 0;
+            this.tempVec2 = new Vec2();
+            this.tempRect = new Rect();
+            this.name = "HitCircle";
+            this.layer = DrawLayer.GIZMO;
+        }
+    }
+    HitCircle.SHOW_GIZMO = true;
+    Comps.HitCircle = HitCircle;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
@@ -8386,6 +8508,7 @@ var Prefabs;
         character.maxHealth = 10;
         character.team = Team.ENEMIES;
         character.setAction(0, Actions.ID.SWORD_SLASH);
+        let actorGizmo = go.addComponent(ActorGizmo);
         let tdas = go.addComponent(Comps.TDActorShadow);
         tdas.setSize(0, 3, 6, 2);
         return go;

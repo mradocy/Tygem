@@ -8,6 +8,8 @@ namespace Actions {
 
         constructor(character: Comps.Character) {
             super(character);
+
+            this.power = 1;
         }
         
 
@@ -25,6 +27,25 @@ namespace Actions {
             let sr: SpriteRenderer = ssGO.addComponent(SpriteRenderer);
             sr.playAnimation("hero_sword_slash");
             let ve: VisualEffect = ssGO.addComponent(VisualEffect);
+
+            // create hit circle
+            let hitCircle: Comps.HitCircle = ssGO.addComponent(Comps.HitCircle);
+            hitCircle.actionRef = this;
+            switch (this.character.team) {
+                case Team.PLAYERS:
+                    hitCircle.teamTargeting = Team.ENEMIES;
+                    break;
+                case Team.ENEMIES:
+                    hitCircle.teamTargeting = Team.PLAYERS;
+                    break;
+                default:
+                    hitCircle.teamTargeting = Team.ALL;
+            }
+            hitCircle.offsetX = -3;
+            hitCircle.offsetY = 0;
+            hitCircle.radius = 13;
+            hitCircle.attackDelay = .03;
+            hitCircle.attackDuration = .06;
 
             // position effect
             let slashOffsetMag: number = 16;

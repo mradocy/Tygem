@@ -6,6 +6,11 @@ namespace Actions {
     
     export class Base {
 
+        /**
+         * Related to how much damage the attack deals (if this action is an attack)
+         */
+        power: number = 0;
+
         constructor(character: Comps.Character) {
             this.character = character;
         }

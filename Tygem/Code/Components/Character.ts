@@ -365,9 +365,8 @@ namespace Comps {
                             this._startIdleState();
                         }
 
-
+                        // starting actions by pressing attack button
                         if (PlayerInput.isAttackPressed()) {
-                            console.log("attack pressed");
                             this.startAction(0);
                         }
                         
@@ -468,6 +467,17 @@ namespace Comps {
             this.vy = vy;
 
             this.updateAnimation();
+
+        }
+
+        // called just before taking damage (so values can be tweaked)
+        preReceiveDamage = (ai: AttackInfo): void => {
+        }
+
+        // called on taking damage
+        onReceiveDamage = (ai: AttackInfo): void => {
+
+            console.log("received damage.  damage: " + ai.damage + " health: " + this.health);
 
         }
         

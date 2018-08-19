@@ -17,7 +17,7 @@ namespace Comps {
             this.transform.getGlobalPosition(this.tempVec2);
             Camera.centerX = this.tempVec2.x;
             Camera.centerY = this.tempVec2.y;
-
+            
         }
         
 

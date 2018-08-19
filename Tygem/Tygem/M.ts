@@ -480,6 +480,74 @@ namespace M {
         if (t > 1) return -1;
         return t;
     }
+
+    /**
+     * Gets if the given circle will intersect a vertical segment.
+     * @param circleX x of the center of the circle.
+     * @param circleY y of the center of the circle
+     * @param circleRadius radius of the circle.
+     * @param segmentX x of both points of the segment.
+     * @param segmentP0y y of the first point that defines the segment.
+     * @param segmentP1y y of the other point that defines the segment.
+     */
+    export function circleVerticalSegmentIntersects(
+        circleX: number, circleY: number, circleRadius: number,
+        segmentX: number, segmentP0y: number, segmentP1y: number): boolean {
+
+        let xDist: number = segmentX - circleX;
+        if (Math.abs(xDist) > circleRadius) return false;
+        
+        let yOff = Math.sqrt(circleRadius * circleRadius - xDist * xDist);
+
+        return circleY - yOff <= Math.max(segmentP0y, segmentP1y) &&
+            circleY + yOff >= Math.min(segmentP0y, segmentP1y);
+    }
+    /**
+     * Gets if the given circle will intersect a horizontal segment.
+     * @param circleX x of the center of the circle.
+     * @param circleY y of the center of the circle
+     * @param circleRadius radius of the circle.
+     * @param segmentY y of both points of the segment.
+     * @param segmentP0x x of the first point that defines the segment.
+     * @param segmentP1x x of the other point that defines the segment.
+     */
+    export function circleHorizontalSegmentIntersects(
+        circleX: number, circleY: number, circleRadius: number,
+        segmentY: number, segmentP0x: number, segmentP1x: number): boolean {
+
+        let yDist: number = segmentY - circleY;
+        if (Math.abs(yDist) > circleRadius) return false;
+
+        let xOff = Math.sqrt(circleRadius * circleRadius - yDist * yDist);
+
+        return circleX - xOff <= Math.max(segmentP0x, segmentP1x) &&
+            circleX + xOff >= Math.min(segmentP0x, segmentP1x);
+    }
+
+    /**
+     * Returns if the given circle intersects or is contained by the given rectangle.
+     * @param circleX x of the center of the circle.
+     * @param circleY y of the center of the circle.
+     * @param circleRadius radius of the circle.
+     * @param rectX x (left side) of the rectangle.
+     * @param rectY y (top side) of the rectangle.
+     * @param rectWidth width of the rectangle
+     * @param rectHeight height of the rectangle
+     */
+    export function circleRectangleIntersects(
+        circleX: number, circleY: number, circleRadius: number,
+        rectX: number, rectY: number, rectWidth: number, rectHeight: number): boolean {
+
+        if (rectX <= circleX && circleX < rectX + rectWidth &&
+            rectY <= circleY && circleY < rectY + rectHeight) return true;
+
+        if (circleVerticalSegmentIntersects(circleX, circleY, circleRadius, rectX, rectY, rectY + rectHeight)) return true;
+        if (circleVerticalSegmentIntersects(circleX, circleY, circleRadius, rectX + rectWidth, rectY, rectY + rectHeight)) return true;
+        if (circleHorizontalSegmentIntersects(circleX, circleY, circleRadius, rectY, rectX, rectX + rectWidth)) return true;
+        if (circleHorizontalSegmentIntersects(circleX, circleY, circleRadius, rectY + rectHeight, rectX, rectX + rectWidth)) return true;
+
+        return false;
+    }
     
     /**
      * Given a line defined by p0 and p1, returns if the point is to the left of the line ("left" when facing p1 from p0).
