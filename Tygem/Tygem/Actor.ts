@@ -67,10 +67,12 @@ class Actor extends ReceivesDamage {
 
     /**
      * Extra x velocity from the wind.
+     * Is reset immediately after collision.
      */
     windX: number = 0;
     /**
      * Extra y velocity from the wind.
+     * Is reset immediately after collision.
      */
     windY: number = 0;
 

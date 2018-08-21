@@ -6155,6 +6155,10 @@ var Collision;
                     response.platformObject.getPlatform().gameObject.sendMessage("onCollisionExit", response);
                 }
             });
+            Actor.forEach(function (actor) {
+                actor.windX = 0;
+                actor.windY = 0;
+            });
             Handler.collisionsPrevFrame.forEach(function (response) {
                 Response._recycle(response);
             });
@@ -7291,6 +7295,7 @@ var Comps;
                     return null;
                 return this._actionInfos[index];
             };
+            this.pushSpeed = 90;
             this.knockbackFriction = 600;
             this.mercyInvincibilityDuration = .4;
             this.mercyInvincibleFlashPeriod = .1;
@@ -7561,6 +7566,24 @@ var Comps;
                     }
                 }
                 if (this.pushMode === Character_PushMode.PUSHED) {
+                    let thisVec2 = this.tempVec2;
+                    let thisChar = this;
+                    let r = (this.halfWidth + this.halfHeight) / 2;
+                    Character.forEach(function (character) {
+                        if (character === thisChar)
+                            return;
+                        let charR = (character.halfWidth + character.halfHeight) / 2;
+                        character.getGlobalPosition(thisVec2);
+                        let dx = x - thisVec2.x;
+                        let dy = foot - character.getFoot();
+                        let mag2 = M.sqrMagnitude(dx, dy);
+                        if (mag2 <= (r + charR) * (r + charR)) {
+                            let mag = Math.sqrt(mag2);
+                            let speed = thisChar.pushSpeed * (r + charR - mag) / (r + charR);
+                            thisChar.windX = dx / mag * speed;
+                            thisChar.windY = dy / mag * speed;
+                        }
+                    });
                 }
                 this.vx = vx;
                 this.vy = vy;

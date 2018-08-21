@@ -105,6 +105,11 @@ namespace Comps {
             return this._actionInfos[index];
         }
 
+        /**
+         * The (max) speed which a character will get pushed by another character
+         */
+        pushSpeed: number = 90;
+
         knockbackFriction: number = 600;
 
         // Mercy invincibility properties: 
@@ -493,8 +498,29 @@ namespace Comps {
 
             // being pushed
             if (this.pushMode === Character_PushMode.PUSHED) {
+                
+                let thisVec2: Vec2 = this.tempVec2;
+                let thisChar: Character = this;
+                let r: number = (this.halfWidth + this.halfHeight) / 2;
+                Character.forEach(function (character: Character): void {
 
-                // TODO: being pushed
+                    if (character === thisChar) return;
+
+                    let charR: number = (character.halfWidth + character.halfHeight) / 2;
+                    character.getGlobalPosition(thisVec2);
+
+                    let dx: number = x - thisVec2.x;
+                    let dy: number = foot - character.getFoot();
+                    let mag2: number = M.sqrMagnitude(dx, dy);
+                    if (mag2 <= (r + charR) * (r + charR)) {
+                        // close enough to be pushed
+                        let mag: number = Math.sqrt(mag2);
+                        let speed: number = thisChar.pushSpeed * (r + charR - mag) / (r + charR);
+                        thisChar.windX = dx / mag * speed;
+                        thisChar.windY = dy / mag * speed;
+                    }
+
+                });
 
             }
 

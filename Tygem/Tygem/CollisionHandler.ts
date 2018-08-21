@@ -451,6 +451,16 @@ namespace Collision {
 
 
 
+            // reset Actor wind
+            Actor.forEach(
+                function (actor: Actor): void {
+                    actor.windX = 0;
+                    actor.windY = 0;
+                }
+            );
+
+
+
             // recycle collision responses
             Handler.collisionsPrevFrame.forEach(
                 function (response: Response): void {
