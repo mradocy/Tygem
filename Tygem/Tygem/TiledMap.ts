@@ -521,7 +521,8 @@ namespace TiledMap {
                 this.tileInfos.push(ti);
             }
             if (tilesetJSON.tileproperties != undefined) {
-                for (var id in tilesetJSON.tileproperties) {
+                for (var idAny in tilesetJSON.tileproperties) {
+                    let id: number = Number.parseFloat(idAny);
                     let tileInfo: TileInfo = this.tileInfos[id];
                     let props: any = tilesetJSON.tileproperties[id];
 
