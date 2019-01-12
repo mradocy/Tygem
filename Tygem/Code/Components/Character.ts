@@ -96,13 +96,38 @@ namespace Comps {
             this._actions[index] = actionInstance;
         }
         /**
-         * Gets the Actions.Info at the given index.
+         * Gets the Actions.Info at the given index.  Returns null if there's no action at the index.
          */
         getActionInfo = (index: number): Actions.Info => {
             if (index < 0 || index >= this._actionInfos.length)
                 return null;
 
             return this._actionInfos[index];
+        }
+
+        /**
+         * Gets position to spawn an action in the global space.
+         * @param direction The given direction will be the "side" of the actor's box.  Set to Direction.NONE for position to be the center.
+         * @param outPos If given, this Vec2 will be filled instead of creating a new Vec2 (and null will be returned instead).
+         */
+        getActionPosition = (direction: Direction, outPos: Vec2 = null): Vec2 => {
+            let localX: number = this.offsetX;
+            let localY: number = this.offsetY;
+            switch (direction) {
+                case Direction.LEFT:
+                    localX -= this.halfWidth;
+                    break;
+                case Direction.UP:
+                    localY -= this.halfHeight;
+                    break;
+                case Direction.RIGHT:
+                    localX += this.halfWidth;
+                    break;
+                case Direction.DOWN:
+                    localY += this.halfHeight;
+                    break;
+            }
+            return this.transform.localToGlobal(localX, localY, outPos);
         }
 
         /**
@@ -516,8 +541,13 @@ namespace Comps {
                         // close enough to be pushed
                         let mag: number = Math.sqrt(mag2);
                         let speed: number = thisChar.pushSpeed * (r + charR - mag) / (r + charR);
-                        thisChar.windX = dx / mag * speed;
-                        thisChar.windY = dy / mag * speed;
+                        if (mag > 0.000001) {
+                            thisChar.windX = dx / mag * speed;
+                            thisChar.windY = dy / mag * speed;
+                        } else {
+                            thisChar.windX = speed;
+                            thisChar.windY = 0;
+                        }
                     }
 
                 });

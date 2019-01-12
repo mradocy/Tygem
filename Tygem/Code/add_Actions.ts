@@ -13,7 +13,9 @@ Actions.addActionInfo({
     name: "Sword Slash",
     ctor: Actions.SwordSlash,
 
-    description: "Slashes foes with a sword."
+    description: "Slashes foes with a sword.",
+
+    estRange: 30
 
 });
 

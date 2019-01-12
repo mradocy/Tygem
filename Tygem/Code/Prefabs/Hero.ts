@@ -25,6 +25,7 @@ namespace Prefabs {
         go.addComponent(Comps.CameraFollow);
 
 
+        let characterGizmo: Comps.CharacterGizmo = go.addComponent(Comps.CharacterGizmo);
         //let actorGizmo: ActorGizmo = go.addComponent(ActorGizmo);
         
         let tdas: Comps.TDActorShadow = go.addComponent(Comps.TDActorShadow);

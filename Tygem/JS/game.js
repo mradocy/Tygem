@@ -30,6 +30,12 @@ class Vec2 {
         this.x = x;
         this.y = y;
     }
+    get x() {
+        return this._x;
+    }
+    set x(value) {
+        this._x = value;
+    }
     static distance(v1, v2) {
         return Math.sqrt((v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y));
     }
@@ -3166,7 +3172,8 @@ var TiledMap;
                     this.tileInfos.push(ti);
                 }
                 if (tilesetJSON.tileproperties != undefined) {
-                    for (var id in tilesetJSON.tileproperties) {
+                    for (var idAny in tilesetJSON.tileproperties) {
+                        let id = Number.parseFloat(idAny);
                         let tileInfo = this.tileInfos[id];
                         let props = tilesetJSON.tileproperties[id];
                         tileInfo.customProperties = props;
@@ -7295,6 +7302,25 @@ var Comps;
                     return null;
                 return this._actionInfos[index];
             };
+            this.getActionPosition = (direction, outPos = null) => {
+                let localX = this.offsetX;
+                let localY = this.offsetY;
+                switch (direction) {
+                    case Direction.LEFT:
+                        localX -= this.halfWidth;
+                        break;
+                    case Direction.UP:
+                        localY -= this.halfHeight;
+                        break;
+                    case Direction.RIGHT:
+                        localX += this.halfWidth;
+                        break;
+                    case Direction.DOWN:
+                        localY += this.halfHeight;
+                        break;
+                }
+                return this.transform.localToGlobal(localX, localY, outPos);
+            };
             this.pushSpeed = 90;
             this.knockbackFriction = 600;
             this.mercyInvincibilityDuration = .4;
@@ -7580,8 +7606,14 @@ var Comps;
                         if (mag2 <= (r + charR) * (r + charR)) {
                             let mag = Math.sqrt(mag2);
                             let speed = thisChar.pushSpeed * (r + charR - mag) / (r + charR);
-                            thisChar.windX = dx / mag * speed;
-                            thisChar.windY = dy / mag * speed;
+                            if (mag > 0.000001) {
+                                thisChar.windX = dx / mag * speed;
+                                thisChar.windY = dy / mag * speed;
+                            }
+                            else {
+                                thisChar.windX = speed;
+                                thisChar.windY = 0;
+                            }
                         }
                     });
                 }
@@ -7875,6 +7907,14 @@ var Actions;
             addInfoError("info.description must be a string", id);
             return;
         }
+        if (info.estRange == undefined) {
+            addInfoError("info.estRange is undefined or null", id);
+            return;
+        }
+        if (typeof info.estRange !== "number") {
+            addInfoError("info.estRange must be a number", id);
+            return;
+        }
         map[idN] = info;
     }
     Actions.addActionInfo = addActionInfo;
@@ -7992,7 +8032,8 @@ Actions.addActionInfo({
     id: Actions.ID.SWORD_SLASH,
     name: "Sword Slash",
     ctor: Actions.SwordSlash,
-    description: "Slashes foes with a sword."
+    description: "Slashes foes with a sword.",
+    estRange: 30
 });
 var Comps;
 (function (Comps) {
@@ -8097,6 +8138,36 @@ var Comps;
         }
     }
     Comps.CameraFollow = CameraFollow;
+})(Comps || (Comps = {}));
+var Comps;
+(function (Comps) {
+    class CharacterGizmo extends DrawerComponent {
+        constructor() {
+            super();
+            this.onStart = () => {
+                this.character = this.getComponent(Comps.Character);
+            };
+            this.estRangeColor = "gray";
+            this.draw = (context) => {
+                if (this.character === null) {
+                    console.error("CharacterGizmo needs Character as a sibling component");
+                    return;
+                }
+                let action = this.character.getActionInfo(0);
+                if (action !== null) {
+                    context.beginPath();
+                    context.strokeStyle = this.estRangeColor;
+                    context.lineWidth = 1;
+                    context.arc(this.character.offsetX, this.character.offsetY, action.estRange, 0, Math.PI * 2);
+                    context.stroke();
+                }
+            };
+            this.character = null;
+            this.name = "CharacterGizmo";
+            this.componentProperties.requireComponent(Comps.Character);
+        }
+    }
+    Comps.CharacterGizmo = CharacterGizmo;
 })(Comps || (Comps = {}));
 var Comps;
 (function (Comps) {
@@ -8641,6 +8712,7 @@ var Prefabs;
         character.setAction(0, Actions.ID.SWORD_SLASH);
         character.enableInput();
         go.addComponent(Comps.CameraFollow);
+        let characterGizmo = go.addComponent(Comps.CharacterGizmo);
         let tdas = go.addComponent(Comps.TDActorShadow);
         tdas.setSize(0, 4, 5, 2);
         return go;

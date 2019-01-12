@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -42,6 +42,7 @@
     <TypeScriptCompile Include="Code\Components\ArrowTestPlatController.ts" />
     <TypeScriptCompile Include="Code\Components\CameraFollow.ts" />
     <TypeScriptCompile Include="Code\Components\Character.ts" />
+    <TypeScriptCompile Include="Code\Components\CharacterGizmo.ts" />
     <TypeScriptCompile Include="Code\Components\ControlCameraWithWASD.ts" />
     <TypeScriptCompile Include="Code\Components\DotFollowsMouse.ts" />
     <TypeScriptCompile Include="Code\Components\DotGraphic.ts" />

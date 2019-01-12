@@ -17,6 +17,11 @@ namespace Actions {
         name: string;
         description: string;
 
+        /**
+         * Estimated range of the action.  Used for AI.
+         */
+        estRange: number;
+
         ctor: new (character: Comps.Character) => Actions.Base;
 
     }
@@ -87,6 +92,16 @@ namespace Actions {
         }
         if (typeof info.description !== "string") {
             addInfoError("info.description must be a string", id);
+            return;
+        }
+
+        // checking estRange
+        if (info.estRange == undefined) {
+            addInfoError("info.estRange is undefined or null", id);
+            return;
+        }
+        if (typeof info.estRange !== "number") {
+            addInfoError("info.estRange must be a number", id);
             return;
         }
 
